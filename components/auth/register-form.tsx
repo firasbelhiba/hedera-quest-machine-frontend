@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Image from 'next/image';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { QuestService } from '@/lib/services';
 import type { User } from '@/lib/types';
@@ -63,8 +64,8 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
-        <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4">
-          <div className="text-white font-bold text-xl">HQ</div>
+        <div className="mx-auto mb-4 w-16 h-16 relative">
+          <Image src="/logo.png" alt="Hedera Quest" fill className="object-contain" />
         </div>
         <CardTitle className="text-2xl">Join Hedera Quest</CardTitle>
         <p className="text-muted-foreground">Create your account and start learning</p>

@@ -16,6 +16,7 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
+import Image from 'next/image';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -148,6 +149,10 @@ export function Header({ onMenuClick }: HeaderProps) {
           <Menu className="h-5 w-5" />
         </Button>
         
+        <div className="relative w-8 h-8 hidden lg:block">
+          <Image src="/logo.png" alt="Hedera Quest" fill className="object-contain" />
+        </div>
+
         <div className="relative w-64">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input

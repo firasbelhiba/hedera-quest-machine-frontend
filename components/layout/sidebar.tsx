@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import {
   Trophy,
@@ -51,15 +52,11 @@ export function Sidebar({ isCollapsed, onToggle, userRole = 'user' }: SidebarPro
         isCollapsed ? 'w-16' : 'w-64'
       )}
     >
-      <div className="p-4 border-b flex items-center justify-between">
-        {!isCollapsed && (
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-lg flex items-center justify-center">
-              <Trophy className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-bold text-lg">Hedera Quest</span>
-          </div>
-        )}
+		<div className="p-4 border-b flex items-center justify-between">
+			<div className="flex items-center space-x-2">
+				<Image src="/logo.png" alt="Hedera Quest" width={32} height={32} className="rounded" />
+				{!isCollapsed && <span className="font-bold text-lg">Hedera Quest</span>}
+			</div>
         <button
           onClick={onToggle}
           className="p-1 rounded-md hover:bg-muted transition-colors"
