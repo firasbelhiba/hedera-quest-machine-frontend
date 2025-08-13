@@ -33,6 +33,13 @@ export class QuestService {
     return user;
   }
 
+  static async logout(): Promise<void> {
+    if (useApi()) {
+      await ApiAuth.logout();
+      return;
+    }
+  }
+
   static async register(userData: {
     name: string;
     email: string;

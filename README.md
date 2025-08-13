@@ -144,6 +144,7 @@ Add these to your `.env.local`:
 ```
 NEXT_PUBLIC_API_URL=your-api-endpoint
 NEXT_PUBLIC_HEDERA_NETWORK=testnet
+NEXT_PUBLIC_USE_API=false
 ```
 
 ## 🌐 Hedera Integration

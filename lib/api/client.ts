@@ -11,23 +11,31 @@ export type ApiError = {
   details?: unknown;
 };
 
+const isBrowser = typeof window !== 'undefined';
+
 export const tokenStorage = {
   getAccessToken(): string | undefined {
+    if (!isBrowser) return undefined;
     return Cookies.get(ACCESS_TOKEN_KEY);
   },
   setAccessToken(token: string) {
+    if (!isBrowser) return;
     Cookies.set(ACCESS_TOKEN_KEY, token, { sameSite: 'lax' });
   },
   clearAccessToken() {
+    if (!isBrowser) return;
     Cookies.remove(ACCESS_TOKEN_KEY);
   },
   getRefreshToken(): string | undefined {
+    if (!isBrowser) return undefined;
     return Cookies.get(REFRESH_TOKEN_KEY);
   },
   setRefreshToken(token: string) {
+    if (!isBrowser) return;
     Cookies.set(REFRESH_TOKEN_KEY, token, { sameSite: 'lax' });
   },
   clearRefreshToken() {
+    if (!isBrowser) return;
     Cookies.remove(REFRESH_TOKEN_KEY);
   },
   clearAll() {

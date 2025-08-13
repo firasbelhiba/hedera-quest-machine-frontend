@@ -75,11 +75,15 @@ export function SubmissionForm({ quest, onSubmit, onCancel }: SubmissionFormProp
     setError(null);
 
     try {
-      // Mock submission - replace with actual service call
-      await QuestService.submitQuest(quest.id, 'current-user-id', {
-        type: data.type,
-        ...data
-      });
+      // Build content explicitly to satisfy SubmissionContent typing
+      const content: any = { type: (data as any).type };
+      if (quest.submissionType === 'url') content.url = (data as any).url;
+      if (quest.submissionType === 'text') content.text = (data as any).text;
+      if (quest.submissionType === 'transaction-id') content.transactionId = (data as any).transactionId;
+      if (quest.submissionType === 'account-id') content.accountId = (data as any).accountId;
+      if (quest.submissionType === 'file') content.fileName = (data as any).fileName;
+
+      await QuestService.submitQuest(quest.id, 'current-user-id', content);
       onSubmit();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Submission failed');
@@ -148,11 +152,10 @@ export function SubmissionForm({ quest, onSubmit, onCancel }: SubmissionFormProp
               <Input
                 id="url"
                 placeholder="https://example.com"
-                {...register('url')}
-                error={errors.url?.message}
+                {...(register as any)('url')}
               />
-              {errors.url && (
-                <p className="text-sm text-destructive mt-1">{errors.url.message}</p>
+              {(errors as any).url && (
+                <p className="text-sm text-destructive mt-1">{(errors as any).url.message}</p>
               )}
             </div>
           )}
@@ -164,10 +167,10 @@ export function SubmissionForm({ quest, onSubmit, onCancel }: SubmissionFormProp
                 id="text"
                 placeholder="Enter your detailed response..."
                 rows={6}
-                {...register('text')}
+                {...(register as any)('text')}
               />
-              {errors.text && (
-                <p className="text-sm text-destructive mt-1">{errors.text.message}</p>
+              {(errors as any).text && (
+                <p className="text-sm text-destructive mt-1">{(errors as any).text.message}</p>
               )}
             </div>
           )}
@@ -178,10 +181,10 @@ export function SubmissionForm({ quest, onSubmit, onCancel }: SubmissionFormProp
               <Input
                 id="transactionId"
                 placeholder="0.0.123456@1234567890.123456789"
-                {...register('transactionId')}
+                {...(register as any)('transactionId')}
               />
-              {errors.transactionId && (
-                <p className="text-sm text-destructive mt-1">{errors.transactionId.message}</p>
+              {(errors as any).transactionId && (
+                <p className="text-sm text-destructive mt-1">{(errors as any).transactionId.message}</p>
               )}
               <p className="text-xs text-muted-foreground mt-1">
                 You can find this in HashScan or your wallet transaction history
@@ -195,10 +198,10 @@ export function SubmissionForm({ quest, onSubmit, onCancel }: SubmissionFormProp
               <Input
                 id="accountId"
                 placeholder="0.0.123456"
-                {...register('accountId')}
+                {...(register as any)('accountId')}
               />
-              {errors.accountId && (
-                <p className="text-sm text-destructive mt-1">{errors.accountId.message}</p>
+              {(errors as any).accountId && (
+                <p className="text-sm text-destructive mt-1">{(errors as any).accountId.message}</p>
               )}
               <p className="text-xs text-muted-foreground mt-1">
                 Format: 0.0.XXXXXX (found in your wallet or HashScan)
@@ -212,10 +215,10 @@ export function SubmissionForm({ quest, onSubmit, onCancel }: SubmissionFormProp
               <Input
                 id="fileName"
                 placeholder="Describe your uploaded file"
-                {...register('fileName')}
+                {...(register as any)('fileName')}
               />
-              {errors.fileName && (
-                <p className="text-sm text-destructive mt-1">{errors.fileName.message}</p>
+              {(errors as any).fileName && (
+                <p className="text-sm text-destructive mt-1">{(errors as any).fileName.message}</p>
               )}
               <div className="mt-2 p-4 border-2 border-dashed rounded-lg text-center">
                 <Upload className="w-8 h-8 mx-auto text-muted-foreground mb-2" />

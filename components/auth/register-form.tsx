@@ -10,7 +10,8 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { QuestService } from '@/lib/services';
-import { Eye, EyeOff, Mail, Lock, User, Wallet, AlertCircle, CheckCircle } from 'lucide-react';
+import type { User } from '@/lib/types';
+import { Eye, EyeOff, Mail, Lock, User as UserIcon, Wallet, AlertCircle, CheckCircle } from 'lucide-react';
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -74,7 +75,7 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
           <div className="space-y-2">
             <Label htmlFor="name">Full Name</Label>
             <div className="relative">
-              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 id="name"
                 type="text"

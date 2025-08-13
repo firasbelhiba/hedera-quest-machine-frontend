@@ -147,7 +147,7 @@ export default function ProfilePage() {
                     <Input
                       id="name"
                       {...register('name')}
-                      error={errors.name?.message}
+                      
                     />
                     {errors.name && (
                       <p className="text-sm text-destructive mt-1">{errors.name.message}</p>
@@ -160,7 +160,7 @@ export default function ProfilePage() {
                       id="email"
                       type="email"
                       {...register('email')}
-                      error={errors.email?.message}
+                      
                     />
                     {errors.email && (
                       <p className="text-sm text-destructive mt-1">{errors.email.message}</p>
@@ -173,7 +173,7 @@ export default function ProfilePage() {
                   <Input
                     id="hederaAccountId"
                     {...register('hederaAccountId')}
-                    error={errors.hederaAccountId?.message}
+                    
                   />
                   {errors.hederaAccountId && (
                     <p className="text-sm text-destructive mt-1">{errors.hederaAccountId.message}</p>

@@ -71,5 +71,8 @@
     "vaul": "^0.9.9",
     "zod": "^4.0.17",
     "zustand": "^5.0.7"
+  },
+  "devDependencies": {
+    "@types/js-cookie": "^3.0.6"
   }
 }

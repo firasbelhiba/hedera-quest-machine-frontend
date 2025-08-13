@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { BadgeCollection } from '@/components/badges/badge-display';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Trophy, Target, Calendar, TrendingUp, Star, Siren as Fire, Award, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { Trophy, Target, Calendar, TrendingUp, Star, Siren as Fire, Award, Clock, CheckCircle, XCircle, AlertCircle, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export default function ProgressPage() {

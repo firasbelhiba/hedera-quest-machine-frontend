@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { User, Quest, Submission, FilterOptions, Theme } from './types';
+import { User, Quest, Submission, FilterOptions } from './types';
 import { QuestService } from './services';
 
 interface AppState {
@@ -76,6 +76,8 @@ const useStore = create<AppState>((set, get) => ({
   },
 
   logout: () => {
+    // Fire and forget; state clears regardless of API usage
+    QuestService.logout().catch(() => {});
     set({ user: null, isAuthenticated: false });
   },
 
