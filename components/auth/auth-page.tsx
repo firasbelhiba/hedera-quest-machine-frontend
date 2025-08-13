@@ -21,9 +21,6 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
         <div className="text-white space-y-8 text-center lg:text-left">
           <div className="space-y-4">
             <div className="flex items-center justify-center lg:justify-start gap-3">
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-400 to-cyan-400 rounded-xl flex items-center justify-center">
-                <Trophy className="w-7 h-7 text-white" />
-              </div>
               <h1 className="text-4xl font-bold">Hedera Quest</h1>
             </div>
             <p className="text-xl text-purple-200">
@@ -66,7 +63,7 @@ export function AuthPage({ onAuthSuccess }: AuthPageProps) {
           </div>
 
           <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6">
-            <h3 className="font-semibold mb-3">What you'll learn:</h3>
+            <h3 className="font-semibold mb-3">What you&apos;ll learn:</h3>
             <div className="grid grid-cols-2 gap-2 text-sm">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
