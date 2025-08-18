@@ -23,14 +23,25 @@ export class QuestService {
   }
 
   // Auth Services
-  static async login(email: string, password: string): Promise<User> {
+  static async login(email: string, password: string): Promise<{ user: User; isAdmin: boolean }> {
+    console.log('QuestService.login called with:', { email, password });
+    console.log('useApi():', useApi());
+    
     if (useApi()) {
+      console.log('Using API login');
       return ApiAuth.login({ email, password });
     }
+    
+    console.log('Using mock login');
     await this.delay();
     const user = mockUsers.find(u => u.email === email);
+    console.log('Found user:', user);
     if (!user) throw new Error('Invalid email or password');
-    return user;
+    
+    // For mock data, we'll accept any password for demo purposes
+    // In a real app, you'd verify the password hash here
+    console.log('Mock login successful for:', user.email);
+    return { user, isAdmin: user.role === 'admin' };
   }
 
   static async logout(): Promise<void> {
@@ -47,7 +58,12 @@ export class QuestService {
     hederaAccountId: string;
   }): Promise<User> {
     if (useApi()) {
-      return ApiAuth.register(userData);
+      // Add confirmPassword to match RegisterRequest type
+      const registerData = {
+        ...userData,
+        confirmPassword: userData.password // For API compatibility
+      };
+      return ApiAuth.register(registerData);
     }
     await this.delay();
     const existingUser = mockUsers.find(u => u.email === userData.email);
@@ -77,15 +93,75 @@ export class QuestService {
   }
 
   static async getCurrentUser(): Promise<User | null> {
+    console.log('getCurrentUser called');
+    
     if (useApi()) {
       try {
-        const me = await ApiAuth.me();
-        return me;
-      } catch {
+        console.log('Using API getCurrentUser');
+        const profileData = await ApiAuth.me();
+        console.log('Profile data received:', profileData);
+        
+        // Convert API response to User object
+        const user: User = {
+          id: String(profileData.admin.id),
+          name: profileData.admin.name,
+          email: profileData.admin.email,
+          avatar: '/logo.png',
+          hederaAccountId: '',
+          points: 0, // These fields might need separate API calls
+          level: 1,
+          streak: 0,
+          joinedAt: profileData.admin.created_at,
+          role: profileData.is_admin ? 'admin' : 'user',
+          badges: [],
+          completedQuests: []
+        };
+        
+        return user;
+      } catch (error) {
+        console.error('Error fetching current user:', error);
+        // If API fails, fall back to localStorage check
+        const token = localStorage.getItem('auth_token');
+        if (token) {
+          console.log('Falling back to localStorage token check');
+          return {
+            id: '1',
+            name: 'User',
+            email: 'user@example.com',
+            avatar: '/logo.png',
+            hederaAccountId: '',
+            points: 1250,
+            level: 3,
+            streak: 7,
+            joinedAt: new Date().toISOString(),
+            role: 'user',
+            badges: [],
+            completedQuests: ['quest-1', 'quest-2', 'quest-3']
+          };
+        }
         return null;
       }
     }
-    await this.delay();
+    
+    // Mock data fallback
+    console.log('Using mock getCurrentUser');
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      return {
+        id: '1',
+        name: 'User',
+        email: 'user@example.com',
+        avatar: '/logo.png',
+        hederaAccountId: '',
+        points: 1250,
+        level: 3,
+        streak: 7,
+        joinedAt: new Date().toISOString(),
+        role: 'user',
+                    badges: [],
+        completedQuests: ['quest-1', 'quest-2', 'quest-3']
+      };
+    }
     return null;
   }
 
@@ -102,14 +178,25 @@ export class QuestService {
 
   // Quest Services
   static async getQuests(filters?: FilterOptions): Promise<Quest[]> {
+    console.log('QuestService.getQuests called with filters:', filters);
+    console.log('useApi():', useApi());
+    
     if (useApi()) {
-      return QuestsApi.list(filters);
+      console.log('Using API getQuests');
+      try {
+        const quests = await QuestsApi.list(filters);
+        console.log('API quests received:', quests);
+        return quests;
+      } catch (error) {
+        console.error('Error fetching quests from API:', error);
+        throw error;
+      }
     }
     await this.delay();
     let filtered = [...mockQuests];
     if (filters) {
       if (filters.categories.length > 0) {
-        filtered = filtered.filter(q => filters.categories.includes(q.category));
+        filtered = filtered.filter(q => q.category && filters.categories.includes(q.category));
       }
       if (filters.difficulties.length > 0) {
         filtered = filtered.filter(q => filters.difficulties.includes(q.difficulty));
@@ -133,23 +220,60 @@ export class QuestService {
     return mockQuests.find(q => q.id === id) || null;
   }
 
-  static async createQuest(quest: Omit<Quest, 'id' | 'createdAt' | 'updatedAt' | 'completions'>): Promise<Quest> {
+  static async createQuest(quest: {
+    title: string;
+    description: string;
+    reward: number;
+    difficulty: 'easy' | 'medium' | 'hard' | 'expert';
+    status?: 'active' | 'completed' | 'expired' | 'draft';
+    startDate?: string;
+    endDate?: string;
+    maxParticipants?: number;
+    badgeIds?: number[];
+    platform_type?: string;
+    interaction_type?: string;
+  }): Promise<Quest> {
+    console.log('QuestService.createQuest called with:', quest);
+    console.log('useApi():', useApi());
+    
     if (useApi()) {
-      return QuestsApi.create(quest);
+      console.log('Using API createQuest');
+      try {
+        const newQuest = await QuestsApi.create(quest);
+        console.log('API quest created:', newQuest);
+        return newQuest;
+      } catch (error) {
+        console.error('Error creating quest via API:', error);
+        throw error;
+      }
     }
+    
+    console.log('Using mock createQuest');
     await this.delay();
     const newQuest: Quest = {
       ...quest,
+      difficulty: quest.difficulty as any, // Cast to avoid type issues
       id: Date.now().toString(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      completions: 0
+      completions: 0,
+      currentParticipants: 0
     };
     mockQuests.push(newQuest);
     return newQuest;
   }
 
-  static async updateQuest(id: string, updates: Partial<Quest>): Promise<Quest> {
+  static async updateQuest(id: string, updates: {
+    title?: string;
+    description?: string;
+    reward?: number;
+    difficulty?: 'easy' | 'medium' | 'hard' | 'expert';
+    status?: 'active' | 'completed' | 'expired' | 'draft';
+    startDate?: string;
+    endDate?: string;
+    maxParticipants?: number;
+    badgeIds?: number[];
+  }): Promise<Quest> {
     if (useApi()) {
       return QuestsApi.update(id, updates);
     }
@@ -159,6 +283,22 @@ export class QuestService {
     mockQuests[questIndex] = { 
       ...mockQuests[questIndex], 
       ...updates, 
+      updatedAt: new Date().toISOString() 
+    };
+    return mockQuests[questIndex];
+  }
+
+  static async activateQuest(id: string): Promise<Quest> {
+    if (useApi()) {
+      return QuestsApi.activate(id);
+    }
+    await this.delay();
+    const questIndex = mockQuests.findIndex(q => q.id === id);
+    if (questIndex === -1) throw new Error('Quest not found');
+    mockQuests[questIndex] = { 
+      ...mockQuests[questIndex], 
+      status: 'active',
+      isActive: true,
       updatedAt: new Date().toISOString() 
     };
     return mockQuests[questIndex];
@@ -235,6 +375,15 @@ export class QuestService {
     return mockBadges;
   }
 
+  static async getAllBadges(): Promise<Badge[]> {
+    if (useApi()) {
+      const response = await BadgesApi.list();
+      return response.data;
+    }
+    await this.delay();
+    return mockBadges;
+  }
+
   static async awardBadge(userId: string, badgeId: string): Promise<Badge> {
     if (useApi()) {
       return BadgesApi.award(userId, badgeId);
@@ -273,6 +422,11 @@ export class QuestService {
 
   // Analytics Services
   static async getDashboardStats(): Promise<DashboardStats> {
+    if (useApi()) {
+      // For now, return mock data since there's no API endpoint for dashboard stats
+      await this.delay();
+      return mockDashboardStats;
+    }
     await this.delay();
     return mockDashboardStats;
   }

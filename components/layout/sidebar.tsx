@@ -16,7 +16,8 @@ import {
   FileText,
   Calendar,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Award
 } from 'lucide-react';
 
 const navigation = [
@@ -30,6 +31,7 @@ const navigation = [
 const adminNavigation = [
   { name: 'Admin Dashboard', href: '/admin', icon: Shield },
   { name: 'Manage Quests', href: '/admin/quests', icon: FileText },
+  { name: 'Manage Badges', href: '/admin/badges', icon: Award },
   { name: 'Review Submissions', href: '/admin/submissions', icon: FileText },
   { name: 'Events', href: '/admin/events', icon: Calendar },
   { name: 'Settings', href: '/admin/settings', icon: Settings },
@@ -44,6 +46,7 @@ interface SidebarProps {
 export function Sidebar({ isCollapsed, onToggle, userRole = 'user' }: SidebarProps) {
   const pathname = usePathname();
   const isAdmin = userRole === 'admin' || userRole === 'moderator';
+  const isAdminPage = pathname.startsWith('/admin');
 
   return (
     <div
@@ -54,8 +57,7 @@ export function Sidebar({ isCollapsed, onToggle, userRole = 'user' }: SidebarPro
     >
 		<div className="p-4 border-b flex items-center justify-between">
 			<div className="flex items-center space-x-2">
-				<Image src="/logo.png" alt="Hedera Quest" width={32} height={32} className="rounded" />
-				{!isCollapsed && <span className="font-bold text-lg">Hedera Quest</span>}
+				<Image src="/logo.png" alt="Hedera Quest" width={40} height={40} className="rounded" />
 			</div>
         <button
           onClick={onToggle}
@@ -66,60 +68,92 @@ export function Sidebar({ isCollapsed, onToggle, userRole = 'user' }: SidebarPro
       </div>
 
       <nav className="flex-1 p-4 space-y-2">
-        {/* Main Navigation */}
-        <div className="space-y-1">
-          {navigation.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={cn(
-                  'flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                  isActive
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted',
-                  isCollapsed && 'justify-center px-2'
-                )}
-              >
-                <item.icon className={cn('h-5 w-5', !isCollapsed && 'mr-3')} />
-                {!isCollapsed && item.name}
-              </Link>
-            );
-          })}
-        </div>
-
-        {/* Admin Navigation */}
-        {isAdmin && (
+        {isAdminPage ? (
+          // Admin pages: Show only admin navigation
+          <div className="space-y-1">
+            {!isCollapsed && (
+              <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                Administration
+              </p>
+            )}
+            {adminNavigation.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={cn(
+                    'flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                    isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted',
+                    isCollapsed && 'justify-center px-2'
+                  )}
+                >
+                  <item.icon className={cn('h-5 w-5', !isCollapsed && 'mr-3')} />
+                  {!isCollapsed && item.name}
+                </Link>
+              );
+            })}
+          </div>
+        ) : (
+          // User pages: Show user navigation + admin section if admin
           <>
-            <div className="pt-4 border-t">
-              {!isCollapsed && (
-                <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-                  Administration
-                </p>
-              )}
-              <div className="space-y-1">
-                {adminNavigation.map((item) => {
-                  const isActive = pathname === item.href;
-                  return (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className={cn(
-                        'flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                        isActive
-                          ? 'bg-primary text-primary-foreground'
-                          : 'text-muted-foreground hover:text-foreground hover:bg-muted',
-                        isCollapsed && 'justify-center px-2'
-                      )}
-                    >
-                      <item.icon className={cn('h-5 w-5', !isCollapsed && 'mr-3')} />
-                      {!isCollapsed && item.name}
-                    </Link>
-                  );
-                })}
-              </div>
+            <div className="space-y-1">
+              {navigation.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={cn(
+                      'flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                      isActive
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted',
+                      isCollapsed && 'justify-center px-2'
+                    )}
+                  >
+                    <item.icon className={cn('h-5 w-5', !isCollapsed && 'mr-3')} />
+                    {!isCollapsed && item.name}
+                  </Link>
+                );
+              })}
             </div>
+
+            {/* Admin Navigation */}
+            {isAdmin && (
+              <>
+                <div className="pt-4 border-t">
+                  {!isCollapsed && (
+                    <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                      Administration
+                    </p>
+                  )}
+                  <div className="space-y-1">
+                    {adminNavigation.map((item) => {
+                      const isActive = pathname === item.href;
+                      return (
+                        <Link
+                          key={item.name}
+                          href={item.href}
+                          className={cn(
+                            'flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                            isActive
+                              ? 'bg-primary text-primary-foreground'
+                              : 'text-muted-foreground hover:text-foreground hover:bg-muted',
+                            isCollapsed && 'justify-center px-2'
+                          )}
+                        >
+                          <item.icon className={cn('h-5 w-5', !isCollapsed && 'mr-3')} />
+                          {!isCollapsed && item.name}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            )}
           </>
         )}
       </nav>

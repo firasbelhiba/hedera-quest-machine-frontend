@@ -1,255 +1,137 @@
 # Hedera Quest Machine
 
-A production-quality, gamified learning platform for the Hedera ecosystem. This template provides a fully functional frontend with comprehensive quest management, user progress tracking, and admin capabilities.
+A gamified learning platform for Hedera blockchain development.
 
-## 🚀 Features
+## Features
 
-### User Features
-- **Quest Discovery**: Browse and filter quests by category, difficulty, and completion status
-- **Progress Tracking**: Personal dashboard with points, levels, streaks, and achievements
-- **Submission System**: Dynamic forms supporting URLs, text, files, and Hedera-specific data
-- **Leaderboard**: Competitive rankings with real-time updates
-- **Badge System**: Collectible achievements with rarity levels
-- **Profile Management**: Comprehensive user settings and Hedera account integration
+- **Quest System**: Complete challenges and earn points
+- **Badge System**: Earn badges for achievements
+- **Leaderboard**: Compete with other developers
+- **Admin Panel**: Manage quests, badges, and submissions
+- **User Profiles**: Track progress and achievements
 
-### Admin Features
-- **Dashboard Analytics**: Comprehensive metrics and visualizations
-- **Quest Management**: CRUD operations for quest creation and editing
-- **Submission Review**: Approval workflow with feedback system
-- **User Management**: Monitor user activity and progress
-- **Event Management**: Create hackathons, cohorts, and challenges
+## Badge Management
 
-### Technical Features
-- **Modern Stack**: Next.js 14, TypeScript, Tailwind CSS, shadcn/ui
-- **State Management**: Zustand for global state
-- **Form Handling**: React Hook Form with Zod validation
-- **Responsive Design**: Mobile-first approach with dark/light themes
-- **Mock Services**: Complete backend abstraction ready for API integration
+### Creating Badges
 
-## 🛠️ Technology Stack
+The platform includes a comprehensive badge management system for administrators. Badges can be created with the following properties:
 
-- **Framework**: Next.js 14 with TypeScript
-- **Styling**: Tailwind CSS + shadcn/ui components
+#### Required Fields:
+- **Name**: Badge name (max 100 characters)
+- **Description**: Badge description (max 500 characters)
+- **Max to Obtain**: Maximum number of times this badge can be earned (1-1000)
+- **Rarity**: Badge rarity level (common, rare, epic, legendary)
+- **Points**: Points awarded when badge is earned (0-10000)
+
+#### Optional Fields:
+- **Image URL**: URL to badge image
+- **Active Status**: Whether the badge is currently active
+
+#### Rarity Levels:
+- **Common**: Easily obtainable badges
+- **Rare**: Harder to obtain badges
+- **Epic**: Very rare and valuable badges
+- **Legendary**: Extremely rare and prestigious badges
+
+### API Endpoints
+
+#### Create Badge
+```
+POST /badges
+```
+
+**Request Body:**
+```json
+{
+  "name": "First Quest Badge",
+  "description": "Awarded for completing your first quest",
+  "maxToObtain": 1,
+  "rarity": "common",
+  "points": 10,
+  "image": "https://example.com/badge.png",
+  "isActive": true
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": 1,
+    "name": "First Quest Badge",
+    "description": "Awarded for completing your first quest",
+    "image": "https://example.com/badge.png",
+    "maxToObtain": 1,
+    "rarity": "common",
+    "points": 10,
+    "isActive": true,
+    "createdBy": 1,
+    "created_at": "2024-01-15T10:00:00.000Z",
+    "updated_at": "2024-01-15T10:00:00.000Z"
+  },
+  "message": "Badge created successfully by admin"
+}
+```
+
+### Usage
+
+1. Navigate to the Admin Panel
+2. Click on "Manage Badges" in the sidebar
+3. Use the "Create Badge" form to add new badges
+4. View and manage existing badges in the badges list
+
+### Components
+
+- `CreateBadgeForm`: Form component for creating new badges
+- `BadgeDisplay`: Reusable component for displaying badges
+- `AdminBadgesPage`: Admin page for badge management
+
+## Getting Started
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Set up environment variables:
+   ```bash
+   NEXT_PUBLIC_API_URL=your_api_url_here
+   ```
+
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Tech Stack
+
+- **Frontend**: Next.js 13, React 18, TypeScript
+- **Styling**: Tailwind CSS, shadcn/ui
+- **Forms**: React Hook Form, Zod validation
+- **HTTP Client**: Axios
 - **State Management**: Zustand
-- **Forms**: React Hook Form + Zod validation
 - **Icons**: Lucide React
-- **Charts**: Recharts
-- **Animations**: Framer Motion
 
-## 📁 Project Structure
+## Project Structure
 
 ```
+project/
 ├── app/                    # Next.js app directory
-│   ├── admin/             # Admin dashboard pages
-│   ├── quests/            # Quest-related pages
-│   └── ...                # Other pages
-├── components/            # Reusable UI components
-│   ├── layout/           # Layout components (Sidebar, Header)
-│   ├── quests/           # Quest-specific components
-│   ├── submissions/      # Submission forms and displays
-│   ├── badges/           # Badge display components
-│   └── ui/               # shadcn/ui components
-├── lib/                  # Core utilities and services
-│   ├── types.ts          # TypeScript type definitions
-│   ├── services.ts       # Mock service layer
-│   ├── store.ts          # Zustand state management
-│   ├── mock-data.ts      # Sample data for development
-│   └── utils.ts          # Utility functions
+│   ├── admin/             # Admin pages
+│   │   ├── badges/        # Badge management
+│   │   ├── quests/        # Quest management
+│   │   └── ...
+│   ├── quests/            # User quest pages
+│   └── ...
+├── components/            # Reusable components
+│   ├── admin/            # Admin-specific components
+│   ├── badges/           # Badge-related components
+│   └── ui/               # UI components
+├── lib/                  # Utilities and API
+│   ├── api/              # API client and endpoints
+│   └── types.ts          # TypeScript types
+└── ...
 ```
-
-## 🎯 Core Architecture
-
-### Service Layer Abstraction
-The application uses a complete service layer abstraction through `QuestService` class:
-- All data operations go through service methods
-- Easy transition from mock data to real APIs
-- Consistent error handling and response formatting
-- TypeScript interfaces match future API contracts
-
-### State Management
-Zustand provides lightweight, efficient state management:
-- Global user authentication state
-- Quest filters and selections
-- UI state (sidebar, theme, etc.)
-- Submission management
-
-### Component Organization
-Clean separation of concerns:
-- Layout components handle navigation and structure
-- Feature components focus on specific functionality
-- UI components are reusable and consistent
-- Business logic stays in services and stores
-
-## 🔧 Getting Started
-
-1. **Clone and Install**
-```bash
-git clone <repository-url>
-cd hedera-quest-machine
-npm install
-```
-
-2. **Development Server**
-```bash
-npm run dev
-```
-
-3. **Build for Production**
-```bash
-npm run build
-```
-
-## 🎨 Design System
-
-### Color Scheme
-- **Primary**: Purple gradient (Hedera brand)
-- **Secondary**: Cyan accent
-- **Success**: Green for completed states
-- **Warning**: Yellow for pending states
-- **Error**: Red for failed states
-
-### Typography
-- **Headings**: Inter font family, multiple weights
-- **Body**: 16px base with 150% line height
-- **Code**: Monospace for technical content
-
-### Component Library
-- **QuestCard**: Feature-rich cards with progress indicators
-- **BadgeDisplay**: Rarity-based badge showcase
-- **SubmissionForm**: Dynamic forms based on quest requirements
-- **LeaderboardRow**: Ranked entries with change indicators
-
-## 🔌 Backend Integration
-
-### API Contracts
-The service layer defines clear interfaces for backend integration:
-
-```typescript
-// Replace mock implementations in services.ts
-class QuestService {
-  static async getQuests(filters?: FilterOptions): Promise<Quest[]> {
-    // Replace with: return await api.get('/quests', { params: filters });
-    return mockQuests;
-  }
-  
-  static async submitQuest(questId: string, userId: string, content: SubmissionContent): Promise<Submission> {
-    // Replace with: return await api.post('/submissions', { questId, userId, content });
-    return newMockSubmission;
-  }
-}
-```
-
-### Environment Variables
-Add these to your `.env.local`:
-```
-NEXT_PUBLIC_API_URL=your-api-endpoint
-NEXT_PUBLIC_HEDERA_NETWORK=testnet
-NEXT_PUBLIC_USE_API=false
-```
-
-## 🌐 Hedera Integration
-
-### Account Validation
-Built-in validators for Hedera-specific data:
-```typescript
-QuestService.validateHederaAccountId('0.0.123456') // true
-QuestService.validateTransactionId('0.0.123456@1234567890.123456789') // true
-```
-
-### HashScan Integration
-Automatic URL generation for blockchain explorers:
-```typescript
-QuestService.generateHashScanUrl(accountId, 'testnet')
-QuestService.generateTransactionUrl(transactionId, 'testnet')
-```
-
-## 📱 Responsive Design
-
-### Breakpoints
-- **Mobile**: < 640px
-- **Tablet**: 640px - 1024px
-- **Desktop**: > 1024px
-
-### Mobile Optimizations
-- Touch-friendly 44px minimum tap targets
-- Collapsible navigation
-- Optimized form layouts
-- Swipe-friendly card interfaces
-
-## 🔐 Admin Features
-
-### Role-Based Access
-```typescript
-// Sidebar automatically shows admin sections
-<Sidebar userRole={user?.role} />
-
-// Route protection in pages
-if (user?.role !== 'admin') {
-  return <Unauthorized />;
-}
-```
-
-### Dashboard Analytics
-- User engagement metrics
-- Quest completion rates
-- Submission approval workflows
-- Category popularity analysis
-
-## 🎮 Gamification Elements
-
-### Progression System
-- **Points**: Earned through quest completion
-- **Levels**: Milestone-based progression
-- **Streaks**: Daily activity tracking
-- **Badges**: Achievement rewards with rarity tiers
-
-### Engagement Features
-- **Leaderboards**: Competitive rankings
-- **Progress Visualization**: Charts and progress bars
-- **Achievement Unlocks**: Badge collection system
-- **Social Features**: Public profiles and sharing
-
-## 🚀 Deployment
-
-### Build Optimization
-```bash
-npm run build
-```
-
-### Static Export (for CDN deployment)
-The app is configured for static export:
-```javascript
-// next.config.js
-module.exports = {
-  output: 'export',
-  images: { unoptimized: true }
-};
-```
-
-## 🤝 Contributing
-
-1. Follow the established component patterns
-2. Use TypeScript for all new code
-3. Follow the service layer abstraction
-4. Maintain responsive design principles
-5. Add proper error handling
-6. Update mock data as needed
-
-## 📄 License
-
-This project is open source and available under the MIT License.
-
----
-
-## 🎯 Next Steps
-
-1. **Backend Integration**: Replace mock services with real API calls
-2. **Authentication**: Implement proper user authentication
-3. **Real-time Updates**: Add WebSocket for live notifications
-4. **File Upload**: Implement actual file upload functionality
-5. **Payment Integration**: Add quest monetization features
-6. **Mobile App**: Consider React Native version
-7. **Analytics**: Integrate proper analytics tracking
-8. **Testing**: Add comprehensive test suite
-
-This template provides a solid foundation for building a production-ready Hedera learning platform. The clean architecture and comprehensive feature set make it ideal for hackathons, educational programs, and community initiatives.

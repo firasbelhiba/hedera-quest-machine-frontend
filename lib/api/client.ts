@@ -16,15 +16,19 @@ const isBrowser = typeof window !== 'undefined';
 export const tokenStorage = {
   getAccessToken(): string | undefined {
     if (!isBrowser) return undefined;
-    return Cookies.get(ACCESS_TOKEN_KEY);
+    // Check both cookie and localStorage for token
+    return Cookies.get(ACCESS_TOKEN_KEY) || localStorage.getItem('auth_token');
   },
   setAccessToken(token: string) {
     if (!isBrowser) return;
+    // Store in both cookie and localStorage for better persistence
     Cookies.set(ACCESS_TOKEN_KEY, token, { sameSite: 'lax' });
+    localStorage.setItem('auth_token', token);
   },
   clearAccessToken() {
     if (!isBrowser) return;
     Cookies.remove(ACCESS_TOKEN_KEY);
+    localStorage.removeItem('auth_token');
   },
   getRefreshToken(): string | undefined {
     if (!isBrowser) return undefined;
@@ -47,6 +51,22 @@ export const tokenStorage = {
 function toApiError(error: AxiosError): ApiError {
   const status = error.response?.status ?? 0;
   const data: any = error.response?.data ?? {};
+
+  // Enhanced error logging for debugging
+  console.error('API Error:', {
+    message: error.message,
+    code: error.code,
+    status: status,
+    responseData: data,
+    config: {
+      url: error.config?.url,
+      method: error.config?.method,
+      headers: error.config?.headers,
+      withCredentials: error.config?.withCredentials,
+      baseURL: error.config?.baseURL
+    }
+  });
+
   return {
     status,
     code: data.code,
@@ -70,7 +90,12 @@ function onRefreshed(token?: string) {
 export function createApiClient(baseURL: string): AxiosInstance {
   const instance = axios.create({
     baseURL,
-    withCredentials: true
+    withCredentials: false, // Disable credentials to avoid CORS preflight issues
+    timeout: 10000,
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
   });
 
   instance.interceptors.request.use((config) => {
@@ -78,7 +103,24 @@ export function createApiClient(baseURL: string): AxiosInstance {
     if (token) {
       config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
+      console.log('✅ Token found and added to request:', token.substring(0, 20) + '...');
+    } else {
+      console.log('❌ No token found in storage');
     }
+
+    // Set basic headers
+    config.headers = config.headers || {};
+    config.headers['Content-Type'] = 'application/json';
+    config.headers['Accept'] = 'application/json';
+
+    // Log request for debugging
+    console.log('API Request:', {
+      url: config.url,
+      method: config.method,
+      hasAuth: !!token,
+      data: config.data
+    });
+
     return config;
   });
 
@@ -115,7 +157,13 @@ export function createApiClient(baseURL: string): AxiosInstance {
           const refreshResponse = await axios.post(
             `${baseURL}/auth/refresh`,
             { refreshToken },
-            { withCredentials: true }
+            {
+              withCredentials: false,
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+              }
+            }
           );
           const newAccessToken: string | undefined = (refreshResponse.data as any)?.accessToken;
           if (newAccessToken) {
@@ -144,6 +192,8 @@ export function createApiClient(baseURL: string): AxiosInstance {
 }
 
 // Default instance using env var; update NEXT_PUBLIC_API_URL when API is ready
-export const api = createApiClient(process.env.NEXT_PUBLIC_API_URL || '/api');
+export const api = createApiClient((process.env.NEXT_PUBLIC_API_URL || 'https://hedera-quests.com').replace(/\/$/, ''));
+
+
 
 

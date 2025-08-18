@@ -1,132 +1,159 @@
 'use client';
 
-import { Badge as BadgeType, BadgeRarity } from '@/lib/types';
-import { Card, CardContent } from '@/components/ui/card';
+import { Badge as BadgeType } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
-import { Trophy, Star, Crown, Gem, Zap } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 interface BadgeDisplayProps {
   badge: BadgeType;
-  size?: 'sm' | 'md' | 'lg';
-  showDate?: boolean;
+  variant?: 'default' | 'compact' | 'detailed';
   className?: string;
+  showImage?: boolean;
 }
 
-const rarityConfig: Record<BadgeRarity, {
-  color: string;
-  icon: React.ComponentType<any>;
-  gradient: string;
-  glow: string;
-}> = {
-  common: {
-    color: 'text-gray-600 dark:text-gray-400',
-    icon: Trophy,
-    gradient: 'from-gray-400 to-gray-600',
-    glow: 'shadow-gray-500/20'
-  },
-  uncommon: {
-    color: 'text-green-600 dark:text-green-400',
-    icon: Star,
-    gradient: 'from-green-400 to-green-600',
-    glow: 'shadow-green-500/30'
-  },
-  rare: {
-    color: 'text-blue-600 dark:text-blue-400',
-    icon: Gem,
-    gradient: 'from-blue-400 to-blue-600',
-    glow: 'shadow-blue-500/30'
-  },
-  epic: {
-    color: 'text-purple-600 dark:text-purple-400',
-    icon: Crown,
-    gradient: 'from-purple-400 to-purple-600',
-    glow: 'shadow-purple-500/40'
-  },
-  legendary: {
-    color: 'text-yellow-600 dark:text-yellow-400',
-    icon: Zap,
-    gradient: 'from-yellow-400 via-orange-500 to-red-500',
-    glow: 'shadow-yellow-500/50'
-  }
+const rarityColors = {
+  common: 'bg-gray-100 text-gray-800 border-gray-200',
+  rare: 'bg-blue-100 text-blue-800 border-blue-200',
+  epic: 'bg-purple-100 text-purple-800 border-purple-200',
+  legendary: 'bg-yellow-100 text-yellow-800 border-yellow-200',
 };
 
-const sizeConfig = {
-  sm: {
-    container: 'w-16 h-16',
-    icon: 'w-6 h-6',
-    title: 'text-xs',
-    description: 'text-xs',
-    date: 'text-xs'
-  },
-  md: {
-    container: 'w-20 h-20',
-    icon: 'w-8 h-8',
-    title: 'text-sm',
-    description: 'text-xs',
-    date: 'text-xs'
-  },
-  lg: {
-    container: 'w-24 h-24',
-    icon: 'w-10 h-10',
-    title: 'text-base',
-    description: 'text-sm',
-    date: 'text-xs'
-  }
+const rarityGradients = {
+  common: 'from-gray-400 to-gray-600',
+  rare: 'from-blue-400 to-blue-600',
+  epic: 'from-purple-400 to-purple-600',
+  legendary: 'from-yellow-400 to-yellow-600',
 };
 
-export function BadgeDisplay({ badge, size = 'md', showDate = true, className }: BadgeDisplayProps) {
-  const rarity = rarityConfig[badge.rarity];
-  const sizeStyle = sizeConfig[size];
-  const IconComponent = rarity.icon;
-
-  return (
-    <div className={cn('group relative', className)}>
-      <Card className="transition-all duration-300 hover:scale-105 cursor-pointer">
-        <CardContent className="p-4 text-center">
-          {/* Badge Icon */}
-          <div className={cn(
-            'mx-auto rounded-full bg-gradient-to-br flex items-center justify-center mb-3 transition-all duration-300 group-hover:shadow-lg',
-            sizeStyle.container,
-            `bg-gradient-to-br ${rarity.gradient}`,
-            `group-hover:${rarity.glow}`
-          )}>
-            <IconComponent className={cn(sizeStyle.icon, 'text-white')} />
+export function BadgeDisplay({ 
+  badge, 
+  variant = 'default', 
+  className,
+  showImage = true 
+}: BadgeDisplayProps) {
+  if (variant === 'compact') {
+    return (
+      <div className={cn('flex items-center gap-2', className)}>
+        {showImage && badge.image && (
+          <div className="w-8 h-8 rounded-full bg-gradient-to-r overflow-hidden">
+            <img 
+              src={badge.image} 
+              alt={badge.name}
+              className="w-full h-full object-cover"
+            />
           </div>
+        )}
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium truncate">{badge.name}</p>
+          <Badge 
+            className={cn('text-xs', rarityColors[badge.rarity])}
+            variant="outline"
+          >
+            {badge.rarity}
+          </Badge>
+        </div>
+      </div>
+    );
+  }
 
-          {/* Badge Info */}
-          <div className="space-y-1">
-            <h3 className={cn('font-semibold', sizeStyle.title)}>
-              {badge.name}
-            </h3>
-            
-            <Badge 
-              variant="outline" 
-              className={cn('text-xs capitalize', rarity.color)}
-            >
+  if (variant === 'detailed') {
+    return (
+      <Card className={cn('hover:shadow-md transition-shadow', className)}>
+        <CardHeader className="pb-3">
+          <div className="flex items-start gap-3">
+            {showImage && (
+              <div className={cn(
+                'w-12 h-12 rounded-full bg-gradient-to-r flex items-center justify-center text-white font-bold text-lg',
+                rarityGradients[badge.rarity]
+              )}>
+                {badge.image ? (
+                  <img 
+                    src={badge.image} 
+                    alt={badge.name}
+                    className="w-full h-full object-cover rounded-full"
+                  />
+                ) : (
+                  badge.name.charAt(0).toUpperCase()
+                )}
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <CardTitle className="text-lg">{badge.name}</CardTitle>
+              <CardDescription className="line-clamp-2">
+                {badge.description}
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="flex flex-wrap gap-2 mb-3">
+            <Badge className={rarityColors[badge.rarity]}>
               {badge.rarity}
             </Badge>
-
-            {size === 'lg' && (
-              <p className={cn('text-muted-foreground', sizeStyle.description)}>
-                {badge.description}
-              </p>
+            {badge.points && (
+              <Badge variant="secondary">
+                {badge.points} pts
+              </Badge>
             )}
-
-            {showDate && (
-              <p className={cn('text-muted-foreground', sizeStyle.date)}>
-                Earned {new Date(badge.earnedAt).toLocaleDateString()}
-              </p>
+            {badge.maxToObtain && (
+              <Badge variant="outline">
+                Max: {badge.maxToObtain}
+              </Badge>
             )}
           </div>
+          {badge.earnedAt && (
+            <p className="text-sm text-muted-foreground">
+              Earned: {new Date(badge.earnedAt).toLocaleDateString()}
+            </p>
+          )}
         </CardContent>
       </Card>
+    );
+  }
 
-      {/* Legendary glow effect */}
-      {badge.rarity === 'legendary' && (
-        <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 opacity-20 blur-xl animate-pulse -z-10" />
-      )}
-    </div>
+  // Default variant
+  return (
+    <Card className={cn('hover:shadow-md transition-shadow', className)}>
+      <CardHeader className="pb-3">
+        <div className="flex items-center gap-3">
+          {showImage && (
+            <div className={cn(
+              'w-10 h-10 rounded-full bg-gradient-to-r flex items-center justify-center text-white font-bold',
+              rarityGradients[badge.rarity]
+            )}>
+              {badge.image ? (
+                <img 
+                  src={badge.image} 
+                  alt={badge.name}
+                  className="w-full h-full object-cover rounded-full"
+                />
+              ) : (
+                badge.name.charAt(0).toUpperCase()
+              )}
+            </div>
+          )}
+          <div className="flex-1 min-w-0">
+            <CardTitle className="text-base">{badge.name}</CardTitle>
+            <CardDescription className="line-clamp-1">
+              {badge.description}
+            </CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <div className="flex flex-wrap gap-2">
+          <Badge className={rarityColors[badge.rarity]}>
+            {badge.rarity}
+          </Badge>
+          {badge.points && (
+            <Badge variant="secondary">
+              {badge.points} pts
+            </Badge>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 

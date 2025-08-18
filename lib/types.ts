@@ -15,23 +15,39 @@ export interface User {
 }
 
 export interface Quest {
-  id: string;
+  id: string | number;
   title: string;
   description: string;
-  category: QuestCategory;
+  category?: QuestCategory;
   difficulty: Difficulty;
-  points: number;
-  estimatedTime: string;
-  requirements: string[];
-  submissionType: SubmissionType;
-  submissionInstructions: string;
-  isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
-  completions: number;
+  points?: number;
+  reward?: string;
+  estimatedTime?: string;
+  requirements?: string[];
+  submissionType?: SubmissionType;
+  submissionInstructions?: string;
+  isActive?: boolean;
+  status?: string;
+  createdAt?: string;
+  created_at?: string;
+  updatedAt?: string;
+  updated_at?: string;
+  completions?: number;
   maxCompletions?: number;
-  prerequisites: string[];
-  thumbnail: string;
+  maxParticipants?: number;
+  currentParticipants?: number;
+  prerequisites?: string[];
+  thumbnail?: string;
+  startDate?: string;
+  endDate?: string;
+  createdBy?: number;
+  creator?: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    username: string;
+  };
+  badges?: any[];
 }
 
 export interface Submission {
@@ -48,13 +64,20 @@ export interface Submission {
 }
 
 export interface Badge {
-  id: string;
+  id: string | number;
   name: string;
   description: string;
   rarity: BadgeRarity;
-  icon: string;
-  earnedAt: string;
-  category: string;
+  icon?: string;
+  image?: string | null;
+  earnedAt?: string;
+  category?: string;
+  maxToObtain?: number;
+  points?: number;
+  isActive?: boolean;
+  createdBy?: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Event {
@@ -86,7 +109,7 @@ export type SubmissionType = 'url' | 'text' | 'file' | 'transaction-id' | 'accou
 
 export type SubmissionStatus = 'pending' | 'approved' | 'rejected' | 'needs-revision';
 
-export type BadgeRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+export type BadgeRarity = 'common' | 'rare' | 'epic' | 'legendary';
 
 export type EventType = 'hackathon' | 'cohort' | 'challenge' | 'community-event';
 
@@ -124,4 +147,87 @@ export interface FilterOptions {
   difficulties: Difficulty[];
   search: string;
   showCompleted: boolean;
+}
+
+// Badge creation types
+export interface CreateBadgeRequest {
+  name: string;
+  description: string;
+  maxToObtain: number;
+  rarity: BadgeRarity;
+  points: number;
+  image?: string;
+  isActive?: boolean;
+}
+
+export interface CreateBadgeResponse {
+  success: boolean;
+  data: {
+    id: number;
+    name: string;
+    description: string;
+    image: string | null;
+    maxToObtain: number;
+    rarity: BadgeRarity;
+    points: number;
+    isActive: boolean;
+    createdBy: number;
+    created_at: string;
+    updated_at: string;
+  };
+  message: string;
+}
+
+export interface ListBadgesResponse {
+  success: boolean;
+  data: Badge[];
+  count: number;
+}
+
+export interface GetBadgeResponse {
+  success: boolean;
+  data: Badge;
+}
+
+export interface BadgeFilters {
+  rarity?: BadgeRarity;
+  isActive?: boolean;
+  createdBy?: number;
+}
+
+// Quest Update Types
+export interface UpdateQuestRequest {
+  title?: string;
+  description?: string;
+  reward?: number;
+  difficulty?: 'easy' | 'medium' | 'hard' | 'expert';
+  status?: 'active' | 'completed' | 'expired' | 'draft';
+  startDate?: string;
+  endDate?: string;
+  maxParticipants?: number;
+  badgeIds?: number[];
+}
+
+export interface UpdateQuestResponse {
+  success: boolean;
+  data: {
+    id: number;
+    title: string;
+    description: string;
+    reward: string;
+    difficulty: string;
+    status: string;
+    startDate: string;
+    endDate: string;
+    maxParticipants: number;
+    currentParticipants: number;
+    createdBy: number;
+    created_at: string;
+    updated_at: string;
+    badges: Array<{
+      id: number;
+      name: string;
+    }>;
+  };
+  message: string;
 }

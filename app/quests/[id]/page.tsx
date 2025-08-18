@@ -50,21 +50,26 @@ export default function QuestDetailPage() {
           QuestService.getQuest(questId),
           QuestService.getCurrentUser()
         ]);
+
+        // Handle the new API response format
+        const questDetails = questData.success ? questData.data : questData;
         
-        if (!questData) {
-          setError('Quest not found');
-          return;
+        if (!questDetails) {
+          throw new Error('Quest not found');
         }
         
-        setQuest(questData);
+        setQuest(questDetails);
         setUser(userData);
         
         if (userData) {
-          const submissionsData = await QuestService.getSubmissions(questId, userData.id);
+          const submissionsData = await QuestService.getSubmissions({
+            userId: userData.id,
+            questId
+          });
           setSubmissions(submissionsData);
         }
       } catch (err) {
-        setError('Failed to load quest data');
+        setError(err.message || 'Failed to load quest data');
         console.error('Quest loading error:', err);
       } finally {
         setIsLoading(false);

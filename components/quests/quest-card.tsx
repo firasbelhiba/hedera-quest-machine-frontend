@@ -28,24 +28,28 @@ const categoryColors = {
 };
 
 const difficultyConfig = {
-  beginner: { color: 'text-green-600', stars: 1 },
-  intermediate: { color: 'text-yellow-600', stars: 2 },
-  advanced: { color: 'text-orange-600', stars: 3 },
+  easy: { color: 'text-green-600', stars: 1 },
+  medium: { color: 'text-yellow-600', stars: 2 },
+  hard: { color: 'text-orange-600', stars: 3 },
   expert: { color: 'text-red-600', stars: 4 },
 };
 
 export function QuestCard({ quest, isCompleted = false, progress = 0, onSelect }: QuestCardProps) {
-  const categoryColor = categoryColors[quest.category];
-  const difficultyInfo = difficultyConfig[quest.difficulty];
+  const categoryColor = quest.category ? categoryColors[quest.category] : '';
+  const difficultyInfo = difficultyConfig[quest.difficulty] || { color: 'text-gray-600', stars: 1 };
+
+  const handleQuestSelect = () => {
+    onSelect();
+  };
 
   return (
     <Card className={cn(
       'group cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.02]',
       isCompleted && 'ring-2 ring-green-500/20 bg-green-50/50 dark:bg-green-950/20'
-    )} onClick={onSelect}>
+    )} onClick={handleQuestSelect}>
       <div className="relative">
         <Image
-          src={quest.thumbnail}
+          src={quest.thumbnail || '/logo.png'}
           alt={quest.title}
           width={400}
           height={200}
@@ -60,7 +64,7 @@ export function QuestCard({ quest, isCompleted = false, progress = 0, onSelect }
           className={cn('absolute top-2 left-2', categoryColor)}
           variant="outline"
         >
-          {quest.category.replace('-', ' ')}
+          {quest.category ? quest.category.replace('-', ' ') : ''}
         </Badge>
       </div>
       

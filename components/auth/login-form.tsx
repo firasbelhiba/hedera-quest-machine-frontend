@@ -13,6 +13,8 @@ import Image from 'next/image';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { QuestService } from '@/lib/services';
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
+import { HydrationSafe } from '@/components/hydration-safe';
+import ErrorBoundary from '@/components/error-boundary';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -22,7 +24,7 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 interface LoginFormProps {
-  onSuccess: (user: User) => void;
+  onSuccess: (user: User, isAdmin: boolean) => void;
   onSwitchToRegister: () => void;
 }
 
@@ -40,8 +42,8 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
     setError(null);
 
     try {
-      const user = await QuestService.login(data.email, data.password);
-      onSuccess(user);
+      const result = await QuestService.login(data.email, data.password);
+      onSuccess(result.user, result.isAdmin);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
     } finally {
@@ -50,16 +52,22 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
   };
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader className="text-center p-4">
-        <div className="mx-auto mb-6 w-16 h-16 relative">
-          <Image src="/logo.png" alt="Hedera Quest" fill className="object-contain scale-[3]" />
+    <ErrorBoundary>
+      <HydrationSafe fallback={
+        <div className="flex items-center justify-center p-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
-        <CardTitle className="text-2xl">Welcome Back</CardTitle>
-        <p className="text-muted-foreground">Sign in to continue your Hedera journey</p>
-      </CardHeader>
-      
-      <CardContent>
+      }>
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center p-4">
+            <div className="mx-auto mb-6 w-16 h-16 relative">
+              <Image src="/logo.png" alt="Hedera Quest" fill className="object-contain scale-[3]" />
+            </div>
+            <CardTitle className="text-2xl">Welcome Back</CardTitle>
+            <p className="text-muted-foreground">Sign in to continue your Hedera journey</p>
+          </CardHeader>
+          
+          <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
@@ -133,7 +141,9 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
             <div>Admin: admin@hederaquest.com / admin123</div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+          </CardContent>
+        </Card>
+      </HydrationSafe>
+    </ErrorBoundary>
   );
 }

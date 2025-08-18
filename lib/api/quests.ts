@@ -3,20 +3,97 @@ import type { Quest, FilterOptions } from '@/lib/types';
 
 export const QuestsApi = {
   async list(filters?: FilterOptions): Promise<Quest[]> {
-    const { data } = await api.get<Quest[]>('/quests', { params: filters });
-    return data;
+    const response = await api.get('/quests', { 
+      params: filters,
+    });
+    
+    console.log('Quests API response:', response.data);
+    
+    // Handle the new response format: { success: true, data: [...], count: number }
+    if (response.data.success && response.data.data) {
+      return response.data.data;
+    }
+    
+    // Fallback to direct array if response format is different
+    return response.data;
   },
   async get(id: string): Promise<Quest> {
-    const { data } = await api.get<Quest>(`/quests/${id}`);
-    return data;
+    const response = await api.get(`/quests/${id}`);
+    
+    // Handle the response format: { success: true, data: {...} }
+    if (response.data.success && response.data.data) {
+      return response.data.data;
+    }
+    
+    // Fallback to direct object if response format is different
+    return response.data;
   },
-  async create(payload: Omit<Quest, 'id' | 'createdAt' | 'updatedAt' | 'completions'>): Promise<Quest> {
-    const { data } = await api.post<Quest>('/quests', payload);
-    return data;
+  async create(payload: {
+    title: string;
+    description: string;
+    reward: number;
+    difficulty: 'easy' | 'medium' | 'hard' | 'expert';
+    status?: 'active' | 'completed' | 'expired' | 'draft';
+    startDate?: string;
+    endDate?: string;
+    maxParticipants?: number;
+    badgeIds?: number[];
+    platform_type?: string;
+    interaction_type?: string;
+  }): Promise<Quest> {
+    console.log('Creating quest with payload:', payload);
+    
+    const response = await api.post('/quests', payload);
+    
+    console.log('Create quest response:', response.data);
+    
+    // Handle the response format: { success: true, data: {...}, message: string }
+    if (response.data.success && response.data.data) {
+      return response.data.data;
+    }
+    
+    // Fallback to direct object if response format is different
+    return response.data;
   },
-  async update(id: string, updates: Partial<Quest>): Promise<Quest> {
-    const { data } = await api.patch<Quest>(`/quests/${id}`, updates);
-    return data;
+  async update(id: string, updates: {
+    title?: string;
+    description?: string;
+    reward?: number;
+    difficulty?: 'easy' | 'medium' | 'hard' | 'expert';
+    status?: 'active' | 'completed' | 'expired' | 'draft';
+    startDate?: string;
+    endDate?: string;
+    maxParticipants?: number;
+    badgeIds?: number[];
+  }): Promise<Quest> {
+    console.log('Updating quest with payload:', updates);
+    
+    const response = await api.put(`/quests/${id}`, updates);
+    
+    console.log('Update quest response:', response.data);
+    
+    // Handle the response format: { success: true, data: {...}, message: string }
+    if (response.data.success && response.data.data) {
+      return response.data.data;
+    }
+    
+    // Fallback to direct object if response format is different
+    return response.data;
+  },
+  async activate(id: string): Promise<Quest> {
+    console.log('Activating quest with ID:', id);
+    
+    const response = await api.put(`/quests/${id}`, { status: 'active' });
+    
+    console.log('Activate quest response:', response.data);
+    
+    // Handle the response format: { success: true, data: {...}, message: string }
+    if (response.data.success && response.data.data) {
+      return response.data.data;
+    }
+    
+    // Fallback to direct object if response format is different
+    return response.data;
   },
   async remove(id: string): Promise<void> {
     await api.delete(`/quests/${id}`);

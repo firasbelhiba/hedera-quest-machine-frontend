@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, Search, Moon, Sun, Menu, Check, X, Clock, Trophy, Users, AlertCircle } from 'lucide-react';
+import { Bell, Search, Moon, Sun, Menu, Check, X, Clock, Trophy, Users, AlertCircle, Settings, User, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useTheme } from '@/components/ui/theme-provider';
@@ -15,8 +15,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import useStore from '@/lib/store';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -83,7 +85,21 @@ const mockNotifications: Notification[] = [
 export function Header({ onMenuClick }: HeaderProps) {
   const { theme, setTheme } = useTheme();
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
+  const { user: currentUser, loadCurrentUser, logout } = useStore();
+  const router = useRouter();
   const unreadCount = notifications.filter(n => !n.read).length;
+
+  // Load current user on component mount
+  useEffect(() => {
+    loadCurrentUser();
+  }, [loadCurrentUser]);
+
+  const handleLogout = () => {
+    // Clear store state and localStorage
+    logout();
+    // Redirect to login page using Next.js router (no refresh)
+    router.push('/');
+  };
 
   const getNotificationIcon = (type: Notification['type']) => {
     switch (type) {
@@ -149,7 +165,7 @@ export function Header({ onMenuClick }: HeaderProps) {
           <Menu className="h-5 w-5" />
         </Button>
         
-        <div className="relative w-8 h-8 hidden lg:block">
+        <div className="relative w-16 h-16 hidden lg:block">
           <Image src="/logo.png" alt="Hedera Quest" fill className="object-contain" />
         </div>
 
@@ -247,13 +263,41 @@ export function Header({ onMenuClick }: HeaderProps) {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-cyan-500" />
-          <div className="hidden md:block">
-            <p className="text-sm font-medium">Alice Chen</p>
-            <p className="text-xs text-muted-foreground">2,850 points</p>
-          </div>
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm" className="flex items-center space-x-2 p-2">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-cyan-500" />
+              <div className="hidden md:block text-left">
+                <p className="text-sm font-medium">
+                  {currentUser?.name || 'Loading...'}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {currentUser?.points ? `${currentUser.points} points` : 'Loading...'}
+                </p>
+              </div>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="cursor-pointer">
+              <User className="mr-2 h-4 w-4" />
+              <span>Profile</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer">
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Settings</span>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem 
+              className="cursor-pointer text-red-600 focus:text-red-600"
+              onClick={handleLogout}
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Logout</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   );

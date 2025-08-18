@@ -16,6 +16,18 @@
   }
 }
 
+@font-face {
+  font-family: 'PixelOperator';
+  src: url('/PixelOperator8.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-pixel {
+  font-family: 'PixelOperator', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -80,3 +92,5 @@
     @apply bg-background text-foreground;
   }
 }
+
+
