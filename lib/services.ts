@@ -304,14 +304,15 @@ export class QuestService {
     return mockQuests[questIndex];
   }
 
-  static async deleteQuest(id: string): Promise<void> {
+  static async deleteQuest(id: string): Promise<{ success: boolean; message: string }> {
     if (useApi()) {
-      return QuestsApi.remove(id);
+      return QuestsApi.deleteQuest(id);
     }
     await this.delay();
     const questIndex = mockQuests.findIndex(q => q.id === id);
     if (questIndex === -1) throw new Error('Quest not found');
     mockQuests.splice(questIndex, 1);
+    return { success: true, message: "Quest deleted successfully" };
   }
 
   // Submission Services

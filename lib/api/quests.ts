@@ -97,6 +97,17 @@ export const QuestsApi = {
   },
   async remove(id: string): Promise<void> {
     await api.delete(`/quests/${id}`);
+  },
+  async deleteQuest(id: string): Promise<{ success: boolean; message: string }> {
+    const response = await api.delete(`/quests/${id}`);
+    
+    // Handle the response format: { success: true, message: string }
+    if (response.data.success) {
+      return response.data;
+    }
+    
+    // Fallback response
+    return { success: true, message: "Quest deleted successfully" };
   }
 };
 
