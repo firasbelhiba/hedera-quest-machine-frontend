@@ -276,7 +276,7 @@ export default function ManageQuestsPage() {
               <Users className="w-4 h-4 text-purple-500" />
               <div>
                 <p className="text-sm text-muted-foreground">Total Completions</p>
-                <p className="text-2xl font-bold">{quests.reduce((sum, q) => sum + q.completions, 0)}</p>
+                <p className="text-2xl font-bold">{quests.reduce((sum, q) => sum + (q.completions || 0), 0)}</p>
               </div>
             </div>
           </CardContent>

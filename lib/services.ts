@@ -29,7 +29,16 @@ export class QuestService {
     
     if (useApi()) {
       console.log('Using API login');
-      return ApiAuth.login({ email, password });
+      const result = await ApiAuth.login({ email, password });
+      // Store user data in localStorage for fallback use
+      if (result.user) {
+        localStorage.setItem('user_data', JSON.stringify({
+          name: result.user.name,
+          email: result.user.email,
+          id: result.user.id
+        }));
+      }
+      return result;
     }
     
     console.log('Using mock login');
@@ -41,14 +50,25 @@ export class QuestService {
     // For mock data, we'll accept any password for demo purposes
     // In a real app, you'd verify the password hash here
     console.log('Mock login successful for:', user.email);
-    return { user, isAdmin: user.role === 'admin' };
+    const isAdmin = user.role === 'admin';
+    // Store user data in localStorage for fallback use
+    localStorage.setItem('user_data', JSON.stringify({
+      name: user.name,
+      email: user.email,
+      id: user.id
+    }));
+    return { user, isAdmin };
   }
 
   static async logout(): Promise<void> {
     if (useApi()) {
       await ApiAuth.logout();
+      // Clear stored user data
+      localStorage.removeItem('user_data');
       return;
     }
+    // Clear stored user data for mock logout too
+    localStorage.removeItem('user_data');
   }
 
   static async register(userData: {
@@ -120,14 +140,47 @@ export class QuestService {
         return user;
       } catch (error) {
         console.error('Error fetching current user:', error);
-        // If API fails, fall back to localStorage check
+        // If API fails, try to get user info from stored login data or token
         const token = localStorage.getItem('auth_token');
         if (token) {
-          console.log('Falling back to localStorage token check');
+          console.log('API failed, but token exists. Trying to extract user info from token or use stored data.');
+          
+          // Try to get user email from stored data or decode token
+          let userEmail = 'user@example.com';
+          let userName = 'User';
+          
+          // Check if we have stored user data from login
+          const storedUserData = localStorage.getItem('user_data');
+          if (storedUserData) {
+            try {
+              const userData = JSON.parse(storedUserData);
+              userEmail = userData.email || userEmail;
+              userName = userData.name || userName;
+            } catch (e) {
+              console.log('Could not parse stored user data');
+            }
+          }
+          
+          // If no stored data, try to extract from token (basic JWT decode)
+          if (userName === 'User') {
+            try {
+              const tokenParts = token.split('.');
+              if (tokenParts.length === 3) {
+                const payload = JSON.parse(atob(tokenParts[1]));
+                userEmail = payload.email || payload.sub || userEmail;
+                userName = payload.name || userEmail.split('@')[0] || userName;
+              }
+            } catch (e) {
+              console.log('Could not decode token, using fallback');
+              // Use email prefix as name if we can't get it from token
+              userName = userEmail.split('@')[0];
+            }
+          }
+          
           return {
             id: '1',
-            name: 'User',
-            email: 'user@example.com',
+            name: userName,
+            email: userEmail,
             avatar: '/logo.png',
             hederaAccountId: '',
             points: 1250,
@@ -149,8 +202,8 @@ export class QuestService {
     if (token) {
       return {
         id: '1',
-        name: 'User',
-        email: 'user@example.com',
+        name: 'Demo User',
+        email: 'demo@example.com',
         avatar: '/logo.png',
         hederaAccountId: '',
         points: 1250,
@@ -158,7 +211,7 @@ export class QuestService {
         streak: 7,
         joinedAt: new Date().toISOString(),
         role: 'user',
-                    badges: [],
+        badges: [],
         completedQuests: ['quest-1', 'quest-2', 'quest-3']
       };
     }
