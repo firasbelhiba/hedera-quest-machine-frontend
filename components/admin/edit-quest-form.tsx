@@ -23,7 +23,7 @@ const editQuestSchema = z.object({
   title: z.string().min(1, 'Title is required').optional(),
   description: z.string().min(10, 'Description must be at least 10 characters').optional(),
   reward: z.number().min(0, 'Reward must be positive').optional(),
-  difficulty: z.enum(['easy', 'medium', 'hard', 'expert']).optional(),
+  difficulty: z.enum(['beginner', 'intermediate', 'advanced', 'expert']).optional(),
   status: z.enum(['draft', 'active', 'completed', 'expired']).optional(),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
@@ -161,7 +161,7 @@ export function EditQuestForm({ quest, onSuccess, onCancel }: EditQuestFormProps
         return;
       }
       
-      await QuestService.updateQuest(quest.id, updateData);
+      await QuestService.updateQuest(String(quest.id), updateData);
       console.log('Quest updated successfully');
       toast({
         title: 'Quest Updated',
@@ -276,9 +276,9 @@ export function EditQuestForm({ quest, onSuccess, onCancel }: EditQuestFormProps
                   <SelectValue placeholder="Select difficulty" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="easy">Easy</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="hard">Hard</SelectItem>
+                  <SelectItem value="beginner">Beginner</SelectItem>
+                  <SelectItem value="intermediate">Intermediate</SelectItem>
+                  <SelectItem value="advanced">Advanced</SelectItem>
                   <SelectItem value="expert">Expert</SelectItem>
                 </SelectContent>
               </Select>
@@ -392,11 +392,11 @@ export function EditQuestForm({ quest, onSuccess, onCancel }: EditQuestFormProps
                   key={badge.id}
                   className={cn(
                     "p-4 border rounded-lg cursor-pointer transition-colors",
-                    selectedBadges.includes(badge.id)
+                    selectedBadges.includes(Number(badge.id))
                       ? "border-primary bg-primary/5"
                       : "border-border hover:border-primary/50"
                   )}
-                  onClick={() => toggleBadge(badge.id)}
+                  onClick={() => toggleBadge(Number(badge.id))}
                 >
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">{badge.icon}</div>

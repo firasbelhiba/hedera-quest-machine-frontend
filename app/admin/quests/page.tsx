@@ -428,11 +428,6 @@ export default function ManageQuestsPage() {
                             <Badge variant="outline" className="text-xs">
                               ID: {quest.id}
                             </Badge>
-                            {quest.platform && (
-                              <Badge variant="secondary" className="text-xs">
-                                {quest.platform}
-                              </Badge>
-                            )}
                           </div>
                         </div>
                       </div>
@@ -606,27 +601,11 @@ export default function ManageQuestsPage() {
                              {selectedQuestDetails.reward || selectedQuestDetails.points || 'N/A'}
                            </span>
                          </div>
-                         <div className="flex items-center justify-between py-2 border-b border-border/50">
-                           <span className="text-sm font-medium text-muted-foreground">Platform</span>
-                           <span className="text-sm capitalize">{selectedQuestDetails.platform_type || 'N/A'}</span>
-                         </div>
                          <div className="flex items-center justify-between py-2">
-                           <span className="text-sm font-medium text-muted-foreground">Interaction Type</span>
-                           <span className="text-sm capitalize">{selectedQuestDetails.interaction_type || 'N/A'}</span>
+                           <span className="text-sm font-medium text-muted-foreground">Category</span>
+                           <span className="text-sm capitalize">{selectedQuestDetails.category || 'N/A'}</span>
                          </div>
-                         {selectedQuestDetails.quest_link && (
-                           <div className="pt-3 border-t border-border/50">
-                             <span className="text-sm font-medium text-muted-foreground block mb-2">Quest Link</span>
-                             <a 
-                               href={selectedQuestDetails.quest_link} 
-                               target="_blank" 
-                               rel="noopener noreferrer" 
-                               className="text-blue-500 hover:text-blue-600 text-sm break-all hover:underline"
-                             >
-                               {selectedQuestDetails.quest_link}
-                             </a>
-                           </div>
-                         )}
+
                        </div>
                      </CardContent>
                    </Card>
@@ -727,19 +706,19 @@ export default function ManageQuestsPage() {
                    </Card>
                  )}
                  
-                 {selectedQuestDetails.participants && selectedQuestDetails.participants.length > 0 && (
+                 {selectedQuestDetails.currentParticipants !== undefined && (
                    <Card className="mb-6">
                      <CardContent className="p-6">
                        <div className="flex items-center gap-2 mb-4">
                          <Users className="h-4 w-4 text-muted-foreground" />
                          <h3 className="font-semibold text-lg">Participants</h3>
-                         <Badge variant="secondary" className="ml-auto">{selectedQuestDetails.participants.length}</Badge>
+                         <Badge variant="secondary" className="ml-auto">{selectedQuestDetails.currentParticipants || 0}</Badge>
                        </div>
                        <div className="text-muted-foreground">
-                         {selectedQuestDetails.participants.length === 0 ? (
+                         {(selectedQuestDetails.currentParticipants || 0) === 0 ? (
                            <p className="text-center py-4">No participants yet</p>
                          ) : (
-                           <p>{selectedQuestDetails.participants.length} participants enrolled in this quest</p>
+                           <p>{selectedQuestDetails.currentParticipants} participants enrolled in this quest</p>
                          )}
                        </div>
                      </CardContent>

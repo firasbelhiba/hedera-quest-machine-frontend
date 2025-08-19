@@ -62,12 +62,12 @@ export function SubmissionForm({ quest, onSubmit, onCancel }: SubmissionFormProp
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const schema = createSubmissionSchema(quest.submissionType);
+  const schema = createSubmissionSchema(quest.submissionType || 'text');
   type FormData = z.infer<typeof schema>;
 
   const { register, handleSubmit, formState: { errors }, watch } = useForm<FormData>({
     resolver: zodResolver(schema),
-    defaultValues: { type: quest.submissionType }
+    defaultValues: { type: quest.submissionType || 'text' }
   });
 
   const submitData = async (data: FormData) => {
@@ -83,7 +83,7 @@ export function SubmissionForm({ quest, onSubmit, onCancel }: SubmissionFormProp
       if (quest.submissionType === 'account-id') content.accountId = (data as any).accountId;
       if (quest.submissionType === 'file') content.fileName = (data as any).fileName;
 
-      await QuestService.submitQuest(quest.id, 'current-user-id', content);
+      await QuestService.submitQuest(String(quest.id), 'current-user-id', content);
       onSubmit();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Submission failed');
@@ -109,7 +109,7 @@ export function SubmissionForm({ quest, onSubmit, onCancel }: SubmissionFormProp
     }
   };
 
-  const SubmissionIcon = getSubmissionIcon(quest.submissionType);
+  const SubmissionIcon = getSubmissionIcon(quest.submissionType || 'text');
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
@@ -125,7 +125,7 @@ export function SubmissionForm({ quest, onSubmit, onCancel }: SubmissionFormProp
         <div className="bg-muted/50 p-4 rounded-lg">
           <h4 className="font-semibold mb-2">Requirements</h4>
           <ul className="space-y-1">
-            {quest.requirements.map((req, index) => (
+            {quest.requirements?.map((req, index) => (
               <li key={index} className="flex items-start gap-2 text-sm">
                 <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
                 {req}

@@ -162,7 +162,7 @@ export default function Dashboard() {
             <QuestCard
               key={quest.id}
               quest={quest}
-              isCompleted={user?.completedQuests?.includes(quest.id)}
+              isCompleted={user?.completedQuests?.includes(String(quest.id))}
               onSelect={() => {
                 // Navigate to quest details
                 window.location.href = `/quests/${quest.id}`;

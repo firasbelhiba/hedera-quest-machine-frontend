@@ -61,8 +61,8 @@ const useStore = create<AppState>((set, get) => ({
   login: async (email: string, password: string) => {
     set({ isLoading: true });
     try {
-      const user = await QuestService.login(email, password);
-      set({ user, isAuthenticated: true, isLoading: false });
+      const result = await QuestService.login(email, password);
+      set({ user: result.user, isAuthenticated: true, isLoading: false });
     } catch (error) {
       set({ isLoading: false });
       throw error;

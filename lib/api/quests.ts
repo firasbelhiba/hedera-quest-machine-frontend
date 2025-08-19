@@ -32,7 +32,7 @@ export const QuestsApi = {
     title: string;
     description: string;
     reward: number;
-    difficulty: 'easy' | 'medium' | 'hard' | 'expert';
+    difficulty: 'beginner' | 'intermediate' | 'advanced' | 'expert';
     status?: 'active' | 'completed' | 'expired' | 'draft';
     startDate?: string;
     endDate?: string;
@@ -59,7 +59,7 @@ export const QuestsApi = {
     title?: string;
     description?: string;
     reward?: number;
-    difficulty?: 'easy' | 'medium' | 'hard' | 'expert';
+    difficulty?: 'beginner' | 'intermediate' | 'advanced' | 'expert';
     status?: 'active' | 'completed' | 'expired' | 'draft';
     startDate?: string;
     endDate?: string;

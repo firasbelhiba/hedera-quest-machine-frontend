@@ -31,7 +31,7 @@ import Link from 'next/link';
 
 export default function QuestDetailPage() {
   const params = useParams();
-  const questId = params.id as string;
+  const questId = params?.id as string;
   
   const [quest, setQuest] = useState<Quest | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -52,7 +52,7 @@ export default function QuestDetailPage() {
         ]);
 
         // Handle the new API response format
-        const questDetails = questData.success ? questData.data : questData;
+        const questDetails = questData && (questData as any).success ? (questData as any).data : questData;
         
         if (!questDetails) {
           throw new Error('Quest not found');
@@ -62,14 +62,11 @@ export default function QuestDetailPage() {
         setUser(userData);
         
         if (userData) {
-          const submissionsData = await QuestService.getSubmissions({
-            userId: userData.id,
-            questId
-          });
+          const submissionsData = await QuestService.getSubmissions(questId, userData.id);
           setSubmissions(submissionsData);
         }
       } catch (err) {
-        setError(err.message || 'Failed to load quest data');
+        setError(err instanceof Error ? err.message : 'Failed to load quest data');
         console.error('Quest loading error:', err);
       } finally {
         setIsLoading(false);
@@ -108,7 +105,7 @@ export default function QuestDetailPage() {
     );
   }
 
-  const isCompleted = user?.completedQuests?.includes(quest.id) || false;
+  const isCompleted = user?.completedQuests?.includes(String(quest.id)) || false;
   const latestSubmission = submissions[0]; // Assuming most recent first
   const canSubmit = !isCompleted && (!latestSubmission || latestSubmission.status === 'needs-revision');
 
@@ -129,7 +126,7 @@ export default function QuestDetailPage() {
     }
   };
 
-  const SubmissionIcon = getSubmissionIcon(quest.submissionType);
+  const SubmissionIcon = getSubmissionIcon(quest.submissionType || 'text');
 
   if (showSubmissionForm) {
     return (
@@ -159,7 +156,7 @@ export default function QuestDetailPage() {
           <Card>
             <div className="relative">
               <Image
-                src={quest.thumbnail}
+                src={quest.thumbnail || '/logo.png'}
                 alt={quest.title}
                 width={800}
                 height={400}
@@ -177,7 +174,7 @@ export default function QuestDetailPage() {
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <Badge variant="outline" className="capitalize">
-                      {quest.category.replace('-', ' ')}
+                      {(quest.category || 'general').replace('-', ' ')}
                     </Badge>
                     <div className="flex items-center">
                       {Array.from({ length: 4 }, (_, i) => (
@@ -224,11 +221,11 @@ export default function QuestDetailPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <SubmissionIcon className="w-4 h-4 text-muted-foreground" />
-                  <span className="capitalize">{quest.submissionType.replace('-', ' ')}</span>
+                  <span className="capitalize">{(quest.submissionType || 'text').replace('-', ' ')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-muted-foreground" />
-                  <span>{quest.requirements.length} requirements</span>
+                  <span>{(quest.requirements || []).length} requirements</span>
                 </div>
               </div>
             </CardContent>
@@ -249,7 +246,7 @@ export default function QuestDetailPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {quest.requirements.map((requirement, index) => (
+                    {(quest.requirements || []).map((requirement, index) => (
                       <div key={index} className="flex items-start gap-3">
                         <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
                         <span>{requirement}</span>
@@ -378,14 +375,14 @@ export default function QuestDetailPage() {
           </Card>
 
           {/* Prerequisites */}
-          {quest.prerequisites.length > 0 && (
+          {(quest.prerequisites || []).length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle>Prerequisites</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {quest.prerequisites.map((prereqId) => (
+                  {(quest.prerequisites || []).map((prereqId) => (
                     <div key={prereqId} className="flex items-center gap-2 p-2 bg-muted rounded">
                       <CheckCircle className="w-4 h-4 text-green-500" />
                       <span className="text-sm">Quest #{prereqId}</span>

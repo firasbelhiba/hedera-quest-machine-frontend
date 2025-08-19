@@ -10,6 +10,8 @@ interface BadgeDisplayProps {
   variant?: 'default' | 'compact' | 'detailed';
   className?: string;
   showImage?: boolean;
+  size?: 'sm' | 'md' | 'lg';
+  showDate?: boolean;
 }
 
 const rarityColors = {
@@ -30,7 +32,9 @@ export function BadgeDisplay({
   badge, 
   variant = 'default', 
   className,
-  showImage = true 
+  showImage = true,
+  size = 'md',
+  showDate = false
 }: BadgeDisplayProps) {
   if (variant === 'compact') {
     return (

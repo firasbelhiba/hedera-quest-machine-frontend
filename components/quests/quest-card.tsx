@@ -28,8 +28,11 @@ const categoryColors = {
 };
 
 const difficultyConfig = {
+  beginner: { color: 'text-green-600', stars: 1 },
   easy: { color: 'text-green-600', stars: 1 },
+  intermediate: { color: 'text-yellow-600', stars: 2 },
   medium: { color: 'text-yellow-600', stars: 2 },
+  advanced: { color: 'text-orange-600', stars: 3 },
   hard: { color: 'text-orange-600', stars: 3 },
   expert: { color: 'text-red-600', stars: 4 },
 };

@@ -54,7 +54,7 @@ export default function QuestsPage() {
   };
 
   const filteredQuests = quests.filter(quest => {
-    if (!filters.showCompleted && user?.completedQuests?.includes(quest.id)) {
+    if (!filters.showCompleted && user?.completedQuests?.includes(String(quest.id))) {
       return false;
     }
     return true;
@@ -142,10 +142,10 @@ export default function QuestsPage() {
                 All Quests ({filteredQuests.length})
               </TabsTrigger>
               <TabsTrigger value="available">
-                Available ({filteredQuests.filter(q => !user?.completedQuests?.includes(q.id)).length})
+                Available ({filteredQuests.filter(q => !user?.completedQuests?.includes(String(q.id))).length})
               </TabsTrigger>
               <TabsTrigger value="completed">
-                Completed ({filteredQuests.filter(q => user?.completedQuests?.includes(q.id)).length})
+                Completed ({filteredQuests.filter(q => user?.completedQuests?.includes(String(q.id))).length})
               </TabsTrigger>
             </TabsList>
 
@@ -156,7 +156,7 @@ export default function QuestsPage() {
                     <QuestCard
                       key={quest.id}
                       quest={quest}
-                      isCompleted={user?.completedQuests?.includes(quest.id)}
+                      isCompleted={user?.completedQuests?.includes(String(quest.id))}
                       onSelect={() => handleQuestSelect(quest)}
                     />
                   ))}
@@ -170,7 +170,7 @@ export default function QuestsPage() {
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
                             <h3 className="text-lg font-semibold">{quest.title}</h3>
-                            {user?.completedQuests?.includes(quest.id) && (
+                            {user?.completedQuests?.includes(String(quest.id)) && (
                               <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
                                 <div className="w-3 h-3 text-white text-xs">✓</div>
                               </div>
@@ -178,14 +178,14 @@ export default function QuestsPage() {
                           </div>
                           <p className="text-muted-foreground mb-3">{quest.description}</p>
                           <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <span className="capitalize">{quest.category.replace('-', ' ')}</span>
+                            <span className="capitalize">{(quest.category || 'general').replace('-', ' ')}</span>
                             <span className="capitalize">{quest.difficulty}</span>
                             <span>{quest.estimatedTime}</span>
                             <span>{quest.points} points</span>
                           </div>
                         </div>
                         <Button size="sm">
-                          {user?.completedQuests?.includes(quest.id) ? 'Review' : 'Start'}
+                          {user?.completedQuests?.includes(String(quest.id)) ? 'Review' : 'Start'}
                         </Button>
                       </div>
                     </div>
@@ -219,7 +219,7 @@ export default function QuestsPage() {
                   : 'space-y-4'
               )}>
                 {filteredQuests
-                  .filter(q => !user?.completedQuests?.includes(q.id))
+                  .filter(q => !user?.completedQuests?.includes(String(q.id)))
                   .map((quest) => (
                     <QuestCard
                       key={quest.id}
@@ -238,7 +238,7 @@ export default function QuestsPage() {
                   : 'space-y-4'
               )}>
                 {filteredQuests
-                  .filter(q => user?.completedQuests?.includes(q.id))
+                  .filter(q => user?.completedQuests?.includes(String(q.id)))
                   .map((quest) => (
                     <QuestCard
                       key={quest.id}

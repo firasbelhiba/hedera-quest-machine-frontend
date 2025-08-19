@@ -23,7 +23,7 @@ const createQuestSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
   reward: z.number().min(0, 'Reward must be positive'),
-  difficulty: z.enum(['easy', 'medium', 'hard', 'expert']),
+  difficulty: z.enum(['beginner', 'intermediate', 'advanced', 'expert']),
   status: z.enum(['draft', 'active', 'completed', 'expired']),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
@@ -65,7 +65,7 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
     resolver: zodResolver(createQuestSchema),
     defaultValues: {
       status: 'draft',
-      difficulty: 'medium',
+      difficulty: 'intermediate',
       maxParticipants: 50,
     }
   });
@@ -260,9 +260,9 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
                      <SelectValue placeholder="Select difficulty" />
                    </SelectTrigger>
                    <SelectContent>
-                     <SelectItem value="easy">Easy</SelectItem>
-                     <SelectItem value="medium">Medium</SelectItem>
-                     <SelectItem value="hard">Hard</SelectItem>
+                     <SelectItem value="beginner">Beginner</SelectItem>
+                     <SelectItem value="intermediate">Intermediate</SelectItem>
+                     <SelectItem value="advanced">Advanced</SelectItem>
                      <SelectItem value="expert">Expert</SelectItem>
                    </SelectContent>
                  </Select>
@@ -412,7 +412,11 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
                            selected={startDate}
                            onSelect={setStartDate}
                            initialFocus
-                           disabled={(date) => date < new Date()}
+                           disabled={(date) => {
+                             const today = new Date();
+                             today.setHours(0, 0, 0, 0);
+                             return date < today;
+                           }}
                          />
                        </PopoverContent>
                      </Popover>
@@ -455,10 +459,11 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
                            selected={endDate}
                            onSelect={setEndDate}
                            initialFocus
-                           disabled={(date) => 
-                             date < new Date() || 
-                             (startDate && date < startDate)
-                           }
+                           disabled={(date) => {
+                             const today = new Date();
+                             today.setHours(0, 0, 0, 0);
+                             return date < today || (startDate ? date < startDate : false);
+                           }}
                          />
                        </PopoverContent>
                      </Popover>

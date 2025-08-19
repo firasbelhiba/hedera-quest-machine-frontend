@@ -52,7 +52,7 @@ export function Sidebar({ isCollapsed, onToggle, userRole = 'user' }: SidebarPro
   const pathname = usePathname();
   const { user } = useStore();
   const isAdmin = userRole === 'admin' || userRole === 'moderator';
-  const isAdminPage = pathname.startsWith('/admin');
+  const isAdminPage = pathname?.startsWith('/admin') || false;
 
   return (
     <div
@@ -72,7 +72,7 @@ export function Sidebar({ isCollapsed, onToggle, userRole = 'user' }: SidebarPro
           'transition-all duration-300 ease-in-out',
           isCollapsed ? 'scale-75' : 'scale-100'
         )}>
-          <Image src="/logo.png" alt="Hedera Quest" width={100} height={100} className="rounded-lg drop-shadow-sm" />
+          <Image src="/logo.png" alt="Hedera Quest" width={140} height={140} className="rounded-lg drop-shadow-sm" />
         </div>
 			</div>
         <button

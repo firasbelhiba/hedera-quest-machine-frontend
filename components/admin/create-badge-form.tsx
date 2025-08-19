@@ -24,7 +24,7 @@ const createBadgeSchema = z.object({
   rarity: z.enum(['common', 'rare', 'epic', 'legendary'] as const),
   points: z.number().min(0, 'Points must be at least 0').max(10000, 'Points must be less than 10000'),
   image: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-  isActive: z.boolean().default(true),
+  isActive: z.boolean().optional(),
 });
 
 type CreateBadgeFormData = z.infer<typeof createBadgeSchema>;

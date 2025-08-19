@@ -277,7 +277,7 @@ export class QuestService {
     title: string;
     description: string;
     reward: number;
-    difficulty: 'easy' | 'medium' | 'hard' | 'expert';
+    difficulty: 'beginner' | 'intermediate' | 'advanced' | 'expert';
     status?: 'active' | 'completed' | 'expired' | 'draft';
     startDate?: string;
     endDate?: string;
@@ -305,6 +305,7 @@ export class QuestService {
     await this.delay();
     const newQuest: Quest = {
       ...quest,
+      reward: quest.reward.toString(),
       difficulty: quest.difficulty as any, // Cast to avoid type issues
       id: Date.now().toString(),
       createdAt: new Date().toISOString(),
@@ -320,7 +321,7 @@ export class QuestService {
     title?: string;
     description?: string;
     reward?: number;
-    difficulty?: 'easy' | 'medium' | 'hard' | 'expert';
+    difficulty?: 'beginner' | 'intermediate' | 'advanced' | 'expert';
     status?: 'active' | 'completed' | 'expired' | 'draft';
     startDate?: string;
     endDate?: string;
@@ -333,11 +334,14 @@ export class QuestService {
     await this.delay();
     const questIndex = mockQuests.findIndex(q => q.id === id);
     if (questIndex === -1) throw new Error('Quest not found');
-    mockQuests[questIndex] = { 
+    const { reward, ...otherUpdates } = updates;
+    const updatedQuest = {
       ...mockQuests[questIndex], 
-      ...updates, 
+      ...otherUpdates,
+      ...(reward !== undefined && { reward: reward.toString() }),
       updatedAt: new Date().toISOString() 
     };
+    mockQuests[questIndex] = updatedQuest;
     return mockQuests[questIndex];
   }
 

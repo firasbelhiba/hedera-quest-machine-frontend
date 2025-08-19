@@ -17,7 +17,7 @@ export const tokenStorage = {
   getAccessToken(): string | undefined {
     if (!isBrowser) return undefined;
     // Check both cookie and localStorage for token
-    return Cookies.get(ACCESS_TOKEN_KEY) || localStorage.getItem('auth_token');
+    return Cookies.get(ACCESS_TOKEN_KEY) || localStorage.getItem('auth_token') || undefined;
   },
   setAccessToken(token: string) {
     if (!isBrowser) return;

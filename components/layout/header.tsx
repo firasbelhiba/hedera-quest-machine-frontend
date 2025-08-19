@@ -165,9 +165,7 @@ export function Header({ onMenuClick }: HeaderProps) {
           <Menu className="h-5 w-5" />
         </Button>
         
-        <div className="relative w-16 h-16 hidden lg:block">
-          <Image src="/logo.png" alt="Hedera Quest" fill className="object-contain" />
-        </div>
+
 
         <div className="relative w-64">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
