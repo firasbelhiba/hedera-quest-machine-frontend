@@ -24,7 +24,8 @@ import {
   AlertCircle,
   Link,
   Twitter,
-  Facebook
+  Facebook,
+  MessageSquare
 } from 'lucide-react';
 
 const profileSchema = z.object({
@@ -47,6 +48,7 @@ export default function ProfilePage() {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isConnectingTwitter, setIsConnectingTwitter] = useState(false);
   const [isConnectingFacebook, setIsConnectingFacebook] = useState(false);
+  const [isConnectingDiscord, setIsConnectingDiscord] = useState(false);
 
   const { toast } = useToast();
   const { register, handleSubmit, formState: { errors }, reset } = useForm<ProfileFormData>({
@@ -288,6 +290,83 @@ export default function ProfilePage() {
        });
      }
    };
+
+  const handleConnectDiscord = async () => {
+    setIsConnectingDiscord(true);
+    try {
+      const accessToken = localStorage.getItem('auth_token');
+      if (!accessToken) {
+        setSaveError('No access token found. Please login again.');
+        setTimeout(() => setSaveError(null), 5000);
+        return;
+      }
+
+      const baseUrl = 'https://hedera-quests.com';
+      const response = await fetch(`${baseUrl}/profile/discord/url`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to get Discord authorization URL');
+      }
+      
+      const data = await response.json();
+      
+      if (data.success && data.url) {
+        // Redirect to Discord authorization URL
+        window.location.href = data.url;
+      } else {
+        throw new Error('Invalid response from server');
+      }
+    } catch (error) {
+      console.error('Error connecting to Discord:', error);
+      setSaveError(error instanceof Error ? error.message : 'Failed to connect to Discord');
+      setTimeout(() => setSaveError(null), 5000);
+    } finally {
+      setIsConnectingDiscord(false);
+    }
+  };
+
+  const handleDisconnectDiscord = async () => {
+    try {
+      const token = localStorage.getItem('auth_token');
+      const baseUrl = 'https://hedera-quests.com';
+      const response = await fetch(`${baseUrl}/profile/discord/profile`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        toast({
+          title: 'Discord Disconnected',
+          description: 'Your Discord account has been successfully disconnected.',
+          variant: 'default',
+          className: 'border-green-500 bg-green-50 text-green-900 dark:bg-green-950 dark:text-green-50',
+        });
+        // Refresh profile data
+        await loadUser();
+      } else {
+        const data = await response.json();
+        toast({
+          title: 'Failed to disconnect Discord',
+          description: data.message || 'Something went wrong.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Failed to disconnect Discord',
+        description: error instanceof Error ? error.message : 'Something went wrong.',
+        variant: 'destructive',
+      });
+    }
+  };
 
   if (isLoading) {
     return (
@@ -664,6 +743,91 @@ export default function ProfilePage() {
                     </div>
                     <p className="text-xs text-muted-foreground mt-2">
                       Connecting your Facebook account allows you to participate in social media quests and earn additional rewards.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Discord Integration */}
+              <div className="border rounded-lg p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h3 className="font-semibold">Discord Integration</h3>
+                    {profileData?.user?.discordProfile ? (
+                      <p className="text-sm text-muted-foreground">
+                        Connected as {profileData.user.discordProfile.discord_username}
+                      </p>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        Link your Discord account to verify social media quests
+                      </p>
+                    )}
+                  </div>
+                  {profileData?.user?.discordProfile ? (
+                    <Badge variant="outline" className="text-green-600">
+                      <CheckCircle className="w-3 h-3 mr-1" />
+                      Connected
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="text-gray-600">
+                      <AlertCircle className="w-3 h-3 mr-1" />
+                      Not Connected
+                    </Badge>
+                  )}
+                </div>
+                
+                {profileData?.user?.discordProfile ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                      <Avatar className="w-10 h-10">
+                        <AvatarImage src={profileData.user.discordProfile.discord_avatar} />
+                        <AvatarFallback>DC</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <p className="font-medium">{profileData.user.discordProfile.discord_username}</p>
+                        <p className="text-sm text-muted-foreground">Discord ID: {profileData.user.discordProfile.discord_id}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.open(`https://discord.com/users/${profileData.user.discordProfile.discord_id}`, '_blank')}
+                      >
+                        <ExternalLink className="w-4 h-4 mr-1" />
+                        View Profile
+                      </Button>
+                      <Button 
+                         variant="outline" 
+                         size="sm" 
+                         className="text-red-600 hover:text-red-700"
+                         onClick={handleDisconnectDiscord}
+                       >
+                         <Link className="w-4 h-4 mr-1" />
+                         Disconnect
+                       </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="flex gap-2">
+                      <Button
+                         variant="default"
+                         size="sm"
+                         className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                         onClick={handleConnectDiscord}
+                         disabled={isConnectingDiscord}
+                       >
+                         <MessageSquare className="w-4 h-4 mr-1" />
+                         {isConnectingDiscord ? 'Connecting...' : 'Connect Discord'}
+                       </Button>
+                      <Button variant="outline" size="sm" disabled>
+                        <ExternalLink className="w-4 h-4 mr-1" />
+                        View Profile
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Connecting your Discord account allows you to participate in social media quests and earn additional rewards.
                     </p>
                   </div>
                 )}
