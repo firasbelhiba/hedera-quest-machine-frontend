@@ -128,7 +128,7 @@ export class QuestService {
           bio: profileData.user.bio || '',
           avatar: '/logo.png',
           hederaAccountId: null,
-          points: 0, // These fields might need separate API calls
+          points: profileData.user.userLevel ? ((profileData.user.userLevel.level - 1) * 1000 + profileData.user.userLevel.progress) : 0,
           level: profileData.user.userLevel?.level || 1,
           streak: 0,
           joinedAt: profileData.user.created_at || new Date().toISOString(),

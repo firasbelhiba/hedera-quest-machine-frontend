@@ -274,7 +274,7 @@ export function Header({ onMenuClick }: HeaderProps) {
                   [{currentUser?.name || 'LOADING...'}]
                 </p>
                 <p className="text-xs text-muted-foreground font-mono">
-                  {currentUser?.points ? `[${currentUser.points}_POINTS]` : '[LOADING...]'}
+                  {currentUser && typeof currentUser.points === 'number' ? `[${currentUser.points}_POINTS]` : '[LOADING...]'}
                 </p>
               </div>
             </Button>
