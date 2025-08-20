@@ -17,10 +17,10 @@ import { Plus, Edit, Trash2, Eye, Filter, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const rarityColors = {
-  common: 'bg-gray-100 text-gray-800',
-  rare: 'bg-blue-100 text-blue-800',
-  epic: 'bg-purple-100 text-purple-800',
-  legendary: 'bg-yellow-100 text-yellow-800',
+  common: 'bg-black border-2 border-dashed border-gray-600 text-gray-400',
+  rare: 'bg-black border-2 border-dashed border-cyan-400 text-cyan-400',
+  epic: 'bg-black border-2 border-dashed border-purple-400 text-purple-400',
+  legendary: 'bg-black border-2 border-dashed border-yellow-400 text-yellow-400',
 };
 
 function AdminBadgesPageContent() {
@@ -104,46 +104,48 @@ function AdminBadgesPageContent() {
 
   return (
     <div className="container mx-auto py-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Badge Management</h1>
-          <p className="text-muted-foreground">
-            Create and manage badges that users can earn
-          </p>
+      <div className="p-4 bg-black border-2 border-dashed border-gray-600 rounded">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold font-mono text-green-400">[BADGE_MANAGEMENT]</h1>
+            <p className="text-gray-400 font-mono text-sm">
+              Create and manage badges that users can earn
+            </p>
+          </div>
+          <Button
+            onClick={() => setShowCreateForm(!showCreateForm)}
+            className="flex items-center gap-2 bg-black border-2 border-dashed border-gray-600 text-green-400 font-mono hover:bg-gray-800"
+          >
+            <Plus className="h-4 w-4" />
+            {showCreateForm ? '[HIDE_FORM]' : '[CREATE_BADGE]'}
+          </Button>
         </div>
-        <Button
-          onClick={() => setShowCreateForm(!showCreateForm)}
-          className="flex items-center gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          {showCreateForm ? 'Hide Form' : 'Create Badge'}
-        </Button>
       </div>
 
       <Tabs defaultValue="list" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="list">All Badges</TabsTrigger>
-          <TabsTrigger value="create">Create Badge</TabsTrigger>
+        <TabsList className="bg-black border-2 border-dashed border-gray-600">
+          <TabsTrigger value="list" className="font-mono data-[state=active]:bg-gray-800 data-[state=active]:text-green-400 text-gray-400">[ALL_BADGES]</TabsTrigger>
+          <TabsTrigger value="create" className="font-mono data-[state=active]:bg-gray-800 data-[state=active]:text-green-400 text-gray-400">[CREATE_BADGE]</TabsTrigger>
         </TabsList>
 
                  <TabsContent value="list" className="space-y-4">
            {/* Filters */}
-           <Card>
+           <Card className="bg-black border-2 border-dashed border-gray-600">
              <CardHeader>
                <div className="flex items-center justify-between">
                  <div className="flex items-center gap-2">
-                   <Filter className="h-4 w-4" />
-                   <CardTitle className="text-lg">Filters</CardTitle>
+                   <Filter className="h-4 w-4 text-green-400" />
+                   <CardTitle className="text-lg font-mono text-green-400">[FILTERS]</CardTitle>
                  </div>
                  {hasActiveFilters && (
                    <Button
                      variant="outline"
                      size="sm"
                      onClick={clearFilters}
-                     className="flex items-center gap-2"
+                     className="flex items-center gap-2 bg-black border-2 border-dashed border-gray-600 text-red-400 font-mono hover:bg-gray-800"
                    >
                      <X className="h-4 w-4" />
-                     Clear Filters
+                     [CLEAR_FILTERS]
                    </Button>
                  )}
                </div>
@@ -151,44 +153,44 @@ function AdminBadgesPageContent() {
              <CardContent>
                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                    <div className="space-y-2">
-                    <Label>Rarity</Label>
+                    <Label className="font-mono text-gray-400">[RARITY]</Label>
                     <Select
                       value={filters.rarity || 'all'}
                       onValueChange={(value) => handleFilterChange('rarity', value === 'all' ? undefined : value)}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="All rarities" />
+                      <SelectTrigger className="bg-black border-2 border-dashed border-gray-600 text-green-400 font-mono">
+                        <SelectValue placeholder="[ALL_RARITIES]" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All rarities</SelectItem>
-                        <SelectItem value="common">Common</SelectItem>
-                        <SelectItem value="rare">Rare</SelectItem>
-                        <SelectItem value="epic">Epic</SelectItem>
-                        <SelectItem value="legendary">Legendary</SelectItem>
+                      <SelectContent className="bg-black border-2 border-dashed border-gray-600">
+                        <SelectItem value="all" className="font-mono text-gray-400 hover:text-green-400">[ALL_RARITIES]</SelectItem>
+                        <SelectItem value="common" className="font-mono text-gray-400 hover:text-green-400">[COMMON]</SelectItem>
+                        <SelectItem value="rare" className="font-mono text-cyan-400 hover:text-green-400">[RARE]</SelectItem>
+                        <SelectItem value="epic" className="font-mono text-purple-400 hover:text-green-400">[EPIC]</SelectItem>
+                        <SelectItem value="legendary" className="font-mono text-yellow-400 hover:text-green-400">[LEGENDARY]</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                                    <div className="space-y-2">
-                    <Label>Status</Label>
+                    <Label className="font-mono text-gray-400">[STATUS]</Label>
                     <Select
                       value={filters.isActive?.toString() || 'all'}
                       onValueChange={(value) => handleFilterChange('isActive', value === 'true' ? true : value === 'false' ? false : undefined)}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="All statuses" />
+                      <SelectTrigger className="bg-black border-2 border-dashed border-gray-600 text-green-400 font-mono">
+                        <SelectValue placeholder="[ALL_STATUSES]" />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All statuses</SelectItem>
-                        <SelectItem value="true">Active</SelectItem>
-                        <SelectItem value="false">Inactive</SelectItem>
+                      <SelectContent className="bg-black border-2 border-dashed border-gray-600">
+                        <SelectItem value="all" className="font-mono text-gray-400 hover:text-green-400">[ALL_STATUSES]</SelectItem>
+                        <SelectItem value="true" className="font-mono text-green-400 hover:text-green-400">[ACTIVE]</SelectItem>
+                        <SelectItem value="false" className="font-mono text-red-400 hover:text-green-400">[INACTIVE]</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                  <div className="space-y-2">
-                   <Label>Results</Label>
-                   <div className="text-sm text-muted-foreground">
+                   <Label className="font-mono text-gray-400">[RESULTS]</Label>
+                   <div className="text-sm font-mono text-green-400">
                      {totalCount} badge{totalCount !== 1 ? 's' : ''} found
                    </div>
                  </div>
@@ -198,30 +200,30 @@ function AdminBadgesPageContent() {
 
            {isLoading ? (
             <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-              <p className="mt-2 text-muted-foreground">Loading badges...</p>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-400 mx-auto"></div>
+              <p className="mt-2 font-mono text-gray-400">[LOADING_BADGES...]</p>
             </div>
           ) : badges.length === 0 ? (
-            <Card>
+            <Card className="bg-black border-2 border-dashed border-gray-600">
               <CardContent className="text-center py-8">
-                <p className="text-muted-foreground">No badges found</p>
+                <p className="font-mono text-gray-400">[NO_BADGES_FOUND]</p>
                 <Button
                   onClick={() => setShowCreateForm(true)}
-                  className="mt-4"
+                  className="mt-4 bg-black border-2 border-dashed border-gray-600 text-green-400 font-mono hover:bg-gray-800"
                 >
-                  Create your first badge
+                  [CREATE_FIRST_BADGE]
                 </Button>
               </CardContent>
             </Card>
           ) : (
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {badges.map((badge) => (
-                <Card key={badge.id} className="hover:shadow-md transition-shadow">
+                <Card key={badge.id} className="bg-black border-2 border-dashed border-gray-600 hover:border-green-400 transition-colors">
                   <CardHeader className="pb-3">
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
-                        <CardTitle className="text-lg">{badge.name}</CardTitle>
-                        <CardDescription className="line-clamp-2">
+                        <CardTitle className="text-lg font-mono text-green-400">{badge.name}</CardTitle>
+                        <CardDescription className="line-clamp-2 font-mono text-gray-400 text-sm">
                           {badge.description}
                         </CardDescription>
                       </div>
@@ -230,6 +232,7 @@ function AdminBadgesPageContent() {
                           variant="ghost"
                           size="sm"
                           onClick={() => {/* TODO: View badge details */}}
+                          className="bg-black border-2 border-dashed border-gray-600 text-cyan-400 hover:bg-gray-800"
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
@@ -237,6 +240,7 @@ function AdminBadgesPageContent() {
                           variant="ghost"
                           size="sm"
                           onClick={() => {/* TODO: Edit badge */}}
+                          className="bg-black border-2 border-dashed border-gray-600 text-yellow-400 hover:bg-gray-800"
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -244,6 +248,7 @@ function AdminBadgesPageContent() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDeleteBadge(badge.id)}
+                          className="bg-black border-2 border-dashed border-gray-600 text-red-400 hover:bg-gray-800"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -253,29 +258,29 @@ function AdminBadgesPageContent() {
                   <CardContent className="pt-0">
                     <div className="flex flex-wrap gap-2 mb-3">
                       <BadgeComponent
-                        className={rarityColors[badge.rarity]}
+                        className={`${rarityColors[badge.rarity]} font-mono`}
                       >
-                        {badge.rarity}
+                        [{badge.rarity.toUpperCase()}]
                       </BadgeComponent>
-                      <BadgeComponent variant="secondary">
-                        {badge.points} pts
+                      <BadgeComponent className="bg-black border-2 border-dashed border-gray-600 text-green-400 font-mono">
+                        [{badge.points}_PTS]
                       </BadgeComponent>
                       {badge.maxToObtain && (
-                        <BadgeComponent variant="outline">
-                          Max: {badge.maxToObtain}
+                        <BadgeComponent className="bg-black border-2 border-dashed border-gray-600 text-orange-400 font-mono">
+                          [MAX:{badge.maxToObtain}]
                         </BadgeComponent>
                       )}
                     </div>
-                    <div className="flex justify-between items-center text-sm text-muted-foreground">
+                    <div className="flex justify-between items-center text-sm font-mono">
                       <span>
                         {badge.isActive ? (
-                          <span className="text-green-600">Active</span>
+                          <span className="text-green-400">[ACTIVE]</span>
                         ) : (
-                          <span className="text-red-600">Inactive</span>
+                          <span className="text-red-400">[INACTIVE]</span>
                         )}
                       </span>
                       {badge.created_at && (
-                        <span>
+                        <span className="text-gray-400">
                           Created: {new Date(badge.created_at).toLocaleDateString()}
                         </span>
                       )}
@@ -294,16 +299,17 @@ function AdminBadgesPageContent() {
 
       {showCreateForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-background rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-black border-2 border-dashed border-gray-600 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Create New Badge</h2>
+                <h2 className="text-xl font-semibold font-mono text-green-400">[CREATE_NEW_BADGE]</h2>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => setShowCreateForm(false)}
+                  className="bg-black border-2 border-dashed border-gray-600 text-red-400 font-mono hover:bg-gray-800"
                 >
-                  ×
+                  [×]
                 </Button>
               </div>
                              <CreateBadgeForm onBadgeCreated={loadBadges} />
