@@ -4,7 +4,7 @@ export interface User {
   name: string;
   email: string;
   avatar: string;
-  hederaAccountId: string;
+  hederaAccountId: string | null;
   points: number;
   level: number;
   streak: number;

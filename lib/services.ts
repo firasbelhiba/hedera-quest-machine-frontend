@@ -75,7 +75,6 @@ export class QuestService {
     name: string;
     email: string;
     password: string;
-    hederaAccountId: string;
   }): Promise<User> {
     if (useApi()) {
       // Add confirmPassword to match RegisterRequest type
@@ -90,16 +89,13 @@ export class QuestService {
     if (existingUser) {
       throw new Error('An account with this email already exists');
     }
-    const existingHederaAccount = mockUsers.find(u => u.hederaAccountId === userData.hederaAccountId);
-    if (existingHederaAccount) {
-      throw new Error('This Hedera account is already linked to another user');
-    }
+
     const newUser: User = {
       id: Date.now().toString(),
       name: userData.name,
       email: userData.email,
       avatar: `https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face`,
-      hederaAccountId: userData.hederaAccountId,
+      hederaAccountId: null,
       points: 0,
       level: 1,
       streak: 0,

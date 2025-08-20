@@ -47,14 +47,56 @@ export default function ProfilePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isVerifyingEmail, setIsVerifyingEmail] = useState(false);
+  const [emailVerificationSuccess, setEmailVerificationSuccess] = useState(false);
   const [isConnectingTwitter, setIsConnectingTwitter] = useState(false);
   const [isConnectingFacebook, setIsConnectingFacebook] = useState(false);
   const [isConnectingDiscord, setIsConnectingDiscord] = useState(false);
 
   const { toast } = useToast();
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<ProfileFormData>({
+  const { register, handleSubmit, formState: { errors }, reset, watch } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema)
   });
+
+  const handleVerifyEmail = async () => {
+     const email = profileData?.user?.email;
+     if (!email) return;
+ 
+     setIsVerifyingEmail(true);
+     setEmailVerificationSuccess(false);
+     
+     try {
+       const accessToken = localStorage.getItem('auth_token');
+       if (!accessToken) {
+         setSaveError('No access token found. Please login again.');
+         setTimeout(() => setSaveError(null), 5000);
+         return;
+       }
+ 
+       const baseUrl = 'https://hedera-quests.com';
+       const response = await fetch(`${baseUrl}/profile/verify-email`, {
+         method: 'POST',
+         headers: {
+           'Authorization': `Bearer ${accessToken}`,
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify({ email })
+       });
+       
+       if (!response.ok) {
+         throw new Error('Failed to send verification email');
+       }
+       
+       setEmailVerificationSuccess(true);
+       setTimeout(() => setEmailVerificationSuccess(false), 5000);
+     } catch (error) {
+       console.error('Error verifying email:', error);
+       setSaveError(error instanceof Error ? error.message : 'Failed to send verification email');
+       setTimeout(() => setSaveError(null), 5000);
+     } finally {
+       setIsVerifyingEmail(false);
+     }
+   };
 
   const loadUser = async () => {
     setIsLoading(true);
@@ -825,6 +867,43 @@ export default function ProfilePage() {
                  )}
                  </CardContent>
                </Card>
+
+              {/* Email Verification */}
+              <div className="border-2 border-dashed border-orange-500/30 bg-gradient-to-br from-orange-500/5 to-yellow-500/5 hover:border-solid transition-all duration-200 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h3 className="font-mono font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wider">{'>'} EMAIL_VERIFICATION</h3>
+                    <p className="text-sm text-muted-foreground font-mono">
+                      [EMAIL] {profileData?.user?.email || 'No email set'}
+                    </p>
+                  </div>
+                  <Badge className="bg-orange-500/20 text-orange-700 dark:text-orange-300 border border-dashed border-orange-500/50 font-mono">
+                    <AlertCircle className="w-3 h-3 mr-1" />
+                    VERIFY_REQUIRED
+                  </Badge>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      onClick={handleVerifyEmail}
+                      disabled={isVerifyingEmail || !profileData?.user?.email}
+                      className="font-mono border-2 border-dashed border-orange-500/50 hover:border-solid hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all duration-200 bg-orange-500 hover:bg-orange-600 text-white"
+                    >
+                      {isVerifyingEmail ? 'SENDING...' : 'SEND_VERIFICATION_EMAIL'}
+                    </Button>
+                  </div>
+                  {emailVerificationSuccess && (
+                    <div className="flex items-center gap-2 p-2 bg-green-500/10 rounded border border-dashed border-green-500/30">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <p className="text-sm text-green-600 dark:text-green-400 font-mono">{'>'} Email sent successfully! Check your inbox.</p>
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground font-mono">
+                    [INFO] Verify your email address to receive important notifications and updates.
+                  </p>
+                </div>
+              </div>
 
               {/* Account Status */}
               <div className="border-2 border-dashed border-green-500/30 bg-gradient-to-br from-green-500/5 to-emerald-500/5 hover:border-solid transition-all duration-200 rounded-lg p-4">

@@ -21,10 +21,6 @@ const registerSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   confirmPassword: z.string(),
-  hederaAccountId: z.string().refine(
-    (val) => QuestService.validateHederaAccountId(val),
-    'Invalid Hedera account ID format (should be like 0.0.123456)'
-  ),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -161,22 +157,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
             )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="hederaAccountId">Hedera Account ID</Label>
-            <div className="relative">
-              <UserIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="hederaAccountId"
-                type="text"
-                placeholder="0.0.123456"
-                className="pl-10"
-                {...register('hederaAccountId')}
-              />
-            </div>
-            {errors.hederaAccountId && (
-              <p className="text-sm text-destructive">{errors.hederaAccountId.message}</p>
-            )}
-          </div>
+
 
           {error && (
             <Alert variant="destructive">

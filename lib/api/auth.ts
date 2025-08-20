@@ -58,13 +58,7 @@ export const AuthService = {
     console.log('Registering with proxy URL: /user/register');
     console.log('Request body:', body);
     
-    const { data } = await axios.post('/user/register', body, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      timeout: 10000,
-    });
+    const { data } = await api.post('/user/register', body);
 
     // Best-effort user construction until backend spec is finalized
     const returnedUser: any = data?.user || data;
