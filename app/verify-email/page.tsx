@@ -1,21 +1,35 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Mail, CheckCircle, AlertCircle } from 'lucide-react';
+import { CheckCircle, AlertCircle, Mail } from 'lucide-react';
+import { AuthService } from '@/lib/api/auth';
 
 export default function VerifyEmailPage() {
-  const [email, setEmail] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [verificationStatus, setVerificationStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
+  const [token, setToken] = useState<string | null>(null);
+  
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
-  const handleVerifyEmail = async () => {
-    if (!email) {
-      setMessage('Please enter your email address');
+  useEffect(() => {
+    // Extract token from URL query parameters
+    const tokenParam = searchParams.get('token');
+    if (tokenParam) {
+      setToken(tokenParam);
+    } else {
+      setVerificationStatus('error');
+      setMessage('No verification token found in URL. Please check your email link.');
+    }
+  }, [searchParams]);
+
+  const handleVerifyToken = async () => {
+    if (!token) {
+      setMessage('No verification token available');
       setVerificationStatus('error');
       return;
     }
@@ -23,14 +37,25 @@ export default function VerifyEmailPage() {
     setIsVerifying(true);
     setVerificationStatus('idle');
     
-    // Simulate API call
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setVerificationStatus('success');
-      setMessage('Verification email sent successfully! Please check your inbox.');
-    } catch (error) {
+      const result = await AuthService.verifyToken(token);
+      
+      if (result.success) {
+        setVerificationStatus('success');
+        setMessage('Email verified successfully! You can now log in to your account.');
+        
+        // Redirect to root page after 3 seconds
+        setTimeout(() => {
+          router.push('/');
+        }, 3000);
+      } else {
+        setVerificationStatus('error');
+        setMessage(result.message || 'Token verification failed. Please try again or request a new verification email.');
+      }
+    } catch (error: any) {
+      console.error('Token verification error:', error);
       setVerificationStatus('error');
-      setMessage('Failed to send verification email. Please try again.');
+      setMessage(error.response?.data?.message || 'Failed to verify token. Please try again or request a new verification email.');
     } finally {
       setIsVerifying(false);
     }
@@ -45,33 +70,20 @@ export default function VerifyEmailPage() {
           </div>
           <CardTitle className="text-xl font-mono text-green-400">[EMAIL_VERIFICATION]</CardTitle>
           <CardDescription className="text-gray-400 font-mono text-sm">
-            Enter your email address to receive a verification link
+            {token ? 'Click the button below to verify your email address' : 'Invalid verification link'}
           </CardDescription>
         </CardHeader>
         
         <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-sm font-mono text-gray-300">
-              [EMAIL_ADDRESS]
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="your.email@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="bg-black border-2 border-dashed border-gray-600 text-gray-300 font-mono placeholder:text-gray-500 focus:border-purple-500"
+          {token && verificationStatus === 'idle' && (
+            <Button
+              onClick={handleVerifyToken}
               disabled={isVerifying}
-            />
-          </div>
-          
-          <Button
-            onClick={handleVerifyEmail}
-            disabled={isVerifying}
-            className="w-full bg-purple-900 hover:bg-purple-800 border-2 border-dashed border-purple-600 text-purple-100 font-mono text-sm transition-colors"
-          >
-            {isVerifying ? '[SENDING...]' : '[SEND_VERIFICATION_EMAIL]'}
-          </Button>
+              className="w-full bg-purple-900 hover:bg-purple-800 border-2 border-dashed border-purple-600 text-purple-100 font-mono text-sm transition-colors"
+            >
+              {isVerifying ? '[VERIFYING...]' : '[VERIFY_EMAIL]'}
+            </Button>
+          )}
           
           {message && (
             <div className={`flex items-center gap-2 p-3 border-2 border-dashed rounded font-mono text-sm ${
@@ -85,6 +97,14 @@ export default function VerifyEmailPage() {
                 <AlertCircle className="w-4 h-4" />
               )}
               <span>{message}</span>
+            </div>
+          )}
+          
+          {verificationStatus === 'success' && (
+            <div className="text-center">
+              <p className="text-xs font-mono text-gray-500">
+                Redirecting to login page in 3 seconds...
+              </p>
             </div>
           )}
           

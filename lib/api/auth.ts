@@ -100,6 +100,17 @@ export const AuthService = {
     } finally {
       tokenStorage.clearAll();
     }
+  },
+
+  async verifyToken(token: string): Promise<{ success: boolean; message: string }> {
+    console.log('Verifying token:', token);
+    
+    const { data } = await api.get('/profile/verify-token', {
+      params: { token }
+    });
+
+    console.log('Token verification response:', data);
+    return data;
   }
 };
 
