@@ -28,11 +28,7 @@ import {
   FileText,
   User as UserIcon,
   Calendar,
-  Globe,
-  Bot,
-  Play,
-  Settings,
-  Zap
+  Globe
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -257,87 +253,7 @@ export default function ReviewSubmissionsPage() {
             </CardContent>
           </Card>
 
-          {/* Twitter Automation Widget */}
-          <Card className="border-2 border-dashed border-gray-600 bg-black">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 font-mono text-green-400">
-                <Bot className="w-5 h-5" />
-                [TWITTER_AUTO_VALIDATOR]
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4">
-              <div className="space-y-4">
-                {/* Configuration Options */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div className="p-3 bg-gray-900 border border-dashed border-gray-700 rounded">
-                    <label className="flex items-center gap-2 text-xs font-mono text-gray-300">
-                      <input type="checkbox" className="w-3 h-3" defaultChecked />
-                      <span>[LIKES_VALIDATION]</span>
-                    </label>
-                    <p className="text-xs text-gray-500 mt-1 font-mono">Validate likes interaction</p>
-                  </div>
-                  <div className="p-3 bg-gray-900 border border-dashed border-gray-700 rounded">
-                    <label className="flex items-center gap-2 text-xs font-mono text-gray-300">
-                      <input type="checkbox" className="w-3 h-3" defaultChecked />
-                      <span>[RETWEETS_CHECK]</span>
-                    </label>
-                    <p className="text-xs text-gray-500 mt-1 font-mono">Validate retweets interaction</p>
-                  </div>
-                  <div className="p-3 bg-gray-900 border border-dashed border-gray-700 rounded">
-                    <label className="flex items-center gap-2 text-xs font-mono text-gray-300">
-                      <input type="checkbox" className="w-3 h-3" defaultChecked />
-                      <span>[COMMENTS_ANALYSIS]</span>
-                    </label>
-                    <p className="text-xs text-gray-500 mt-1 font-mono">Validate comments interaction</p>
-                  </div>
-                  <div className="p-3 bg-gray-900 border border-dashed border-gray-700 rounded">
-                    <label className="flex items-center gap-2 text-xs font-mono text-gray-300">
-                      <input type="checkbox" className="w-3 h-3" defaultChecked />
-                      <span>[FOLLOW_VALIDATION]</span>
-                    </label>
-                    <p className="text-xs text-gray-500 mt-1 font-mono">Validate follow interaction</p>
-                  </div>
-                </div>
 
-                {/* Action Buttons */}
-                <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs text-gray-400 font-mono">
-                    <Zap className="w-3 h-3" />
-                    <span>AI-powered validation with configurable criteria</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="border-dashed border-gray-500 text-gray-300 hover:bg-gray-800 bg-black font-mono"
-                    >
-                      <Settings className="w-4 h-4 mr-1" />
-                      [SAVE_CONFIG]
-                    </Button>
-                    <Button 
-                      className="bg-gray-800 hover:bg-gray-700 text-green-400 font-mono border-2 border-gray-600"
-                      size="sm"
-                    >
-                      <Play className="w-4 h-4 mr-1" />
-                      [LAUNCH_AUTO_REVIEW]
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Status Display */}
-                <div className="p-3 bg-gray-900 border border-dashed border-gray-700 rounded font-mono text-xs">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-gray-300">Status: [READY]</span>
-                    <span className="text-gray-300">Pending: {filteredSubmissions.filter(s => s.status === 'pending').length} submissions</span>
-                  </div>
-                  <div className="flex items-center justify-between text-gray-500">
-                    <span>Active Rules: 4/6</span>
-                    <span>Est. Processing: ~{Math.ceil(filteredSubmissions.filter(s => s.status === 'pending').length * 0.5)}min</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
           {/* Submissions Table */}
           <Card className="bg-black border-2 border-dashed border-gray-600">

@@ -202,32 +202,33 @@ export default function ManageQuestsPage() {
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'beginner': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
-      case 'intermediate': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
-      case 'advanced': return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300';
-      case 'expert': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+      case 'beginner': return 'bg-black border-2 border-dashed border-green-400 text-green-400 font-mono';
+      case 'intermediate': return 'bg-black border-2 border-dashed border-yellow-400 text-yellow-400 font-mono';
+      case 'advanced': return 'bg-black border-2 border-dashed border-orange-400 text-orange-400 font-mono';
+      case 'expert': return 'bg-black border-2 border-dashed border-red-400 text-red-400 font-mono';
+      default: return 'bg-black border-2 border-dashed border-gray-400 text-gray-400 font-mono';
     }
   };
 
   const getCategoryColor = (category: string) => {
     const colors = {
-      'getting-started': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-      'defi': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
-      'nfts': 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300',
-      'development': 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900 dark:text-cyan-300',
-      'consensus': 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300',
-      'smart-contracts': 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300',
-      'token-service': 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300',
-      'file-service': 'bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-300',
+      'getting-started': 'bg-black border-2 border-dashed border-blue-400 text-blue-400 font-mono',
+      'defi': 'bg-black border-2 border-dashed border-purple-400 text-purple-400 font-mono',
+      'nfts': 'bg-black border-2 border-dashed border-pink-400 text-pink-400 font-mono',
+      'development': 'bg-black border-2 border-dashed border-cyan-400 text-cyan-400 font-mono',
+      'consensus': 'bg-black border-2 border-dashed border-indigo-400 text-indigo-400 font-mono',
+      'smart-contracts': 'bg-black border-2 border-dashed border-emerald-400 text-emerald-400 font-mono',
+      'token-service': 'bg-black border-2 border-dashed border-amber-400 text-amber-400 font-mono',
+      'file-service': 'bg-black border-2 border-dashed border-slate-400 text-slate-400 font-mono',
     };
-    return colors[category as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+    return colors[category as keyof typeof colors] || 'bg-black border-2 border-dashed border-gray-400 text-gray-400 font-mono';
   };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-400"></div>
+        <p className="ml-3 font-mono text-gray-400">[LOADING_QUESTS...]</p>
       </div>
     );
   }
@@ -237,57 +238,57 @@ export default function ManageQuestsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Manage Quests</h1>
-          <p className="text-muted-foreground">Create, edit, and manage learning quests</p>
+          <h1 className="text-3xl font-bold font-mono text-green-400">[MANAGE_QUESTS]</h1>
+          <p className="font-mono text-gray-400">Create, edit, and manage learning quests</p>
         </div>
-        <Button onClick={() => setShowCreateDialog(true)} className="gap-2">
+        <Button onClick={() => setShowCreateDialog(true)} className="gap-2 bg-black border-2 border-dashed border-gray-600 text-green-400 font-mono hover:bg-gray-800">
           <Plus className="w-4 h-4" />
-          Create Quest
+          [CREATE_QUEST]
         </Button>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className="bg-black border-2 border-dashed border-gray-600">
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <FileText className="w-4 h-4 text-blue-500" />
+              <FileText className="w-4 h-4 text-blue-400" />
               <div>
-                <p className="text-sm text-muted-foreground">Total Quests</p>
-                <p className="text-2xl font-bold">{quests.length}</p>
+                <p className="text-sm font-mono text-gray-400">[TOTAL_QUESTS]</p>
+                <p className="text-2xl font-bold font-mono text-green-400">{quests.length}</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-black border-2 border-dashed border-gray-600">
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <Trophy className="w-4 h-4 text-green-500" />
+              <Trophy className="w-4 h-4 text-green-400" />
               <div>
-                <p className="text-sm text-muted-foreground">Active</p>
-                <p className="text-2xl font-bold">{quests.filter(q => q.isActive).length}</p>
+                <p className="text-sm font-mono text-gray-400">[ACTIVE]</p>
+                <p className="text-2xl font-bold font-mono text-green-400">{quests.filter(q => q.isActive).length}</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-black border-2 border-dashed border-gray-600">
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <Users className="w-4 h-4 text-purple-500" />
+              <Users className="w-4 h-4 text-purple-400" />
               <div>
-                <p className="text-sm text-muted-foreground">Total Completions</p>
-                <p className="text-2xl font-bold">{quests.reduce((sum, q) => sum + (q.completions || 0), 0)}</p>
+                <p className="text-sm font-mono text-gray-400">[COMPLETIONS]</p>
+                <p className="text-2xl font-bold font-mono text-green-400">{quests.reduce((sum, q) => sum + (q.completions || 0), 0)}</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="bg-black border-2 border-dashed border-gray-600">
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-orange-500" />
+              <Clock className="w-4 h-4 text-orange-400" />
               <div>
-                <p className="text-sm text-muted-foreground">Avg. Time</p>
-                <p className="text-2xl font-bold">2.5h</p>
+                <p className="text-sm font-mono text-gray-400">[AVG_TIME]</p>
+                <p className="text-2xl font-bold font-mono text-green-400">2.5h</p>
               </div>
             </div>
           </CardContent>
@@ -295,65 +296,65 @@ export default function ManageQuestsPage() {
       </div>
 
       {/* Filters */}
-      <Card>
+      <Card className="bg-black border-2 border-dashed border-gray-600">
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 placeholder="Search quests..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
+                className="pl-10 bg-black border-2 border-dashed border-gray-600 text-green-400 font-mono placeholder:text-gray-500"
               />
             </div>
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-2 border rounded-md bg-background"
+              className="px-3 py-2 bg-black border-2 border-dashed border-gray-600 text-green-400 font-mono rounded-md"
             >
-              <option value="all">All Categories</option>
-              <option value="getting-started">Getting Started</option>
-              <option value="defi">DeFi</option>
-              <option value="nfts">NFTs</option>
-              <option value="development">Development</option>
-              <option value="consensus">Consensus</option>
-              <option value="smart-contracts">Smart Contracts</option>
-              <option value="token-service">Token Service</option>
-              <option value="file-service">File Service</option>
+              <option value="all">[ALL_CATEGORIES]</option>
+              <option value="getting-started">[GETTING_STARTED]</option>
+              <option value="defi">[DEFI]</option>
+              <option value="nfts">[NFTS]</option>
+              <option value="development">[DEVELOPMENT]</option>
+              <option value="consensus">[CONSENSUS]</option>
+              <option value="smart-contracts">[SMART_CONTRACTS]</option>
+              <option value="token-service">[TOKEN_SERVICE]</option>
+              <option value="file-service">[FILE_SERVICE]</option>
             </select>
             <select
               value={selectedDifficulty}
               onChange={(e) => setSelectedDifficulty(e.target.value)}
-              className="px-3 py-2 border rounded-md bg-background"
+              className="px-3 py-2 bg-black border-2 border-dashed border-gray-600 text-green-400 font-mono rounded-md"
             >
-              <option value="all">All Difficulties</option>
-              <option value="beginner">Beginner</option>
-              <option value="intermediate">Intermediate</option>
-              <option value="advanced">Advanced</option>
-              <option value="expert">Expert</option>
+              <option value="all">[ALL_DIFFICULTIES]</option>
+              <option value="beginner">[BEGINNER]</option>
+              <option value="intermediate">[INTERMEDIATE]</option>
+              <option value="advanced">[ADVANCED]</option>
+              <option value="expert">[EXPERT]</option>
             </select>
           </div>
         </CardContent>
       </Card>
 
       {/* Quests Table */}
-      <Card className="shadow-sm">
+      <Card className="bg-black border-2 border-dashed border-gray-600">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Trophy className="h-5 w-5 text-primary" />
+              <div className="p-2 bg-black border-2 border-dashed border-gray-600 rounded-lg">
+                <Trophy className="h-5 w-5 text-green-400" />
               </div>
               <div>
-                <CardTitle className="text-xl">Quest Management</CardTitle>
-                <p className="text-sm text-muted-foreground mt-1">
+                <CardTitle className="text-xl font-mono text-green-400">[QUEST_MANAGEMENT]</CardTitle>
+                <p className="text-sm font-mono text-gray-400 mt-1">
                   {filteredQuests.length} quest{filteredQuests.length !== 1 ? 's' : ''} found
                 </p>
               </div>
             </div>
-            <Badge variant="outline" className="text-xs">
-              Total: {filteredQuests.length}
+            <Badge className="bg-black border-2 border-dashed border-gray-600 text-green-400 font-mono">
+              [TOTAL:{filteredQuests.length}]
             </Badge>
           </div>
         </CardHeader>
@@ -361,45 +362,45 @@ export default function ManageQuestsPage() {
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="border-b-2 bg-muted/30">
-                  <TableHead className="font-semibold text-foreground py-4 px-6">
+                <TableRow className="border-b-2 border-dashed border-gray-600 bg-black">
+                  <TableHead className="font-semibold font-mono text-green-400 py-4 px-6">
                     <div className="flex items-center gap-2">
                       <FileText className="h-4 w-4" />
-                      Quest Details
+                      [QUEST_DETAILS]
                     </div>
                   </TableHead>
-                  <TableHead className="font-semibold text-foreground py-4 px-4">
+                  <TableHead className="font-semibold font-mono text-green-400 py-4 px-4">
                     <div className="flex items-center gap-2">
                       <Filter className="h-4 w-4" />
-                      Category
+                      [CATEGORY]
                     </div>
                   </TableHead>
-                  <TableHead className="font-semibold text-foreground py-4 px-4">
+                  <TableHead className="font-semibold font-mono text-green-400 py-4 px-4">
                     <div className="flex items-center gap-2">
                       <Trophy className="h-4 w-4" />
-                      Difficulty
+                      [DIFFICULTY]
                     </div>
                   </TableHead>
-                  <TableHead className="font-semibold text-foreground py-4 px-4">
+                  <TableHead className="font-semibold font-mono text-green-400 py-4 px-4">
                     <div className="flex items-center gap-2">
                       <Trophy className="h-4 w-4" />
-                      Rewards
+                      [REWARDS]
                     </div>
                   </TableHead>
-                  <TableHead className="font-semibold text-foreground py-4 px-4">
+                  <TableHead className="font-semibold font-mono text-green-400 py-4 px-4">
                     <div className="flex items-center gap-2">
                       <Users className="h-4 w-4" />
-                      Participants
+                      [PARTICIPANTS]
                     </div>
                   </TableHead>
-                  <TableHead className="font-semibold text-foreground py-4 px-4">
+                  <TableHead className="font-semibold font-mono text-green-400 py-4 px-4">
                     <div className="flex items-center gap-2">
                       <Clock className="h-4 w-4" />
-                      Status
+                      [STATUS]
                     </div>
                   </TableHead>
-                  <TableHead className="font-semibold text-foreground py-4 px-4 text-center">
-                    Actions
+                  <TableHead className="font-semibold font-mono text-green-400 py-4 px-4 text-center">
+                    [ACTIONS]
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -408,25 +409,25 @@ export default function ManageQuestsPage() {
                   <TableRow 
                     key={quest.id} 
                     className={cn(
-                      "hover:bg-muted/50 transition-colors border-b",
-                      index % 2 === 0 ? "bg-background" : "bg-muted/20"
+                      "hover:bg-gray-900/50 transition-colors border-b border-dashed border-gray-600",
+                      index % 2 === 0 ? "bg-black" : "bg-gray-900/20"
                     )}
                   >
                     <TableCell className="py-4 px-6">
                       <div className="flex items-start gap-3">
-                        <div className="p-2 bg-primary/10 rounded-lg flex-shrink-0 mt-1">
-                          <FileText className="h-4 w-4 text-primary" />
+                        <div className="p-2 bg-gray-900 border border-dashed border-gray-600 flex-shrink-0 mt-1">
+                          <FileText className="h-4 w-4 text-green-400" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <div className="font-semibold text-foreground mb-1 line-clamp-1">
+                          <div className="font-semibold font-mono text-green-400 mb-1 line-clamp-1">
                             {quest.title}
                           </div>
-                          <div className="text-sm text-muted-foreground line-clamp-2 max-w-md">
+                          <div className="text-sm font-mono text-gray-400 line-clamp-2 max-w-md">
                             {quest.description}
                           </div>
                           <div className="flex items-center gap-2 mt-2">
-                            <Badge variant="outline" className="text-xs">
-                              ID: {quest.id}
+                            <Badge variant="outline" className="text-xs font-mono bg-black border-dashed border-gray-600 text-gray-400">
+                              [ID: {quest.id}]
                             </Badge>
                           </div>
                         </div>
@@ -434,32 +435,32 @@ export default function ManageQuestsPage() {
                     </TableCell>
                     <TableCell className="py-4 px-4">
                       <Badge 
-                        className={cn('text-xs font-medium', getCategoryColor(quest.category || 'general'))} 
+                        className={cn('text-xs font-mono font-medium bg-black border-dashed border-gray-600', getCategoryColor(quest.category || 'general'))} 
                         variant="outline"
                       >
-                        {quest.category ? quest.category.replace('-', ' ') : 'No Category'}
+                        [{quest.category ? quest.category.replace('-', ' ') : 'No Category'}]
                       </Badge>
                     </TableCell>
                     <TableCell className="py-4 px-4">
                       <Badge 
-                        className={cn('text-xs font-medium', getDifficultyColor(quest.difficulty))} 
+                        className={cn('text-xs font-mono font-medium bg-black border-dashed border-gray-600', getDifficultyColor(quest.difficulty))} 
                         variant="outline"
                       >
-                        {quest.difficulty}
+                        [{quest.difficulty}]
                       </Badge>
                     </TableCell>
                     <TableCell className="py-4 px-4">
                       <div className="flex items-center gap-2">
-                        <Trophy className="h-4 w-4 text-yellow-500" />
-                        <span className="font-medium">
+                        <Trophy className="h-4 w-4 text-green-400" />
+                        <span className="font-mono font-medium text-green-400">
                           {quest.points || quest.reward || '0'} pts
                         </span>
                       </div>
                     </TableCell>
                     <TableCell className="py-4 px-4">
                       <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-blue-500" />
-                        <span className="font-medium">
+                        <Users className="h-4 w-4 text-green-400" />
+                        <span className="font-mono font-medium text-green-400">
                           {quest.completions || quest.currentParticipants || '0'}
                         </span>
                       </div>
@@ -467,16 +468,19 @@ export default function ManageQuestsPage() {
                     <TableCell className="py-4 px-4">
                       <div className="flex items-center gap-2">
                         <div className={cn(
-                          "w-2 h-2 rounded-full",
+                          "w-2 h-2",
                           (quest.isActive || quest.status === 'active') 
-                            ? "bg-green-500 animate-pulse" 
-                            : "bg-gray-400"
+                            ? "bg-green-400 animate-pulse" 
+                            : "bg-gray-600"
                         )} />
                         <Badge 
-                          variant={(quest.isActive || quest.status === 'active') ? "default" : "secondary"}
-                          className="font-medium"
+                          variant="outline"
+                          className={cn(
+                            "font-mono font-medium bg-black border-dashed border-gray-600",
+                            (quest.isActive || quest.status === 'active') ? "text-green-400" : "text-gray-400"
+                          )}
                         >
-                          {(quest.isActive || quest.status === 'active') ? 'Active' : 'Inactive'}
+                          [{(quest.isActive || quest.status === 'active') ? 'Active' : 'Inactive'}]
                         </Badge>
                       </div>
                     </TableCell>
@@ -487,42 +491,42 @@ export default function ManageQuestsPage() {
                             <Button 
                               variant="ghost" 
                               size="sm" 
-                              className="h-8 w-8 p-0 hover:bg-muted/80 transition-colors"
+                              className="h-8 w-8 p-0 bg-black border border-dashed border-gray-600 hover:bg-gray-900 transition-colors font-mono text-green-400"
                             >
                               <MoreHorizontal className="w-4 h-4" />
                               <span className="sr-only">Open menu</span>
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuContent align="end" className="w-48 bg-black border border-dashed border-gray-600">
                             <DropdownMenuItem 
                               onClick={() => handleViewQuestDetails(quest)}
-                              className="cursor-pointer"
+                              className="cursor-pointer font-mono text-green-400 hover:bg-gray-900 focus:bg-gray-900"
                             >
-                              <Eye className="w-4 h-4 mr-2 text-blue-500" />
-                              View Details
+                              <Eye className="w-4 h-4 mr-2 text-green-400" />
+                              [View Details]
                             </DropdownMenuItem>
                             <DropdownMenuItem 
                               onClick={() => handleEditQuest(quest)}
-                              className="cursor-pointer"
+                              className="cursor-pointer font-mono text-green-400 hover:bg-gray-900 focus:bg-gray-900"
                             >
-                              <Edit className="w-4 h-4 mr-2 text-orange-500" />
-                              Edit Quest
+                              <Edit className="w-4 h-4 mr-2 text-green-400" />
+                              [Edit Quest]
                             </DropdownMenuItem>
                             {!(quest.isActive || quest.status === 'active') && (
                               <DropdownMenuItem 
                                 onClick={() => activateQuest(quest)}
-                                className="cursor-pointer"
+                                className="cursor-pointer font-mono text-green-400 hover:bg-gray-900 focus:bg-gray-900"
                               >
-                                <Trophy className="w-4 h-4 mr-2 text-green-500" />
-                                Activate Quest
+                                <Trophy className="w-4 h-4 mr-2 text-green-400" />
+                                [Activate Quest]
                               </DropdownMenuItem>
                             )}
                             <DropdownMenuItem 
                               onClick={() => handleDeleteQuest(quest)}
-                              className="text-red-600 cursor-pointer hover:bg-red-50 focus:bg-red-50"
+                              className="text-red-400 cursor-pointer hover:bg-gray-900 focus:bg-gray-900 font-mono"
                             >
                               <Trash2 className="w-4 h-4 mr-2" />
-                              Delete Quest
+                              [Delete Quest]
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -542,21 +546,21 @@ export default function ManageQuestsPage() {
           setSelectedQuest(null);
           setSelectedQuestDetails(null);
         }}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
-            <DialogHeader className="pb-4 border-b">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden bg-black border border-dashed border-gray-600">
+            <DialogHeader className="pb-4 border-b border-dashed border-gray-600">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <Trophy className="h-5 w-5 text-primary" />
+                <div className="p-2 bg-gray-900 border border-dashed border-gray-600">
+                  <Trophy className="h-5 w-5 text-green-400" />
                 </div>
                 <div className="flex-1">
-                  <DialogTitle className="text-xl">{selectedQuest.title}</DialogTitle>
+                  <DialogTitle className="text-xl font-mono text-green-400">[{selectedQuest.title}]</DialogTitle>
                   {selectedQuestDetails && (
                     <div className="flex items-center gap-2 mt-1">
-                      <Badge variant={selectedQuestDetails.status === 'active' ? 'default' : 'secondary'}>
-                        {selectedQuestDetails.status}
+                      <Badge variant="outline" className="bg-black border-dashed border-gray-600 font-mono text-green-400">
+                        [{selectedQuestDetails.status}]
                       </Badge>
-                      <Badge className={getDifficultyColor(selectedQuestDetails.difficulty)} variant="outline">
-                        {selectedQuestDetails.difficulty}
+                      <Badge className={cn('bg-black border-dashed border-gray-600 font-mono', getDifficultyColor(selectedQuestDetails.difficulty))} variant="outline">
+                        [{selectedQuestDetails.difficulty}]
                       </Badge>
                     </div>
                   )}
@@ -566,44 +570,44 @@ export default function ManageQuestsPage() {
             
             {isLoadingDetails ? (
               <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                <span className="ml-3 text-muted-foreground">Loading quest details...</span>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-400"></div>
+                <span className="ml-3 font-mono text-gray-400">[Loading quest details...]</span>
               </div>
             ) : selectedQuestDetails ? (
                <div className="overflow-y-auto max-h-[calc(90vh-120px)] p-1">
                  {/* Description Card */}
-                 <Card className="mb-6">
+                 <Card className="mb-6 bg-black border border-dashed border-gray-600">
                    <CardContent className="p-6">
                      <div className="flex items-center gap-2 mb-3">
-                       <FileText className="h-4 w-4 text-muted-foreground" />
-                       <h3 className="font-semibold text-lg">Description</h3>
+                       <FileText className="h-4 w-4 text-green-400" />
+                       <h3 className="font-semibold font-mono text-lg text-green-400">[Description]</h3>
                      </div>
-                     <p className="text-muted-foreground leading-relaxed">{selectedQuestDetails.description}</p>
+                     <p className="font-mono text-gray-400 leading-relaxed">{selectedQuestDetails.description}</p>
                    </CardContent>
                  </Card>
                  
                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                    {/* Quest Information Card */}
-                   <Card>
+                   <Card className="bg-black border border-dashed border-gray-600">
                      <CardContent className="p-6">
                        <div className="flex items-center gap-2 mb-4">
-                         <Trophy className="h-4 w-4 text-muted-foreground" />
-                         <h3 className="font-semibold text-lg">Quest Information</h3>
+                         <Trophy className="h-4 w-4 text-green-400" />
+                         <h3 className="font-semibold font-mono text-lg text-green-400">[Quest Information]</h3>
                        </div>
                        <div className="space-y-3">
-                         <div className="flex items-center justify-between py-2 border-b border-border/50">
-                           <span className="text-sm font-medium text-muted-foreground">Quest ID</span>
-                           <span className="text-sm font-mono">{selectedQuestDetails.id}</span>
+                         <div className="flex items-center justify-between py-2 border-b border-dashed border-gray-600">
+                           <span className="text-sm font-medium font-mono text-gray-400">Quest ID</span>
+                           <span className="text-sm font-mono text-green-400">{selectedQuestDetails.id}</span>
                          </div>
-                         <div className="flex items-center justify-between py-2 border-b border-border/50">
-                           <span className="text-sm font-medium text-muted-foreground">Reward</span>
-                           <span className="text-sm font-semibold text-green-600">
+                         <div className="flex items-center justify-between py-2 border-b border-dashed border-gray-600">
+                           <span className="text-sm font-medium font-mono text-gray-400">Reward</span>
+                           <span className="text-sm font-semibold font-mono text-green-400">
                              {selectedQuestDetails.reward || selectedQuestDetails.points || 'N/A'}
                            </span>
                          </div>
                          <div className="flex items-center justify-between py-2">
-                           <span className="text-sm font-medium text-muted-foreground">Category</span>
-                           <span className="text-sm capitalize">{selectedQuestDetails.category || 'N/A'}</span>
+                           <span className="text-sm font-medium font-mono text-gray-400">Category</span>
+                           <span className="text-sm font-mono text-green-400 capitalize">{selectedQuestDetails.category || 'N/A'}</span>
                          </div>
 
                        </div>
@@ -611,36 +615,36 @@ export default function ManageQuestsPage() {
                    </Card>
                    
                    {/* Participation & Timeline Card */}
-                   <Card>
+                   <Card className="bg-black border border-dashed border-gray-600">
                      <CardContent className="p-6">
                        <div className="flex items-center gap-2 mb-4">
-                         <Users className="h-4 w-4 text-muted-foreground" />
-                         <h3 className="font-semibold text-lg">Participation & Timeline</h3>
+                         <Users className="h-4 w-4 text-green-400" />
+                         <h3 className="font-semibold font-mono text-lg text-green-400">[Participation & Timeline]</h3>
                        </div>
                        <div className="space-y-3">
-                         <div className="flex items-center justify-between py-2 border-b border-border/50">
-                           <span className="text-sm font-medium text-muted-foreground">Current Participants</span>
-                           <span className="text-sm font-semibold">{selectedQuestDetails.currentParticipants || 0}</span>
+                         <div className="flex items-center justify-between py-2 border-b border-dashed border-gray-600">
+                           <span className="text-sm font-medium font-mono text-gray-400">Current Participants</span>
+                           <span className="text-sm font-semibold font-mono text-green-400">{selectedQuestDetails.currentParticipants || 0}</span>
                          </div>
-                         <div className="flex items-center justify-between py-2 border-b border-border/50">
-                           <span className="text-sm font-medium text-muted-foreground">Max Participants</span>
-                           <span className="text-sm">{selectedQuestDetails.maxParticipants || 'Unlimited'}</span>
+                         <div className="flex items-center justify-between py-2 border-b border-dashed border-gray-600">
+                           <span className="text-sm font-medium font-mono text-gray-400">Max Participants</span>
+                           <span className="text-sm font-mono text-green-400">{selectedQuestDetails.maxParticipants || 'Unlimited'}</span>
                          </div>
-                         <div className="flex items-center justify-between py-2 border-b border-border/50">
-                           <span className="text-sm font-medium text-muted-foreground">Start Date</span>
-                           <span className="text-sm">{selectedQuestDetails.startDate ? new Date(selectedQuestDetails.startDate).toLocaleDateString() : 'N/A'}</span>
+                         <div className="flex items-center justify-between py-2 border-b border-dashed border-gray-600">
+                           <span className="text-sm font-medium font-mono text-gray-400">Start Date</span>
+                           <span className="text-sm font-mono text-green-400">{selectedQuestDetails.startDate ? new Date(selectedQuestDetails.startDate).toLocaleDateString() : 'N/A'}</span>
                          </div>
-                         <div className="flex items-center justify-between py-2 border-b border-border/50">
-                           <span className="text-sm font-medium text-muted-foreground">End Date</span>
-                           <span className="text-sm">{selectedQuestDetails.endDate ? new Date(selectedQuestDetails.endDate).toLocaleDateString() : 'N/A'}</span>
+                         <div className="flex items-center justify-between py-2 border-b border-dashed border-gray-600">
+                           <span className="text-sm font-medium font-mono text-gray-400">End Date</span>
+                           <span className="text-sm font-mono text-green-400">{selectedQuestDetails.endDate ? new Date(selectedQuestDetails.endDate).toLocaleDateString() : 'N/A'}</span>
                          </div>
-                         <div className="flex items-center justify-between py-2 border-b border-border/50">
-                           <span className="text-sm font-medium text-muted-foreground">Created</span>
-                           <span className="text-sm">{selectedQuestDetails.created_at ? new Date(selectedQuestDetails.created_at).toLocaleDateString() : 'N/A'}</span>
+                         <div className="flex items-center justify-between py-2 border-b border-dashed border-gray-600">
+                           <span className="text-sm font-medium font-mono text-gray-400">Created</span>
+                           <span className="text-sm font-mono text-green-400">{selectedQuestDetails.created_at ? new Date(selectedQuestDetails.created_at).toLocaleDateString() : 'N/A'}</span>
                          </div>
                          <div className="flex items-center justify-between py-2">
-                           <span className="text-sm font-medium text-muted-foreground">Last Updated</span>
-                           <span className="text-sm">{selectedQuestDetails.updated_at ? new Date(selectedQuestDetails.updated_at).toLocaleDateString() : 'N/A'}</span>
+                           <span className="text-sm font-medium font-mono text-gray-400">Last Updated</span>
+                           <span className="text-sm font-mono text-green-400">{selectedQuestDetails.updated_at ? new Date(selectedQuestDetails.updated_at).toLocaleDateString() : 'N/A'}</span>
                          </div>
                        </div>
                      </CardContent>
@@ -648,19 +652,19 @@ export default function ManageQuestsPage() {
                  </div>
                  
                  {selectedQuestDetails.creator && (
-                   <Card className="mb-6">
+                   <Card className="mb-6 bg-black border border-dashed border-gray-600">
                      <CardContent className="p-6">
                        <div className="flex items-center gap-2 mb-4">
-                         <Users className="h-4 w-4 text-muted-foreground" />
-                         <h3 className="font-semibold text-lg">Creator Information</h3>
+                         <Users className="h-4 w-4 text-green-400" />
+                         <h3 className="font-semibold font-mono text-lg text-green-400">[Creator Information]</h3>
                        </div>
                        <div className="flex items-center gap-4">
-                         <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-                           <Users className="h-6 w-6 text-primary" />
+                         <div className="w-12 h-12 bg-gray-900 border border-dashed border-gray-600 flex items-center justify-center">
+                           <Users className="h-6 w-6 text-green-400" />
                          </div>
                          <div>
-                           <div className="font-medium">{selectedQuestDetails.creator.firstName} {selectedQuestDetails.creator.lastName}</div>
-                           <div className="text-sm text-muted-foreground">@{selectedQuestDetails.creator.username}</div>
+                           <div className="font-medium font-mono text-green-400">{selectedQuestDetails.creator.firstName} {selectedQuestDetails.creator.lastName}</div>
+                           <div className="text-sm font-mono text-gray-400">@{selectedQuestDetails.creator.username}</div>
                          </div>
                        </div>
                      </CardContent>
@@ -668,36 +672,36 @@ export default function ManageQuestsPage() {
                  )}
                  
                  {selectedQuestDetails.badges && selectedQuestDetails.badges.length > 0 && (
-                   <Card className="mb-6">
+                   <Card className="mb-6 bg-black border border-dashed border-gray-600">
                      <CardContent className="p-6">
                        <div className="flex items-center gap-2 mb-4">
-                         <Trophy className="h-4 w-4 text-muted-foreground" />
-                         <h3 className="font-semibold text-lg">Associated Badges</h3>
-                         <Badge variant="secondary" className="ml-auto">{selectedQuestDetails.badges.length}</Badge>
+                         <Trophy className="h-4 w-4 text-green-400" />
+                         <h3 className="font-semibold font-mono text-lg text-green-400">[Associated Badges]</h3>
+                         <Badge variant="outline" className="ml-auto bg-black border-dashed border-gray-600 font-mono text-gray-400">[{selectedQuestDetails.badges.length}]</Badge>
                        </div>
                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                          {selectedQuestDetails.badges.map((badge: any, index: number) => (
-                           <div key={badge.id || index} className="border rounded-lg p-4 space-y-3 hover:shadow-sm transition-shadow">
+                           <div key={badge.id || index} className="border border-dashed border-gray-600 bg-gray-900 p-4 space-y-3 hover:bg-gray-800 transition-colors">
                              <div className="flex items-center gap-3">
                                {badge.image ? (
-                                 <img src={badge.image} alt={badge.name} className="w-10 h-10 rounded-lg" />
+                                 <img src={badge.image} alt={badge.name} className="w-10 h-10 border border-dashed border-gray-600" />
                                ) : (
-                                 <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-                                   <Trophy className="h-5 w-5 text-primary" />
+                                 <div className="w-10 h-10 bg-black border border-dashed border-gray-600 flex items-center justify-center">
+                                   <Trophy className="h-5 w-5 text-green-400" />
                                  </div>
                                )}
                                <div className="flex-1">
-                                 <div className="font-medium">{badge.name}</div>
-                                 <div className="text-xs text-muted-foreground flex items-center gap-2">
-                                   <span>{badge.rarity}</span>
+                                 <div className="font-medium font-mono text-green-400">{badge.name}</div>
+                                 <div className="text-xs font-mono text-gray-400 flex items-center gap-2">
+                                   <span>[{badge.rarity}]</span>
                                    <span>•</span>
-                                   <span className="font-semibold text-green-600">{badge.points} pts</span>
+                                   <span className="font-semibold text-green-400">{badge.points} pts</span>
                                  </div>
                                </div>
                              </div>
-                             <p className="text-sm text-muted-foreground">{badge.description}</p>
-                             <div className="text-xs text-muted-foreground border-t pt-2">
-                               Max to obtain: <span className="font-medium">{badge.maxToObtain}</span>
+                             <p className="text-sm font-mono text-gray-400">{badge.description}</p>
+                             <div className="text-xs font-mono text-gray-400 border-t border-dashed border-gray-600 pt-2">
+                               Max to obtain: <span className="font-medium text-green-400">[{badge.maxToObtain}]</span>
                              </div>
                            </div>
                          ))}
@@ -707,18 +711,18 @@ export default function ManageQuestsPage() {
                  )}
                  
                  {selectedQuestDetails.currentParticipants !== undefined && (
-                   <Card className="mb-6">
+                   <Card className="mb-6 bg-black border border-dashed border-gray-600">
                      <CardContent className="p-6">
                        <div className="flex items-center gap-2 mb-4">
-                         <Users className="h-4 w-4 text-muted-foreground" />
-                         <h3 className="font-semibold text-lg">Participants</h3>
-                         <Badge variant="secondary" className="ml-auto">{selectedQuestDetails.currentParticipants || 0}</Badge>
+                         <Users className="h-4 w-4 text-green-400" />
+                         <h3 className="font-semibold font-mono text-lg text-green-400">[Participants]</h3>
+                         <Badge variant="outline" className="ml-auto bg-black border-dashed border-gray-600 font-mono text-gray-400">[{selectedQuestDetails.currentParticipants || 0}]</Badge>
                        </div>
-                       <div className="text-muted-foreground">
+                       <div className="font-mono text-gray-400">
                          {(selectedQuestDetails.currentParticipants || 0) === 0 ? (
-                           <p className="text-center py-4">No participants yet</p>
+                           <p className="text-center py-4">[No participants yet]</p>
                          ) : (
-                           <p>{selectedQuestDetails.currentParticipants} participants enrolled in this quest</p>
+                           <p>[{selectedQuestDetails.currentParticipants} participants enrolled in this quest]</p>
                          )}
                        </div>
                      </CardContent>
@@ -726,18 +730,18 @@ export default function ManageQuestsPage() {
                  )}
                  
                  {selectedQuestDetails.requirements && selectedQuestDetails.requirements.length > 0 && (
-                   <Card className="mb-6">
+                   <Card className="mb-6 bg-black border border-dashed border-gray-600">
                      <CardContent className="p-6">
                        <div className="flex items-center gap-2 mb-4">
-                         <FileText className="h-4 w-4 text-muted-foreground" />
-                         <h3 className="font-semibold text-lg">Requirements</h3>
-                         <Badge variant="secondary" className="ml-auto">{selectedQuestDetails.requirements.length}</Badge>
+                         <FileText className="h-4 w-4 text-green-400" />
+                         <h3 className="font-semibold font-mono text-lg text-green-400">[Requirements]</h3>
+                         <Badge variant="outline" className="ml-auto bg-black border-dashed border-gray-600 font-mono text-gray-400">[{selectedQuestDetails.requirements.length}]</Badge>
                        </div>
                        <ul className="space-y-3">
                          {selectedQuestDetails.requirements.map((req: string, index: number) => (
-                           <li key={index} className="flex items-start gap-3 p-3 bg-muted/30 rounded-lg">
-                             <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
-                             <span className="text-sm leading-relaxed">{req}</span>
+                           <li key={index} className="flex items-start gap-3 p-3 bg-gray-900 border border-dashed border-gray-600">
+                             <div className="w-2 h-2 bg-green-400 mt-2 flex-shrink-0"></div>
+                             <span className="text-sm font-mono text-gray-400 leading-relaxed">{req}</span>
                            </li>
                          ))}
                        </ul>
@@ -746,22 +750,22 @@ export default function ManageQuestsPage() {
                  )}
                  
                  {selectedQuestDetails.submissionInstructions && (
-                   <Card className="mb-6">
+                   <Card className="mb-6 bg-black border border-dashed border-gray-600">
                      <CardContent className="p-6">
                        <div className="flex items-center gap-2 mb-4">
-                         <FileText className="h-4 w-4 text-muted-foreground" />
-                         <h3 className="font-semibold text-lg">Submission Instructions</h3>
+                         <FileText className="h-4 w-4 text-green-400" />
+                         <h3 className="font-semibold font-mono text-lg text-green-400">[Submission Instructions]</h3>
                        </div>
-                       <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                         <p className="text-sm leading-relaxed">{selectedQuestDetails.submissionInstructions}</p>
+                       <div className="bg-gray-900 border border-dashed border-gray-600 p-4">
+                         <p className="text-sm font-mono text-gray-400 leading-relaxed">{selectedQuestDetails.submissionInstructions}</p>
                        </div>
                      </CardContent>
                    </Card>
                  )}
                </div>
             ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                Failed to load quest details
+              <div className="text-center py-8 font-mono text-gray-400">
+                [Failed to load quest details]
               </div>
             )}
           </DialogContent>
@@ -770,7 +774,7 @@ export default function ManageQuestsPage() {
 
       {/* Create Quest Dialog */}
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-        <DialogContent className="max-w-5xl max-h-[95vh] overflow-y-auto p-0">
+        <DialogContent className="max-w-5xl max-h-[95vh] overflow-y-auto p-0 bg-black border border-dashed border-gray-600">
           <CreateQuestForm 
             onSuccess={() => {
               setShowCreateDialog(false);
@@ -788,7 +792,7 @@ export default function ManageQuestsPage() {
       {/* Edit Quest Dialog */}
       {questToEdit && (
         <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-          <DialogContent className="max-w-5xl max-h-[95vh] overflow-y-auto p-0">
+          <DialogContent className="max-w-5xl max-h-[95vh] overflow-y-auto p-0 bg-black border border-dashed border-gray-600">
             <EditQuestForm 
               quest={questToEdit}
               onSuccess={handleEditSuccess}
@@ -800,22 +804,25 @@ export default function ManageQuestsPage() {
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-black border border-dashed border-gray-600">
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Quest</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="font-mono text-green-400">[Delete Quest]</AlertDialogTitle>
+            <AlertDialogDescription className="font-mono text-gray-400">
               Are you sure you want to delete "{questToDelete?.title}"? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>
-              Cancel
+            <AlertDialogCancel 
+              onClick={() => setShowDeleteDialog(false)}
+              className="bg-black border border-dashed border-gray-600 font-mono text-gray-400 hover:bg-gray-900 hover:text-gray-300"
+            >
+              [Cancel]
             </AlertDialogCancel>
             <AlertDialogAction 
               onClick={confirmDeleteQuest}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-900 border border-dashed border-red-600 font-mono text-red-400 hover:bg-red-800 hover:text-red-300"
             >
-              Delete Quest
+              [Delete Quest]
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
