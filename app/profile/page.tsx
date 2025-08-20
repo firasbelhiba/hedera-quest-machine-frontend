@@ -454,19 +454,19 @@ export default function ProfilePage() {
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger 
             value="profile" 
-            className="font-mono text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/20 data-[state=active]:to-purple-500/20 data-[state=active]:border data-[state=active]:border-dashed data-[state=active]:border-primary/30 data-[state=active]:text-primary transition-all duration-200"
+            className="font-mono text-sm data-[state=active]:bg-primary/20 data-[state=active]:border data-[state=active]:border-dashed data-[state=active]:border-primary/30 data-[state=active]:text-primary transition-all duration-200"
           >
             👤 PROFILE
           </TabsTrigger>
           <TabsTrigger 
             value="account" 
-            className="font-mono text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/20 data-[state=active]:to-purple-500/20 data-[state=active]:border data-[state=active]:border-dashed data-[state=active]:border-primary/30 data-[state=active]:text-primary transition-all duration-200"
+            className="font-mono text-sm data-[state=active]:bg-primary/20 data-[state=active]:border data-[state=active]:border-dashed data-[state=active]:border-primary/30 data-[state=active]:text-primary transition-all duration-200"
           >
             ⚙️ ACCOUNT
           </TabsTrigger>
           <TabsTrigger 
             value="privacy" 
-            className="font-mono text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/20 data-[state=active]:to-purple-500/20 data-[state=active]:border data-[state=active]:border-dashed data-[state=active]:border-primary/30 data-[state=active]:text-primary transition-all duration-200"
+            className="font-mono text-sm data-[state=active]:bg-primary/20 data-[state=active]:border data-[state=active]:border-dashed data-[state=active]:border-primary/30 data-[state=active]:text-primary transition-all duration-200"
           >
             🔒 PRIVACY
           </TabsTrigger>
@@ -869,87 +869,70 @@ export default function ProfilePage() {
                </Card>
 
               {/* Email Verification */}
-              <div className="border-2 border-dashed border-orange-500/30 bg-gradient-to-br from-orange-500/5 to-yellow-500/5 hover:border-solid transition-all duration-200 rounded-lg p-4">
+              <div className={`border-2 border-dashed hover:border-solid transition-all duration-200 rounded-lg p-4 ${
+                profileData?.user?.email_verified 
+                  ? 'border-green-500/30 bg-gradient-to-br from-green-500/5 to-emerald-500/5'
+                  : 'border-orange-500/30 bg-gradient-to-br from-orange-500/5 to-yellow-500/5'
+              }`}>
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <h3 className="font-mono font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wider">{'>'} EMAIL_VERIFICATION</h3>
+                    <h3 className={`font-mono font-semibold uppercase tracking-wider ${
+                      profileData?.user?.email_verified 
+                        ? 'text-green-600 dark:text-green-400'
+                        : 'text-orange-600 dark:text-orange-400'
+                    }`}>{'>'} EMAIL_VERIFICATION</h3>
                     <p className="text-sm text-muted-foreground font-mono">
                       [EMAIL] {profileData?.user?.email || 'No email set'}
                     </p>
                   </div>
-                  <Badge className="bg-orange-500/20 text-orange-700 dark:text-orange-300 border border-dashed border-orange-500/50 font-mono">
-                    <AlertCircle className="w-3 h-3 mr-1" />
-                    VERIFY_REQUIRED
+                  <Badge className={`border border-dashed font-mono ${
+                    profileData?.user?.email_verified 
+                      ? 'bg-green-500/20 text-green-700 dark:text-green-300 border-green-500/50'
+                      : 'bg-orange-500/20 text-orange-700 dark:text-orange-300 border-orange-500/50'
+                  }`}>
+                    {profileData?.user?.email_verified ? (
+                      <><CheckCircle className="w-3 h-3 mr-1" />VERIFIED</>
+                    ) : (
+                      <><AlertCircle className="w-3 h-3 mr-1" />VERIFY_REQUIRED</>
+                    )}
                   </Badge>
                 </div>
                 <div className="space-y-3">
-                  <div className="flex gap-2">
-                    <Button
-                      type="button"
-                      onClick={handleVerifyEmail}
-                      disabled={isVerifyingEmail || !profileData?.user?.email}
-                      className="font-mono border-2 border-dashed border-orange-500/50 hover:border-solid hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all duration-200 bg-orange-500 hover:bg-orange-600 text-white"
-                    >
-                      {isVerifyingEmail ? 'SENDING...' : 'SEND_VERIFICATION_EMAIL'}
-                    </Button>
-                  </div>
-                  {emailVerificationSuccess && (
+                  {!profileData?.user?.email_verified && (
+                    <>
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          onClick={handleVerifyEmail}
+                          disabled={isVerifyingEmail || !profileData?.user?.email}
+                          className="font-mono border-2 border-dashed border-orange-500/50 hover:border-solid hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all duration-200 bg-orange-500 hover:bg-orange-600 text-white"
+                        >
+                          {isVerifyingEmail ? 'SENDING...' : 'SEND_VERIFICATION_EMAIL'}
+                        </Button>
+                      </div>
+                      {emailVerificationSuccess && (
+                        <div className="flex items-center gap-2 p-2 bg-green-500/10 rounded border border-dashed border-green-500/30">
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                          <p className="text-sm text-green-600 dark:text-green-400 font-mono">{'>'} Email sent successfully! Check your inbox.</p>
+                        </div>
+                      )}
+                      <p className="text-xs text-muted-foreground font-mono">
+                        [INFO] Verify your email address to receive important notifications and updates.
+                      </p>
+                    </>
+                  )}
+                  {profileData?.user?.email_verified && (
                     <div className="flex items-center gap-2 p-2 bg-green-500/10 rounded border border-dashed border-green-500/30">
                       <CheckCircle className="w-4 h-4 text-green-500" />
-                      <p className="text-sm text-green-600 dark:text-green-400 font-mono">{'>'} Email sent successfully! Check your inbox.</p>
+                      <p className="text-sm text-green-600 dark:text-green-400 font-mono">{'>'} Your email address has been verified successfully!</p>
                     </div>
                   )}
-                  <p className="text-xs text-muted-foreground font-mono">
-                    [INFO] Verify your email address to receive important notifications and updates.
-                  </p>
                 </div>
               </div>
 
-              {/* Account Status */}
-              <div className="border-2 border-dashed border-green-500/30 bg-gradient-to-br from-green-500/5 to-emerald-500/5 hover:border-solid transition-all duration-200 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div>
-                    <h3 className="font-mono font-semibold text-green-600 dark:text-green-400 uppercase tracking-wider">{'>'} ACCOUNT_STATUS</h3>
-                    <p className="text-sm text-muted-foreground font-mono">
-                      [STATUS: VERIFIED] Your account is in good standing
-                    </p>
-                  </div>
-                  <Badge className="bg-green-500/20 text-green-700 dark:text-green-300 border border-dashed border-green-500/50 font-mono">
-                    <Shield className="w-3 h-3 mr-1" />
-                    VERIFIED
-                  </Badge>
-                </div>
-                <div className="text-sm space-y-2">
-                  <div className="flex items-center gap-2 p-2 bg-green-500/10 rounded border border-dashed border-green-500/30">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span className="font-mono">[✓] Email verified</span>
-                  </div>
-                  <div className="flex items-center gap-2 p-2 bg-green-500/10 rounded border border-dashed border-green-500/30">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span className="font-mono">[✓] Hedera account linked</span>
-                  </div>
-                  <div className="flex items-center gap-2 p-2 bg-green-500/10 rounded border border-dashed border-green-500/30">
-                    <CheckCircle className="w-4 h-4 text-green-500" />
-                    <span className="font-mono">[✓] Profile completed</span>
-                  </div>
-                </div>
-              </div>
 
-              {/* Danger Zone */}
-              <div className="border-2 border-dashed border-red-500/30 bg-gradient-to-br from-red-500/5 to-orange-500/5 hover:border-solid transition-all duration-200 rounded-lg p-4">
-                <h3 className="font-mono font-semibold text-red-600 dark:text-red-400 mb-2 uppercase tracking-wider">{'>'} DANGER_ZONE</h3>
-                <p className="text-sm text-muted-foreground mb-3 font-mono">
-                  [WARNING] These actions cannot be undone. Please be careful.
-                </p>
-                <div className="space-y-2">
-                  <Button variant="outline" size="sm" className="text-red-600 border-red-500/50 border-dashed hover:bg-red-50 hover:border-solid font-mono">
-                    [!] Reset Progress
-                  </Button>
-                  <Button variant="outline" size="sm" className="text-red-600 border-red-500/50 border-dashed hover:bg-red-50 hover:border-solid font-mono">
-                    [!] Delete Account
-                  </Button>
-                </div>
-              </div>
+
+
             </CardContent>
           </Card>
         </TabsContent>

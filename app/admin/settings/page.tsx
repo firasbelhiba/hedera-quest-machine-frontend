@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { tokenStorage } from '@/lib/api/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,10 +21,14 @@ import {
   Globe,
   Palette,
   Save,
-  AlertTriangle
+  AlertTriangle,
+  Twitter
 } from 'lucide-react';
 
 export default function SettingsPage() {
+  const [adminProfile, setAdminProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  
   const [settings, setSettings] = useState({
     // General Settings
     siteName: 'Hedera Quest Machine',
@@ -58,10 +63,93 @@ export default function SettingsPage() {
     hederaNetwork: 'testnet',
     hashscanEnabled: true,
     analyticsEnabled: true,
+    
+    // Social Media Integration
+    twitterConnected: false,
+    twitterApiKey: '',
+    twitterApiSecret: '',
+    twitterAccessToken: '',
+    twitterAccessTokenSecret: '',
   });
 
   const handleSettingChange = (key: string, value: any) => {
     setSettings(prev => ({ ...prev, [key]: value }));
+  };
+
+  const fetchAdminProfile = async () => {
+    try {
+      const token = tokenStorage.getAccessToken();
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+      
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://hedera-quests.com';
+      const response = await fetch(`${baseUrl}/profile/me`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAdminProfile(data.admin);
+      }
+    } catch (error) {
+      console.error('Error fetching admin profile:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAdminProfile();
+    
+    // Check if user just returned from Twitter auth
+    const twitterAuthPending = localStorage.getItem('twitter_auth_pending');
+    if (twitterAuthPending) {
+      localStorage.removeItem('twitter_auth_pending');
+      // Refresh profile data after a short delay to ensure backend is updated
+      setTimeout(() => {
+        fetchAdminProfile();
+      }, 2000);
+    }
+  }, []);
+
+  const handleTwitterConnect = async () => {
+    try {
+      const token = tokenStorage.getAccessToken();
+      if (!token) {
+        alert('Please log in to connect your Twitter account.');
+        return;
+      }
+      
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://hedera-quests.com';
+      const response = await fetch(`${baseUrl}/profile/admin/twitter/url`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.url) {
+          // Store a flag to refresh profile data when user returns
+          localStorage.setItem('twitter_auth_pending', 'true');
+          window.location.href = data.url;
+        } else {
+          alert('Failed to get Twitter authorization URL');
+        }
+      } else {
+        alert('Failed to connect to Twitter API');
+      }
+    } catch (error) {
+      console.error('Error connecting to Twitter:', error);
+      alert('Error connecting to Twitter. Please try again.');
+    }
   };
 
   const handleSaveSettings = () => {
@@ -510,6 +598,77 @@ export default function SettingsPage() {
                     onCheckedChange={(checked) => handleSettingChange('analyticsEnabled', checked)}
                   />
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Twitter className="w-5 h-5" />
+                Social Media Integration
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Twitter Integration</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Connect Twitter account for social features
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={adminProfile?.twitterProfile ? "default" : "secondary"}>
+                      {adminProfile?.twitterProfile ? "Connected" : "Disconnected"}
+                    </Badge>
+                    <Button 
+                      variant={adminProfile?.twitterProfile ? "outline" : "default"}
+                      size="sm"
+                      disabled={loading}
+                      onClick={() => {
+                        if (adminProfile?.twitterProfile) {
+                          // Handle disconnect logic here
+                          alert('Disconnect functionality to be implemented');
+                        } else {
+                          handleTwitterConnect();
+                        }
+                      }}
+                    >
+                      {adminProfile?.twitterProfile ? "Disconnect" : "Connect Twitter"}
+                    </Button>
+                  </div>
+                </div>
+
+                {adminProfile?.twitterProfile && (
+                  <div className="space-y-4 p-4 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <img 
+                        src={adminProfile.twitterProfile.twitter_profile_picture} 
+                        alt="Twitter Profile" 
+                        className="w-10 h-10 rounded-full"
+                      />
+                      <div>
+                        <p className="font-medium">@{adminProfile.twitterProfile.twitter_username}</p>
+                        <p className="text-sm text-muted-foreground">Twitter ID: {adminProfile.twitterProfile.twitter_id}</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-sm">Connected At</Label>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(adminProfile.twitterProfile.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div>
+                        <Label className="text-sm">Token Expires</Label>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(adminProfile.twitterProfile.expires_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
