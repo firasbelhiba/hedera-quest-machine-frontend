@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useToast } from '@/hooks/use-toast';
 import { 
   User as UserIcon, 
   Settings, 
@@ -45,22 +46,28 @@ export default function ProfilePage() {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [isConnectingTwitter, setIsConnectingTwitter] = useState(false);
 
+  const { toast } = useToast();
   const { register, handleSubmit, formState: { errors }, reset } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema)
   });
 
-  useEffect(() => {
-    const loadUser = async () => {
-      setIsLoading(true);
-      try {
-        const token = localStorage.getItem('auth_token');
-        const response = await fetch('https://hedera-quests.com/profile/me', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-        });
+  const loadUser = async () => {
+    setIsLoading(true);
+    try {
+      const accessToken = localStorage.getItem('auth_token');
+      if (!accessToken) {
+        console.log('No access token found');
+        return;
+      }
+
+      const baseUrl = 'https://hedera-quests.com';
+      const response = await fetch(`${baseUrl}/profile/me`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
         
         if (!response.ok) {
           throw new Error('Failed to fetch profile data');
@@ -91,14 +98,15 @@ export default function ProfilePage() {
           email: userData.email,
           hederaAccountId: userData.hederaAccountId
         });
-      } catch (error) {
-        console.error('Failed to load user data:', error);
-        setSaveError('Failed to load profile data');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    } catch (error) {
+      console.error('Failed to load user data:', error);
+      setSaveError('Failed to load profile data');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     loadUser();
   }, [reset]);
 
@@ -128,13 +136,19 @@ export default function ProfilePage() {
   const handleConnectTwitter = async () => {
     setIsConnectingTwitter(true);
     try {
+      const accessToken = localStorage.getItem('auth_token');
+      if (!accessToken) {
+        setSaveError('No access token found. Please login again.');
+        setTimeout(() => setSaveError(null), 5000);
+        return;
+      }
+
       const baseUrl = 'https://hedera-quests.com';
-      const token = localStorage.getItem('auth_token');
       const response = await fetch(`${baseUrl}/profile/twitter/url`, {
         method: 'GET',
         headers: {
+          'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
       });
       
@@ -161,7 +175,7 @@ export default function ProfilePage() {
 
   const handleDisconnectTwitter = async () => {
     try {
-      const token = localStorage.getItem('access_token');
+      const token = localStorage.getItem('auth_token');
       const baseUrl = 'https://hedera-quests.com';
       const response = await fetch(`${baseUrl}/profile/twitter/profile`, {
         method: 'DELETE',
@@ -174,6 +188,8 @@ export default function ProfilePage() {
         toast({
           title: 'Twitter Disconnected',
           description: 'Your Twitter account has been successfully disconnected.',
+          variant: 'default',
+          className: 'border-green-500 bg-green-50 text-green-900 dark:bg-green-950 dark:text-green-50',
         });
         // Refresh profile data
         await loadUser();
