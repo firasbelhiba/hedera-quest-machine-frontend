@@ -22,7 +22,9 @@ import {
   Palette,
   Save,
   AlertTriangle,
-  Twitter
+  Twitter,
+  MessageCircle,
+  Facebook
 } from 'lucide-react';
 
 export default function SettingsPage() {
@@ -115,7 +117,27 @@ export default function SettingsPage() {
         fetchAdminProfile();
       }, 2000);
     }
-  }, []);
+    
+    // Check if user just returned from Discord auth
+     const discordAuthPending = localStorage.getItem('discord_auth_pending');
+     if (discordAuthPending) {
+       localStorage.removeItem('discord_auth_pending');
+       // Refresh profile data after a short delay to ensure backend is updated
+       setTimeout(() => {
+         fetchAdminProfile();
+       }, 2000);
+     }
+     
+     // Check if user just returned from Facebook auth
+     const facebookAuthPending = localStorage.getItem('facebook_auth_pending');
+     if (facebookAuthPending) {
+       localStorage.removeItem('facebook_auth_pending');
+       // Refresh profile data after a short delay to ensure backend is updated
+       setTimeout(() => {
+         fetchAdminProfile();
+       }, 2000);
+     }
+   }, []);
 
   const handleTwitterConnect = async () => {
     try {
@@ -127,11 +149,10 @@ export default function SettingsPage() {
       
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://hedera-quests.com';
       const response = await fetch(`${baseUrl}/profile/admin/twitter/url`, {
-        method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+          'Content-Type': 'application/json'
+        }
       });
       
       if (response.ok) {
@@ -144,13 +165,81 @@ export default function SettingsPage() {
           alert('Failed to get Twitter authorization URL');
         }
       } else {
-        alert('Failed to connect to Twitter API');
+        alert('Failed to connect to Twitter. Please try again.');
       }
     } catch (error) {
       console.error('Error connecting to Twitter:', error);
-      alert('Error connecting to Twitter. Please try again.');
+      alert('Failed to connect to Twitter. Please try again.');
     }
   };
+
+  const handleDiscordConnect = async () => {
+    try {
+      const token = tokenStorage.getAccessToken();
+      if (!token) {
+        alert('Please log in to connect your Discord account.');
+        return;
+      }
+      
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://hedera-quests.com';
+      const response = await fetch(`${baseUrl}/profile/admin/discord/url`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.url) {
+          // Store a flag to refresh profile data when user returns
+          localStorage.setItem('discord_auth_pending', 'true');
+          window.location.href = data.url;
+        } else {
+          alert('Failed to get Discord authorization URL');
+        }
+      } else {
+        alert('Failed to connect to Discord. Please try again.');
+      }
+    } catch (error) {
+       console.error('Error connecting to Discord:', error);
+       alert('Failed to connect to Discord. Please try again.');
+     }
+   };
+
+  const handleFacebookConnect = async () => {
+    try {
+      const token = tokenStorage.getAccessToken();
+      if (!token) {
+        alert('Please log in to connect your Facebook account.');
+        return;
+      }
+      
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://hedera-quests.com';
+      const response = await fetch(`${baseUrl}/profile/admin/facebook/url`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.url) {
+          // Store a flag to refresh profile data when user returns
+          localStorage.setItem('facebook_auth_pending', 'true');
+          window.location.href = data.url;
+        } else {
+          alert('Failed to get Facebook authorization URL');
+        }
+      } else {
+        alert('Failed to connect to Facebook. Please try again.');
+      }
+    } catch (error) {
+       console.error('Error connecting to Facebook:', error);
+       alert('Failed to connect to Facebook. Please try again.');
+     }
+   };
 
   const handleSaveSettings = () => {
     // In a real app, this would save to the backend
@@ -664,6 +753,120 @@ export default function SettingsPage() {
                         <Label className="text-sm">Token Expires</Label>
                         <p className="text-sm text-muted-foreground">
                           {new Date(adminProfile.twitterProfile.expires_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <Separator />
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Discord Integration</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Connect Discord account for community features
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={adminProfile?.discordProfile ? "default" : "secondary"}>
+                      {adminProfile?.discordProfile ? "Connected" : "Disconnected"}
+                    </Badge>
+                    <Button 
+                      variant={adminProfile?.discordProfile ? "outline" : "default"}
+                      size="sm"
+                      disabled={loading}
+                      onClick={() => {
+                        if (adminProfile?.discordProfile) {
+                          // Handle disconnect logic here
+                          alert('Disconnect functionality to be implemented');
+                        } else {
+                          handleDiscordConnect();
+                        }
+                      }}
+                    >
+                      {adminProfile?.discordProfile ? "Disconnect" : "Connect Discord"}
+                    </Button>
+                  </div>
+                </div>
+
+                {adminProfile?.discordProfile && (
+                  <div className="space-y-4 p-4 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <MessageCircle className="w-10 h-10 text-indigo-500" />
+                      <div>
+                        <p className="font-medium">{adminProfile.discordProfile.discord_username}</p>
+                        <p className="text-sm text-muted-foreground">Discord ID: {adminProfile.discordProfile.discord_id}</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-sm">Connected At</Label>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(adminProfile.discordProfile.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div>
+                        <Label className="text-sm">Token Expires</Label>
+                        <p className="text-sm text-muted-foreground">
+                          {adminProfile.discordProfile.expires_at ? new Date(adminProfile.discordProfile.expires_at).toLocaleDateString() : 'Never'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <Separator />
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Facebook Integration</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Connect Facebook account for social features
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={adminProfile?.facebookProfile ? "default" : "secondary"}>
+                      {adminProfile?.facebookProfile ? "Connected" : "Disconnected"}
+                    </Badge>
+                    <Button 
+                      variant={adminProfile?.facebookProfile ? "outline" : "default"}
+                      size="sm"
+                      disabled={loading}
+                      onClick={() => {
+                        if (adminProfile?.facebookProfile) {
+                          // Handle disconnect logic here
+                          alert('Disconnect functionality to be implemented');
+                        } else {
+                          handleFacebookConnect();
+                        }
+                      }}
+                    >
+                      {adminProfile?.facebookProfile ? "Disconnect" : "Connect Facebook"}
+                    </Button>
+                  </div>
+                </div>
+
+                {adminProfile?.facebookProfile && (
+                  <div className="space-y-4 p-4 bg-muted/50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Facebook className="w-10 h-10 text-blue-600" />
+                      <div>
+                        <p className="font-medium">{adminProfile.facebookProfile.facebook_username}</p>
+                        <p className="text-sm text-muted-foreground">Facebook ID: {adminProfile.facebookProfile.facebook_id}</p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-sm">Connected At</Label>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(adminProfile.facebookProfile.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div>
+                        <Label className="text-sm">Token Expires</Label>
+                        <p className="text-sm text-muted-foreground">
+                          {adminProfile.facebookProfile.expires_at ? new Date(adminProfile.facebookProfile.expires_at).toLocaleDateString() : 'Never'}
                         </p>
                       </div>
                     </div>

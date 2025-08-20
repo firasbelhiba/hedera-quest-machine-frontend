@@ -17,7 +17,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import useStore from '@/lib/store';
 
 interface HeaderProps {
@@ -87,7 +87,9 @@ export function Header({ onMenuClick }: HeaderProps) {
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
   const { user: currentUser, loadCurrentUser, logout } = useStore();
   const router = useRouter();
+  const pathname = usePathname();
   const unreadCount = notifications.filter(n => !n.read).length;
+  const isAdminPage = pathname?.startsWith('/admin');
 
   // Load current user on component mount
   useEffect(() => {
@@ -273,9 +275,11 @@ export function Header({ onMenuClick }: HeaderProps) {
                 <p className="text-sm font-medium font-mono">
                   [{currentUser?.name || 'LOADING...'}]
                 </p>
-                <p className="text-xs text-muted-foreground font-mono">
-                  {currentUser && typeof currentUser.points === 'number' ? `[${currentUser.points}_POINTS]` : '[LOADING...]'}
-                </p>
+                {!isAdminPage && (
+                  <p className="text-xs text-muted-foreground font-mono">
+                    {currentUser && typeof currentUser.points === 'number' ? `[${currentUser.points}_POINTS]` : '[LOADING...]'}
+                  </p>
+                )}
               </div>
             </Button>
           </DropdownMenuTrigger>
