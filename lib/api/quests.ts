@@ -9,7 +9,12 @@ export const QuestsApi = {
     
     console.log('Quests API response:', response.data);
     
-    // Handle the new response format: { success: true, data: [...], count: number }
+    // Handle the new response format: { success: true, quests: [...], questCompletion: [...] }
+    if (response.data.success && response.data.quests) {
+      return response.data.quests;
+    }
+    
+    // Handle alternative format: { success: true, data: [...], count: number }
     if (response.data.success && response.data.data) {
       return response.data.data;
     }

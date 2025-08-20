@@ -79,103 +79,164 @@ export default function ProgressPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="text-center space-y-4">
-        <div className="w-20 h-20 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-full mx-auto flex items-center justify-center">
-          <Trophy className="w-10 h-10 text-white" />
-        </div>
-        <div>
-          <h1 className="text-3xl font-bold">{user.name}</h1>
-          <p className="text-muted-foreground">Hedera ID: {user.hederaAccountId}</p>
+      <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-cyan-500/10 to-blue-500/10 rounded-lg" />
+        <div className="relative bg-background/80 backdrop-blur-sm border-2 border-dashed border-primary/20 rounded-lg p-8">
+          <div className="text-center space-y-4">
+            <div className="relative mx-auto w-20 h-20">
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-cyan-500/20 rounded-lg border-2 border-dashed border-primary/30" />
+              <div className="relative w-full h-full bg-gradient-to-r from-purple-600 to-cyan-500 rounded-lg flex items-center justify-center">
+                <Trophy className="w-10 h-10 text-white" />
+              </div>
+            </div>
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-purple-500 to-cyan-500 bg-clip-text text-transparent font-mono">
+                🏆 {user.name}
+              </h1>
+              <p className="text-muted-foreground font-mono text-sm mt-2">
+                > HEDERA_ID: {user.hederaAccountId}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
+        <Card className="border-2 border-dashed border-yellow-500/20 bg-gradient-to-br from-yellow-500/5 to-orange-500/5 hover:border-solid transition-all duration-200">
           <CardContent className="p-6 text-center">
-            <Trophy className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
-            <div className="text-2xl font-bold">{user.level}</div>
-            <div className="text-sm text-muted-foreground">Level</div>
+            <div className="p-2 bg-yellow-500/10 rounded-lg border border-dashed border-yellow-500/30 w-fit mx-auto mb-3">
+              <Trophy className="w-6 h-6 text-yellow-500" />
+            </div>
+            <div className="text-2xl font-bold font-mono bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
+              {user.level}
+            </div>
+            <div className="text-xs text-muted-foreground font-mono uppercase tracking-wider">LEVEL</div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-2 border-dashed border-blue-500/20 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 hover:border-solid transition-all duration-200">
           <CardContent className="p-6 text-center">
-            <Target className="w-8 h-8 text-blue-500 mx-auto mb-2" />
-            <div className="text-2xl font-bold">{user.points.toLocaleString()}</div>
-            <div className="text-sm text-muted-foreground">Total Points</div>
+            <div className="p-2 bg-blue-500/10 rounded-lg border border-dashed border-blue-500/30 w-fit mx-auto mb-3">
+              <Target className="w-6 h-6 text-blue-500" />
+            </div>
+            <div className="text-2xl font-bold font-mono bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
+              {user.points.toLocaleString()}
+            </div>
+            <div className="text-xs text-muted-foreground font-mono uppercase tracking-wider">TOTAL_POINTS</div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-2 border-dashed border-red-500/20 bg-gradient-to-br from-red-500/5 to-pink-500/5 hover:border-solid transition-all duration-200">
           <CardContent className="p-6 text-center">
-            <Fire className="w-8 h-8 text-red-500 mx-auto mb-2" />
-            <div className="text-2xl font-bold">{user.streak}</div>
-            <div className="text-sm text-muted-foreground">Day Streak</div>
+            <div className="p-2 bg-red-500/10 rounded-lg border border-dashed border-red-500/30 w-fit mx-auto mb-3">
+              <Fire className="w-6 h-6 text-red-500" />
+            </div>
+            <div className="text-2xl font-bold font-mono bg-gradient-to-r from-red-500 to-pink-500 bg-clip-text text-transparent">
+              {user.streak}
+            </div>
+            <div className="text-xs text-muted-foreground font-mono uppercase tracking-wider">DAY_STREAK</div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-2 border-dashed border-purple-500/20 bg-gradient-to-br from-purple-500/5 to-indigo-500/5 hover:border-solid transition-all duration-200">
           <CardContent className="p-6 text-center">
-            <Award className="w-8 h-8 text-purple-500 mx-auto mb-2" />
-            <div className="text-2xl font-bold">{badges.length}</div>
-            <div className="text-sm text-muted-foreground">Badges Earned</div>
+            <div className="p-2 bg-purple-500/10 rounded-lg border border-dashed border-purple-500/30 w-fit mx-auto mb-3">
+              <Award className="w-6 h-6 text-purple-500" />
+            </div>
+            <div className="text-2xl font-bold font-mono bg-gradient-to-r from-purple-500 to-indigo-500 bg-clip-text text-transparent">
+              {badges.length}
+            </div>
+            <div className="text-xs text-muted-foreground font-mono uppercase tracking-wider">BADGES_EARNED</div>
           </CardContent>
         </Card>
       </div>
 
       {/* Level Progress */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5" />
-            Level Progress
+      <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5 hover:border-solid transition-all duration-200">
+        <CardHeader className="border-b border-dashed border-primary/20">
+          <CardTitle className="flex items-center gap-2 font-mono text-lg">
+            <div className="p-1 bg-primary/10 rounded border border-dashed border-primary/30">
+              <TrendingUp className="w-4 h-4 text-primary" />
+            </div>
+            > LEVEL_PROGRESS
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <div>
-                <div className="text-lg font-semibold">Level {user.level}</div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-lg font-semibold font-mono bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">LEVEL_{user.level}</div>
+                <div className="text-sm text-muted-foreground font-mono">
                   {user.points.toLocaleString()} / {pointsForNextLevel.toLocaleString()} points
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-lg font-semibold">Level {nextLevel}</div>
-                <div className="text-sm text-muted-foreground">
-                  {pointsForNextLevel - user.points} points to go
+                <div className="text-lg font-semibold font-mono bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">LEVEL_{nextLevel}</div>
+                <div className="text-sm text-muted-foreground font-mono">
+                  > {pointsForNextLevel - user.points} points to go
                 </div>
               </div>
             </div>
-            <Progress value={Math.max(0, Math.min(100, progressToNext))} className="h-3" />
+            <div className="relative">
+              <div className="h-3 bg-muted rounded-lg border border-dashed border-primary/20" />
+              <div 
+                className="absolute top-0 left-0 h-3 bg-gradient-to-r from-primary to-purple-500 rounded-lg transition-all duration-500"
+                style={{ width: `${Math.max(0, Math.min(100, progressToNext))}%` }}
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
 
       <Tabs defaultValue="badges" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="badges">Badges ({badges.length})</TabsTrigger>
-          <TabsTrigger value="submissions">Submissions ({submissions.length})</TabsTrigger>
-          <TabsTrigger value="activity">Recent Activity</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 bg-muted/50 border-2 border-dashed border-primary/20 rounded-lg p-1">
+          <TabsTrigger 
+            value="badges" 
+            className="font-mono text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/20 data-[state=active]:to-purple-500/20 data-[state=active]:border data-[state=active]:border-dashed data-[state=active]:border-primary/30 data-[state=active]:text-primary transition-all duration-200"
+          >
+            🏆 BADGES ({badges.length})
+          </TabsTrigger>
+          <TabsTrigger 
+            value="submissions" 
+            className="font-mono text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/20 data-[state=active]:to-purple-500/20 data-[state=active]:border data-[state=active]:border-dashed data-[state=active]:border-primary/30 data-[state=active]:text-primary transition-all duration-200"
+          >
+            📝 SUBMISSIONS ({submissions.length})
+          </TabsTrigger>
+          <TabsTrigger 
+            value="activity" 
+            className="font-mono text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/20 data-[state=active]:to-purple-500/20 data-[state=active]:border data-[state=active]:border-dashed data-[state=active]:border-primary/30 data-[state=active]:text-primary transition-all duration-200"
+          >
+            📊 RECENT_ACTIVITY
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="badges" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Badge Collection</CardTitle>
+          <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5 hover:border-solid transition-all duration-200">
+            <CardHeader className="border-b border-dashed border-primary/20">
+              <CardTitle className="flex items-center gap-2 font-mono text-lg">
+                <div className="p-1 bg-primary/10 rounded border border-dashed border-primary/30">
+                  <Award className="w-4 h-4 text-primary" />
+                </div>
+                > BADGE_COLLECTION
+              </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               {badges.length > 0 ? (
                 <BadgeCollection badges={badges} size="md" showDate={true} />
               ) : (
                 <div className="text-center py-12">
-                  <Award className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No badges yet</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Complete quests to earn your first badge!
+                  <div className="relative mx-auto w-16 h-16 mb-4">
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-lg border-2 border-dashed border-primary/30" />
+                    <div className="relative w-full h-full bg-gradient-to-r from-primary/10 to-purple-500/10 rounded-lg flex items-center justify-center">
+                      <Award className="w-8 h-8 text-primary" />
+                    </div>
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2 font-mono text-primary">NO_BADGES_YET</h3>
+                  <p className="text-muted-foreground mb-4 font-mono text-sm">
+                    > Complete quests to earn your first badge!
                   </p>
-                  <Button>Discover Quests</Button>
+                  <Button className="font-mono">DISCOVER_QUESTS</Button>
                 </div>
               )}
             </CardContent>
@@ -185,79 +246,100 @@ export default function ProgressPage() {
         <TabsContent value="submissions" className="space-y-6">
           {/* Submission Stats */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <Card>
+            <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5 hover:border-solid transition-all duration-200">
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold">{submissionStats.total}</div>
-                <div className="text-xs text-muted-foreground">Total</div>
+                <div className="p-2 bg-primary/10 rounded-lg border border-dashed border-primary/30 w-fit mx-auto mb-2">
+                  <FileText className="w-4 h-4 text-primary" />
+                </div>
+                <div className="text-2xl font-bold font-mono bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">{submissionStats.total}</div>
+                <div className="text-xs text-muted-foreground font-mono uppercase tracking-wider">TOTAL</div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="border-2 border-dashed border-green-500/20 bg-gradient-to-br from-green-500/5 to-emerald-500/5 hover:border-solid transition-all duration-200">
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-green-600">{submissionStats.approved}</div>
-                <div className="text-xs text-muted-foreground">Approved</div>
+                <div className="p-2 bg-green-500/10 rounded-lg border border-dashed border-green-500/30 w-fit mx-auto mb-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                </div>
+                <div className="text-2xl font-bold font-mono bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">{submissionStats.approved}</div>
+                <div className="text-xs text-muted-foreground font-mono uppercase tracking-wider">APPROVED</div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="border-2 border-dashed border-yellow-500/20 bg-gradient-to-br from-yellow-500/5 to-amber-500/5 hover:border-solid transition-all duration-200">
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-yellow-600">{submissionStats.pending}</div>
-                <div className="text-xs text-muted-foreground">Pending</div>
+                <div className="p-2 bg-yellow-500/10 rounded-lg border border-dashed border-yellow-500/30 w-fit mx-auto mb-2">
+                  <Clock className="w-4 h-4 text-yellow-500" />
+                </div>
+                <div className="text-2xl font-bold font-mono bg-gradient-to-r from-yellow-500 to-amber-500 bg-clip-text text-transparent">{submissionStats.pending}</div>
+                <div className="text-xs text-muted-foreground font-mono uppercase tracking-wider">PENDING</div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="border-2 border-dashed border-orange-500/20 bg-gradient-to-br from-orange-500/5 to-red-500/5 hover:border-solid transition-all duration-200">
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-orange-600">{submissionStats.needsRevision}</div>
-                <div className="text-xs text-muted-foreground">Needs Revision</div>
+                <div className="p-2 bg-orange-500/10 rounded-lg border border-dashed border-orange-500/30 w-fit mx-auto mb-2">
+                  <AlertCircle className="w-4 h-4 text-orange-500" />
+                </div>
+                <div className="text-2xl font-bold font-mono bg-gradient-to-r from-orange-500 to-red-500 bg-clip-text text-transparent">{submissionStats.needsRevision}</div>
+                <div className="text-xs text-muted-foreground font-mono uppercase tracking-wider">NEEDS_REVISION</div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="border-2 border-dashed border-red-500/20 bg-gradient-to-br from-red-500/5 to-pink-500/5 hover:border-solid transition-all duration-200">
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-red-600">{submissionStats.rejected}</div>
-                <div className="text-xs text-muted-foreground">Rejected</div>
+                <div className="p-2 bg-red-500/10 rounded-lg border border-dashed border-red-500/30 w-fit mx-auto mb-2">
+                  <XCircle className="w-4 h-4 text-red-500" />
+                </div>
+                <div className="text-2xl font-bold font-mono bg-gradient-to-r from-red-500 to-pink-500 bg-clip-text text-transparent">{submissionStats.rejected}</div>
+                <div className="text-xs text-muted-foreground font-mono uppercase tracking-wider">REJECTED</div>
               </CardContent>
             </Card>
           </div>
 
           {/* Submissions List */}
-          <Card>
-            <CardHeader>
-              <CardTitle>All Submissions</CardTitle>
+          <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5 hover:border-solid transition-all duration-200">
+            <CardHeader className="border-b border-dashed border-primary/20">
+              <CardTitle className="flex items-center gap-2 font-mono text-lg">
+                <div className="p-1 bg-primary/10 rounded border border-dashed border-primary/30">
+                  <FileText className="w-4 h-4 text-primary" />
+                </div>
+                > ALL_SUBMISSIONS
+              </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               {submissions.length > 0 ? (
                 <div className="space-y-4">
                   {submissions.map((submission) => (
-                    <div key={submission.id} className="border rounded-lg p-4">
+                    <div key={submission.id} className="border-2 border-dashed border-primary/10 rounded-lg p-4 bg-gradient-to-r from-background/50 to-muted/20 hover:border-solid transition-all duration-200">
                       <div className="flex items-center justify-between mb-2">
-                        <div className="font-medium">Quest #{submission.questId}</div>
+                        <div className="font-medium font-mono text-primary">QUEST_#{submission.questId}</div>
                         <Badge 
                           variant="outline"
                           className={cn(
-                            submission.status === 'approved' && 'border-green-500 text-green-700',
-                            submission.status === 'pending' && 'border-yellow-500 text-yellow-700',
-                            submission.status === 'needs-revision' && 'border-orange-500 text-orange-700',
-                            submission.status === 'rejected' && 'border-red-500 text-red-700'
+                            'font-mono border-2 border-dashed',
+                            submission.status === 'approved' && 'border-green-500/30 text-green-700 bg-green-500/10',
+                            submission.status === 'pending' && 'border-yellow-500/30 text-yellow-700 bg-yellow-500/10',
+                            submission.status === 'needs-revision' && 'border-orange-500/30 text-orange-700 bg-orange-500/10',
+                            submission.status === 'rejected' && 'border-red-500/30 text-red-700 bg-red-500/10'
                           )}
                         >
-                          {submission.status.replace('-', ' ')}
+                          {submission.status.replace('-', '_').toUpperCase()}
                         </Badge>
                       </div>
                       
-                      <div className="text-sm text-muted-foreground mb-2">
-                        Submitted {new Date(submission.submittedAt).toLocaleDateString()}
+                      <div className="text-sm text-muted-foreground mb-2 font-mono">
+                        > SUBMITTED: {new Date(submission.submittedAt).toLocaleDateString()}
                         {submission.reviewedAt && (
-                          <> • Reviewed {new Date(submission.reviewedAt).toLocaleDateString()}</>
+                          <> • REVIEWED: {new Date(submission.reviewedAt).toLocaleDateString()}</>
                         )}
                       </div>
                       
                       {submission.feedback && (
-                        <div className="bg-muted p-3 rounded text-sm">
-                          <strong>Feedback:</strong> {submission.feedback}
+                        <div className="bg-muted/50 p-3 rounded border border-dashed border-primary/20 text-sm font-mono">
+                          <strong className="text-primary">FEEDBACK:</strong> {submission.feedback}
                         </div>
                       )}
                       
                       {submission.points && (
-                        <div className="text-sm font-medium text-green-600 mt-2">
-                          +{submission.points} points earned
+                        <div className="text-sm font-medium font-mono bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent mt-2">
+                          +{submission.points} POINTS_EARNED
                         </div>
                       )}
                     </div>
@@ -265,12 +347,17 @@ export default function ProgressPage() {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No submissions yet</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Start completing quests to see your submissions here.
+                  <div className="relative mx-auto w-16 h-16 mb-4">
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-lg border-2 border-dashed border-primary/30" />
+                    <div className="relative w-full h-full bg-gradient-to-r from-primary/10 to-purple-500/10 rounded-lg flex items-center justify-center">
+                      <FileText className="w-8 h-8 text-primary" />
+                    </div>
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2 font-mono text-primary">NO_SUBMISSIONS_YET</h3>
+                  <p className="text-muted-foreground mb-4 font-mono text-sm">
+                    > Start completing quests to see your submissions here.
                   </p>
-                  <Button>Browse Quests</Button>
+                  <Button className="font-mono">BROWSE_QUESTS</Button>
                 </div>
               )}
             </CardContent>
@@ -278,24 +365,26 @@ export default function ProgressPage() {
         </TabsContent>
 
         <TabsContent value="activity" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="w-5 h-5" />
-                Recent Activity
+          <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5 hover:border-solid transition-all duration-200">
+            <CardHeader className="border-b border-dashed border-primary/20">
+              <CardTitle className="flex items-center gap-2 font-mono text-lg">
+                <div className="p-1 bg-primary/10 rounded border border-dashed border-primary/30">
+                  <Clock className="w-4 h-4 text-primary" />
+                </div>
+                > RECENT_ACTIVITY
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               {recentActivity.length > 0 ? (
                 <div className="space-y-4">
                   {recentActivity.map((submission) => (
-                    <div key={submission.id} className="flex items-center gap-4 p-3 border rounded-lg">
+                    <div key={submission.id} className="flex items-center gap-4 p-3 border-2 border-dashed border-primary/10 rounded-lg bg-gradient-to-r from-background/50 to-muted/20 hover:border-solid transition-all duration-200">
                       <div className={cn(
-                        'w-8 h-8 rounded-full flex items-center justify-center',
-                        submission.status === 'approved' && 'bg-green-100 dark:bg-green-900',
-                        submission.status === 'pending' && 'bg-yellow-100 dark:bg-yellow-900',
-                        submission.status === 'needs-revision' && 'bg-orange-100 dark:bg-orange-900',
-                        submission.status === 'rejected' && 'bg-red-100 dark:bg-red-900'
+                        'w-8 h-8 rounded-lg border-2 border-dashed flex items-center justify-center',
+                        submission.status === 'approved' && 'bg-green-500/10 border-green-500/30',
+                        submission.status === 'pending' && 'bg-yellow-500/10 border-yellow-500/30',
+                        submission.status === 'needs-revision' && 'bg-orange-500/10 border-orange-500/30',
+                        submission.status === 'rejected' && 'bg-red-500/10 border-red-500/30'
                       )}>
                         {submission.status === 'approved' && <CheckCircle className="w-4 h-4 text-green-600" />}
                         {submission.status === 'pending' && <Clock className="w-4 h-4 text-yellow-600" />}
@@ -304,20 +393,20 @@ export default function ProgressPage() {
                       </div>
                       
                       <div className="flex-1">
-                        <div className="font-medium">
-                          {submission.status === 'approved' && 'Quest completed'}
-                          {submission.status === 'pending' && 'Quest submitted'}
-                          {submission.status === 'needs-revision' && 'Revision requested'}
-                          {submission.status === 'rejected' && 'Submission rejected'}
+                        <div className="font-medium font-mono text-primary">
+                          {submission.status === 'approved' && '✅ QUEST_COMPLETED'}
+                          {submission.status === 'pending' && '⏳ QUEST_SUBMITTED'}
+                          {submission.status === 'needs-revision' && '🔄 REVISION_REQUESTED'}
+                          {submission.status === 'rejected' && '❌ SUBMISSION_REJECTED'}
                         </div>
-                        <div className="text-sm text-muted-foreground">
-                          Quest #{submission.questId} • {new Date(submission.submittedAt).toLocaleDateString()}
+                        <div className="text-sm text-muted-foreground font-mono">
+                          > QUEST_#{submission.questId} • {new Date(submission.submittedAt).toLocaleDateString()}
                         </div>
                       </div>
                       
                       {submission.points && (
-                        <div className="text-sm font-medium text-green-600">
-                          +{submission.points}
+                        <div className="text-sm font-medium font-mono bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">
+                          +{submission.points} PTS
                         </div>
                       )}
                     </div>
@@ -325,10 +414,15 @@ export default function ProgressPage() {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No recent activity</h3>
-                  <p className="text-muted-foreground">
-                    Your quest submissions and achievements will appear here.
+                  <div className="relative mx-auto w-16 h-16 mb-4">
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-lg border-2 border-dashed border-primary/30" />
+                    <div className="relative w-full h-full bg-gradient-to-r from-primary/10 to-purple-500/10 rounded-lg flex items-center justify-center">
+                      <Calendar className="w-8 h-8 text-primary" />
+                    </div>
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2 font-mono text-primary">NO_RECENT_ACTIVITY</h3>
+                  <p className="text-muted-foreground font-mono text-sm">
+                    > Your quest submissions and achievements will appear here.
                   </p>
                 </div>
               )}

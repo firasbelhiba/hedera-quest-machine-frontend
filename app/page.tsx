@@ -58,66 +58,81 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
       {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-cyan-500 rounded-lg p-6 text-white">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">Welcome back, {user?.name}! 🚀</h1>
-            <p className="text-purple-100 mt-1">
-              Ready to continue your Hedera journey? You're on a {user?.streak || 0} day streak!
-            </p>
-          </div>
-          <div className="text-right">
-            <div className="text-3xl font-bold">{user?.points?.toLocaleString() || 0}</div>
-            <div className="text-purple-200 text-sm">Total Points</div>
+      <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-cyan-500/10 to-blue-500/10 rounded-lg" />
+        <div className="relative bg-background/80 backdrop-blur-sm border-2 border-dashed border-primary/20 rounded-lg p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-purple-500 to-cyan-500 bg-clip-text text-transparent font-mono">
+                🚀 Welcome back, {user?.name}!
+              </h1>
+              <p className="text-muted-foreground font-mono text-sm mt-2">
+                > Ready to continue your Hedera journey? Streak: {user?.streak || 0} days
+              </p>
+            </div>
+            <div className="text-right bg-gradient-to-br from-primary/5 to-cyan-500/5 p-4 rounded-lg border border-dashed border-primary/20">
+              <div className="text-3xl font-bold font-mono bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
+                {user?.points?.toLocaleString() || 0}
+              </div>
+              <div className="text-muted-foreground text-sm font-mono">TOTAL_POINTS</div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
+        <Card className="border-2 border-dashed border-yellow-500/20 bg-gradient-to-br from-yellow-500/5 to-orange-500/5 hover:border-solid transition-all duration-200">
           <CardContent className="p-6">
             <div className="flex items-center">
-              <Trophy className="h-8 w-8 text-yellow-500" />
+              <div className="p-2 bg-yellow-500/10 rounded-lg border border-dashed border-yellow-500/30">
+                <Trophy className="h-6 w-6 text-yellow-500" />
+              </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Level</p>
-                <p className="text-2xl font-bold">{user?.level || 1}</p>
+                <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">LEVEL</p>
+                <p className="text-2xl font-bold font-mono">{user?.level || 1}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-2 border-dashed border-red-500/20 bg-gradient-to-br from-red-500/5 to-pink-500/5 hover:border-solid transition-all duration-200">
           <CardContent className="p-6">
             <div className="flex items-center">
-              <Fire className="h-8 w-8 text-red-500" />
+              <div className="p-2 bg-red-500/10 rounded-lg border border-dashed border-red-500/30">
+                <Fire className="h-6 w-6 text-red-500" />
+              </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Streak</p>
-                <p className="text-2xl font-bold">{user?.streak || 0} days</p>
+                <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">STREAK</p>
+                <p className="text-2xl font-bold font-mono">{user?.streak || 0}<span className="text-sm ml-1">days</span></p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-2 border-dashed border-green-500/20 bg-gradient-to-br from-green-500/5 to-emerald-500/5 hover:border-solid transition-all duration-200">
           <CardContent className="p-6">
             <div className="flex items-center">
-              <Target className="h-8 w-8 text-green-500" />
+              <div className="p-2 bg-green-500/10 rounded-lg border border-dashed border-green-500/30">
+                <Target className="h-6 w-6 text-green-500" />
+              </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Completed</p>
-                <p className="text-2xl font-bold">{user?.completedQuests?.length || 0}</p>
+                <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">COMPLETED</p>
+                <p className="text-2xl font-bold font-mono">{user?.completedQuests?.length || 0}</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-2 border-dashed border-purple-500/20 bg-gradient-to-br from-purple-500/5 to-indigo-500/5 hover:border-solid transition-all duration-200">
           <CardContent className="p-6">
             <div className="flex items-center">
-              <Star className="h-8 w-8 text-purple-500" />
+              <div className="p-2 bg-purple-500/10 rounded-lg border border-dashed border-purple-500/30">
+                <Star className="h-6 w-6 text-purple-500" />
+              </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-muted-foreground">Badges</p>
-                <p className="text-2xl font-bold">{user?.badges?.length || 0}</p>
+                <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">BADGES</p>
+                <p className="text-2xl font-bold font-mono">{user?.badges?.length || 0}</p>
               </div>
             </div>
           </CardContent>
@@ -125,22 +140,31 @@ export default function Dashboard() {
       </div>
 
       {/* Progress to Next Level */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Zap className="w-5 h-5 text-yellow-500" />
-            Level Progress
+      <Card className="border-2 border-dashed border-yellow-500/20 bg-gradient-to-br from-yellow-500/5 to-orange-500/5 hover:border-solid transition-all duration-200">
+        <CardHeader className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10">
+          <CardTitle className="flex items-center gap-2 font-mono">
+            <div className="p-1 bg-yellow-500/20 rounded border border-dashed border-yellow-500/40">
+              <Zap className="w-4 h-4 text-yellow-500" />
+            </div>
+            ⚡ LEVEL_PROGRESS
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <div className="space-y-3">
-            <div className="flex justify-between text-sm">
-              <span>Level {user?.level || 1}</span>
-              <span>Level {(user?.level || 1) + 1}</span>
+            <div className="flex justify-between text-sm font-mono">
+              <span className="bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent font-bold">
+                LVL_{user?.level || 1}
+              </span>
+              <span className="bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent font-bold">
+                LVL_{(user?.level || 1) + 1}
+              </span>
             </div>
-            <Progress value={75} className="h-3" />
-            <p className="text-sm text-muted-foreground">
-              Earn 150 more points to reach the next level
+            <div className="relative">
+              <Progress value={75} className="h-4 border border-dashed border-primary/20" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent rounded-full" />
+            </div>
+            <p className="text-sm text-muted-foreground font-mono">
+              > Earn 150 more points to reach the next level
             </p>
           </div>
         </CardContent>
@@ -149,9 +173,14 @@ export default function Dashboard() {
       {/* Featured Quests */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Featured Quests</h2>
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-primary via-blue-500 to-cyan-500 bg-clip-text text-transparent font-mono">
+            🎮 Featured Quests
+          </h2>
           <Link href="/quests">
-            <Button variant="outline" className="gap-2">
+            <Button 
+              variant="outline" 
+              className="gap-2 border-2 border-dashed hover:border-solid transition-all duration-200 font-mono bg-gradient-to-r from-primary/5 to-blue-500/5 hover:shadow-[inset_2px_2px_0px_0px_rgba(0,0,0,0.1)]"
+            >
               View All <ArrowRight className="w-4 h-4" />
             </Button>
           </Link>
@@ -165,7 +194,7 @@ export default function Dashboard() {
               isCompleted={user?.completedQuests?.includes(String(quest.id))}
               onSelect={() => {
                 // Navigate to quest details
-                window.location.href = `/quests/${quest.id}`;
+                router.push(`/quests/${quest.id}`);
               }}
             />
           ))}
@@ -175,47 +204,59 @@ export default function Dashboard() {
       {/* Platform Stats */}
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-blue-500" />
-                Community
+          <Card className="border-2 border-dashed border-blue-500/20 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 hover:border-solid transition-all duration-200">
+            <CardHeader className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10">
+              <CardTitle className="flex items-center gap-2 font-mono">
+                <div className="p-1 bg-blue-500/20 rounded border border-dashed border-blue-500/40">
+                  <Users className="w-4 h-4 text-blue-500" />
+                </div>
+                👥 COMMUNITY
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <div className="text-2xl font-bold">{stats.totalUsers.toLocaleString()}</div>
-                <p className="text-sm text-muted-foreground">Active learners</p>
+                <div className="text-2xl font-bold font-mono bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
+                  {stats.totalUsers.toLocaleString()}
+                </div>
+                <p className="text-sm text-muted-foreground font-mono">Active learners</p>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-green-500" />
-                Success Rate
+          <Card className="border-2 border-dashed border-green-500/20 bg-gradient-to-br from-green-500/5 to-emerald-500/5 hover:border-solid transition-all duration-200">
+            <CardHeader className="bg-gradient-to-r from-green-500/10 to-emerald-500/10">
+              <CardTitle className="flex items-center gap-2 font-mono">
+                <div className="p-1 bg-green-500/20 rounded border border-dashed border-green-500/40">
+                  <TrendingUp className="w-4 h-4 text-green-500" />
+                </div>
+                📈 SUCCESS_RATE
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <div className="text-2xl font-bold">{stats.approvalRate}%</div>
-                <p className="text-sm text-muted-foreground">Quest completion rate</p>
+                <div className="text-2xl font-bold font-mono bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">
+                  {stats.approvalRate}%
+                </div>
+                <p className="text-sm text-muted-foreground font-mono">Quest completion rate</p>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-purple-500" />
-                Avg. Time
+          <Card className="border-2 border-dashed border-purple-500/20 bg-gradient-to-br from-purple-500/5 to-indigo-500/5 hover:border-solid transition-all duration-200">
+            <CardHeader className="bg-gradient-to-r from-purple-500/10 to-indigo-500/10">
+              <CardTitle className="flex items-center gap-2 font-mono">
+                <div className="p-1 bg-purple-500/20 rounded border border-dashed border-purple-500/40">
+                  <Clock className="w-4 h-4 text-purple-500" />
+                </div>
+                ⏱️ AVG_TIME
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <div className="text-2xl font-bold">{stats.avgCompletionTime}h</div>
-                <p className="text-sm text-muted-foreground">Per quest completion</p>
+                <div className="text-2xl font-bold font-mono bg-gradient-to-r from-purple-500 to-indigo-500 bg-clip-text text-transparent">
+                  {stats.avgCompletionTime}h
+                </div>
+                <p className="text-sm text-muted-foreground font-mono">Per quest completion</p>
               </div>
             </CardContent>
           </Card>
@@ -224,20 +265,25 @@ export default function Dashboard() {
 
       {/* Popular Categories */}
       {stats && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Popular Categories</CardTitle>
+        <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-blue-500/5 hover:border-solid transition-all duration-200">
+          <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-500/10">
+            <CardTitle className="font-mono bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
+              📊 POPULAR_CATEGORIES
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {stats.popularCategories.map((category) => (
-                <div key={category.category} className="flex items-center justify-between">
+                <div key={category.category} className="flex items-center justify-between p-3 bg-gradient-to-r from-background/50 to-muted/20 rounded-lg border border-dashed border-primary/10 hover:border-solid transition-all duration-200">
                   <div className="flex items-center gap-3">
-                    <Badge variant="outline" className="capitalize">
+                    <Badge 
+                      variant="outline" 
+                      className="capitalize font-mono border-dashed bg-gradient-to-r from-primary/10 to-blue-500/10 hover:border-solid transition-all duration-200"
+                    >
                       {category.category.replace('-', ' ')}
                     </Badge>
                   </div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-sm text-muted-foreground font-mono">
                     {category.count} quests
                   </div>
                 </div>

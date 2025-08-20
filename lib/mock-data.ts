@@ -99,7 +99,8 @@ export const mockQuests: Quest[] = [
     updatedAt: '2024-01-01',
     completions: 156,
     prerequisites: [],
-    thumbnail: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=400&h=250&fit=crop'
+    thumbnail: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=400&h=250&fit=crop',
+    platform_type: 'twitter'
   },
   {
     id: '2',
@@ -121,7 +122,8 @@ export const mockQuests: Quest[] = [
     updatedAt: '2024-01-02',
     completions: 134,
     prerequisites: ['1'],
-    thumbnail: 'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=400&h=250&fit=crop'
+    thumbnail: 'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=400&h=250&fit=crop',
+    platform_type: 'facebook'
   },
   {
     id: '3',
@@ -143,7 +145,8 @@ export const mockQuests: Quest[] = [
     updatedAt: '2024-01-03',
     completions: 67,
     prerequisites: ['1', '2'],
-    thumbnail: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&h=250&fit=crop'
+    thumbnail: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&h=250&fit=crop',
+    platform_type: 'discord'
   },
   {
     id: '4',
@@ -165,7 +168,8 @@ export const mockQuests: Quest[] = [
     updatedAt: '2024-01-04',
     completions: 89,
     prerequisites: ['1'],
-    thumbnail: 'https://images.unsplash.com/photo-1634973357973-f2ed2657db3c?w=400&h=250&fit=crop'
+    thumbnail: 'https://images.unsplash.com/photo-1634973357973-f2ed2657db3c?w=400&h=250&fit=crop',
+    platform_type: 'twitter'
   },
   {
     id: '5',
@@ -187,7 +191,54 @@ export const mockQuests: Quest[] = [
     updatedAt: '2024-01-05',
     completions: 34,
     prerequisites: ['1', '2'],
-    thumbnail: 'https://images.unsplash.com/photo-1639322537228-f710d846310a?w=400&h=250&fit=crop'
+    thumbnail: 'https://images.unsplash.com/photo-1639322537228-f710d846310a?w=400&h=250&fit=crop',
+    platform_type: 'youtube'
+  },
+  {
+    id: '6',
+    title: 'Build a Hedera dApp Tutorial',
+    description: 'Create a comprehensive tutorial on building decentralized applications on Hedera.',
+    category: 'development',
+    difficulty: 'advanced',
+    points: 800,
+    estimatedTime: '4 hours',
+    requirements: [
+      'Create a step-by-step tutorial',
+      'Include code examples',
+      'Deploy a working demo'
+    ],
+    submissionType: 'url',
+    submissionInstructions: 'Submit a link to your published tutorial (Medium, Dev.to, or personal blog)',
+    isActive: true,
+    createdAt: '2024-01-06',
+    updatedAt: '2024-01-06',
+    completions: 12,
+    prerequisites: ['1', '3'],
+    thumbnail: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=250&fit=crop',
+    platform_type: 'medium'
+  },
+  {
+    id: '7',
+    title: 'Join Hedera Community Chat',
+    description: 'Connect with other Hedera developers and enthusiasts in our community chat.',
+    category: 'community',
+    difficulty: 'beginner',
+    points: 50,
+    estimatedTime: '5 minutes',
+    requirements: [
+      'Join the Hedera Telegram group',
+      'Introduce yourself',
+      'Ask a question or share your experience'
+    ],
+    submissionType: 'text',
+    submissionInstructions: 'Share your Telegram username and a brief introduction you posted',
+    isActive: true,
+    createdAt: '2024-01-07',
+    updatedAt: '2024-01-07',
+    completions: 203,
+    prerequisites: [],
+    thumbnail: 'https://images.unsplash.com/photo-1577563908411-5077b6dc7624?w=400&h=250&fit=crop',
+    platform_type: 'telegram'
   }
 ];
 
@@ -232,6 +283,47 @@ export const mockSubmissions: Submission[] = [
       transactionId: '0.0.123456@1705495200.123456789'
     },
     feedback: 'Transaction ID format is incorrect. Please check and resubmit.'
+  },
+  {
+    id: '4',
+    questId: '5',
+    userId: '2',
+    status: 'approved',
+    submittedAt: '2024-01-19T14:20:00Z',
+    reviewedAt: '2024-01-19T16:45:00Z',
+    reviewedBy: 'admin',
+    content: {
+      type: 'text',
+      text: 'I participated in SaucerSwap liquidity farming and learned about impermanent loss. The experience taught me the importance of understanding tokenomics and market dynamics when providing liquidity. I provided HBAR/USDC liquidity and monitored the pool performance over a week, gaining insights into DeFi mechanics on Hedera.'
+    },
+    feedback: 'Excellent analysis of your DeFi experience!',
+    points: 600
+  },
+  {
+    id: '5',
+    questId: '6',
+    userId: '1',
+    status: 'pending',
+    submittedAt: '2024-01-20T11:30:00Z',
+    content: {
+      type: 'url',
+      url: 'https://medium.com/@alice/building-hedera-dapps-complete-guide'
+    }
+  },
+  {
+    id: '6',
+    questId: '7',
+    userId: '2',
+    status: 'approved',
+    submittedAt: '2024-01-21T08:15:00Z',
+    reviewedAt: '2024-01-21T09:00:00Z',
+    reviewedBy: 'admin',
+    content: {
+      type: 'text',
+      text: 'My Telegram username is @bob_hedera_dev. I introduced myself as a new developer interested in building on Hedera and asked about best practices for smart contract deployment.'
+    },
+    feedback: 'Welcome to the community!',
+    points: 50
   }
 ];
 

@@ -48,6 +48,7 @@ export interface Quest {
     username: string;
   };
   badges?: any[];
+  platform_type?: string;
 }
 
 export interface Submission {

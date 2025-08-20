@@ -192,7 +192,7 @@ export function createApiClient(baseURL: string): AxiosInstance {
 }
 
 // Default instance using env var; update NEXT_PUBLIC_API_URL when API is ready
-export const api = createApiClient((process.env.NEXT_PUBLIC_API_URL || 'https://hedera-quests.com').replace(/\/$/, ''));
+export const api = createApiClient((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000').replace(/\/$/, ''));
 
 
 

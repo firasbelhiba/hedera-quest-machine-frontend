@@ -21,7 +21,8 @@ import {
   Shield, 
   CheckCircle,
   AlertCircle,
-  Link
+  Link,
+  Twitter
 } from 'lucide-react';
 
 const profileSchema = z.object({
@@ -37,10 +38,12 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
+  const [profileData, setProfileData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [isConnectingTwitter, setIsConnectingTwitter] = useState(false);
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema)
@@ -50,17 +53,47 @@ export default function ProfilePage() {
     const loadUser = async () => {
       setIsLoading(true);
       try {
-        const userData = await QuestService.getCurrentUser();
-        setUser(userData);
-        if (userData) {
-          reset({
-            name: userData.name,
-            email: userData.email,
-            hederaAccountId: userData.hederaAccountId
-          });
+        const token = localStorage.getItem('auth_token');
+        const response = await fetch('https://hedera-quests.com/profile/me', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch profile data');
         }
+        
+        const data = await response.json();
+        setProfileData(data);
+        
+        // Create user object from profile data
+        const userData: User = {
+          id: String(data.user.id),
+          name: `${data.user.firstName} ${data.user.lastName}`.trim(),
+          email: data.user.email,
+          avatar: data.user.twitterProfile?.twitter_profile_picture || '/logo.png',
+          hederaAccountId: '',
+          points: 0,
+          level: 1,
+          streak: 0,
+          joinedAt: new Date().toISOString(),
+          role: data.is_admin ? 'admin' : 'user',
+          badges: [],
+          completedQuests: []
+        };
+        
+        setUser(userData);
+        reset({
+          name: userData.name,
+          email: userData.email,
+          hederaAccountId: userData.hederaAccountId
+        });
       } catch (error) {
         console.error('Failed to load user data:', error);
+        setSaveError('Failed to load profile data');
       } finally {
         setIsLoading(false);
       }
@@ -90,6 +123,75 @@ export default function ProfilePage() {
 
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  };
+
+  const handleConnectTwitter = async () => {
+    setIsConnectingTwitter(true);
+    try {
+      const baseUrl = 'https://hedera-quests.com';
+      const token = localStorage.getItem('auth_token');
+      const response = await fetch(`${baseUrl}/profile/twitter/url`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to get Twitter authorization URL');
+      }
+      
+      const data = await response.json();
+      
+      if (data.success && data.url) {
+        // Redirect to Twitter authorization URL
+        window.location.href = data.url;
+      } else {
+        throw new Error('Invalid response from server');
+      }
+    } catch (error) {
+      console.error('Error connecting to Twitter:', error);
+      setSaveError(error instanceof Error ? error.message : 'Failed to connect to Twitter');
+      setTimeout(() => setSaveError(null), 5000);
+    } finally {
+      setIsConnectingTwitter(false);
+    }
+  };
+
+  const handleDisconnectTwitter = async () => {
+    try {
+      const token = localStorage.getItem('access_token');
+      const baseUrl = 'https://hedera-quests.com';
+      const response = await fetch(`${baseUrl}/profile/twitter/profile`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        toast({
+          title: 'Twitter Disconnected',
+          description: 'Your Twitter account has been successfully disconnected.',
+        });
+        // Refresh profile data
+        await loadUser();
+      } else {
+        const data = await response.json();
+        toast({
+          title: 'Failed to disconnect Twitter',
+          description: data.message || 'Something went wrong.',
+          variant: 'destructive',
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Failed to disconnect Twitter',
+        description: error.message || 'Something went wrong.',
+        variant: 'destructive',
+      });
+    }
   };
 
   if (isLoading) {
@@ -263,6 +365,91 @@ export default function ProfilePage() {
                     Update Account
                   </Button>
                 </div>
+              </div>
+
+              {/* Social Media Integration */}
+              <div className="border rounded-lg p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h3 className="font-semibold">Twitter Integration</h3>
+                    {profileData?.user?.twitterProfile ? (
+                      <p className="text-sm text-muted-foreground">
+                        Connected as @{profileData.user.twitterProfile.twitter_username}
+                      </p>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">
+                        Link your Twitter account to verify social media quests
+                      </p>
+                    )}
+                  </div>
+                  {profileData?.user?.twitterProfile ? (
+                    <Badge variant="outline" className="text-green-600">
+                      <CheckCircle className="w-3 h-3 mr-1" />
+                      Connected
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="text-gray-600">
+                      <AlertCircle className="w-3 h-3 mr-1" />
+                      Not Connected
+                    </Badge>
+                  )}
+                </div>
+                
+                {profileData?.user?.twitterProfile ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
+                      <Avatar className="w-10 h-10">
+                        <AvatarImage src={profileData.user.twitterProfile.twitter_profile_picture} />
+                        <AvatarFallback>@</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <p className="font-medium">@{profileData.user.twitterProfile.twitter_username}</p>
+                        <p className="text-sm text-muted-foreground">Twitter ID: {profileData.user.twitterProfile.twitter_id}</p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.open(`https://twitter.com/${profileData.user.twitterProfile.twitter_username}`, '_blank')}
+                      >
+                        <ExternalLink className="w-4 h-4 mr-1" />
+                        View Profile
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="text-red-600 hover:text-red-700"
+                        onClick={handleDisconnectTwitter}
+                      >
+                        <Link className="w-4 h-4 mr-1" />
+                        Disconnect
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="flex gap-2">
+                      <Button
+                         variant="default"
+                         size="sm"
+                         className="bg-blue-500 hover:bg-blue-600 text-white"
+                         onClick={handleConnectTwitter}
+                         disabled={isConnectingTwitter}
+                       >
+                         <Twitter className="w-4 h-4 mr-1" />
+                         {isConnectingTwitter ? 'Connecting...' : 'Connect Twitter'}
+                       </Button>
+                      <Button variant="outline" size="sm" disabled>
+                        <ExternalLink className="w-4 h-4 mr-1" />
+                        View Profile
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Connecting your Twitter account allows you to participate in social media quests and earn additional rewards.
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Account Status */}

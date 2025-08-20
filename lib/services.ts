@@ -401,6 +401,26 @@ export class QuestService {
     return filtered;
   }
 
+  static async getQuestCompletions(): Promise<any> {
+    if (useApi()) {
+      return SubmissionsApi.getQuestCompletions();
+    }
+    await this.delay();
+    // Mock data structure matching the API response
+    return {
+      success: true,
+      quests: mockQuests.map(quest => ({
+        ...quest,
+        completions: mockSubmissions
+          .filter(s => s.questId === quest.id)
+          .map(submission => ({
+            ...submission,
+            user: mockUsers.find(u => u.id === submission.userId)
+          }))
+      }))
+    };
+  }
+
   static async reviewSubmission(
     submissionId: string, 
     status: 'approved' | 'rejected' | 'needs-revision', 
