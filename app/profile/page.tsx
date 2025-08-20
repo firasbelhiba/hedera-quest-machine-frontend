@@ -96,8 +96,8 @@ export default function ProfilePage() {
         
         setUser(userData);
         reset({
-          name: userData.name,
-          email: userData.email,
+          name: userData.firstName && userData.lastName ? `${userData.firstName} ${userData.lastName}` : userData.username || '',
+           email: userData.email,
           hederaAccountId: userData.hederaAccountId
         });
     } catch (error) {
@@ -216,41 +216,78 @@ export default function ProfilePage() {
   };
 
   const handleDisconnectTwitter = async () => {
-    try {
-      const token = localStorage.getItem('auth_token');
-      const baseUrl = 'https://hedera-quests.com';
-      const response = await fetch(`${baseUrl}/profile/twitter/profile`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+     try {
+       const token = localStorage.getItem('auth_token');
+       const baseUrl = 'https://hedera-quests.com';
+       const response = await fetch(`${baseUrl}/profile/twitter/profile`, {
+         method: 'DELETE',
+         headers: {
+           Authorization: `Bearer ${token}`,
+         },
+       });
 
-      if (response.ok) {
-        toast({
-          title: 'Twitter Disconnected',
-          description: 'Your Twitter account has been successfully disconnected.',
-          variant: 'default',
-          className: 'border-green-500 bg-green-50 text-green-900 dark:bg-green-950 dark:text-green-50',
-        });
-        // Refresh profile data
-        await loadUser();
-      } else {
-        const data = await response.json();
-        toast({
-          title: 'Failed to disconnect Twitter',
-          description: data.message || 'Something went wrong.',
-          variant: 'destructive',
-        });
-      }
-    } catch (error) {
-      toast({
-        title: 'Failed to disconnect Twitter',
-        description: error instanceof Error ? error.message : 'Something went wrong.',
-        variant: 'destructive',
-      });
-    }
-  };
+       if (response.ok) {
+         toast({
+           title: 'Twitter Disconnected',
+           description: 'Your Twitter account has been successfully disconnected.',
+           variant: 'default',
+           className: 'border-green-500 bg-green-50 text-green-900 dark:bg-green-950 dark:text-green-50',
+         });
+         // Refresh profile data
+         await loadUser();
+       } else {
+         const data = await response.json();
+         toast({
+           title: 'Failed to disconnect Twitter',
+           description: data.message || 'Something went wrong.',
+           variant: 'destructive',
+         });
+       }
+     } catch (error) {
+       toast({
+         title: 'Failed to disconnect Twitter',
+         description: error instanceof Error ? error.message : 'Something went wrong.',
+         variant: 'destructive',
+       });
+     }
+   };
+
+   const handleDisconnectFacebook = async () => {
+     try {
+       const token = localStorage.getItem('auth_token');
+       const baseUrl = 'https://hedera-quests.com';
+       const response = await fetch(`${baseUrl}/profile/facebook/profile`, {
+         method: 'DELETE',
+         headers: {
+           Authorization: `Bearer ${token}`,
+         },
+       });
+
+       if (response.ok) {
+         toast({
+           title: 'Facebook Disconnected',
+           description: 'Your Facebook account has been successfully disconnected.',
+           variant: 'default',
+           className: 'border-green-500 bg-green-50 text-green-900 dark:bg-green-950 dark:text-green-50',
+         });
+         // Refresh profile data
+         await loadUser();
+       } else {
+         const data = await response.json();
+         toast({
+           title: 'Failed to disconnect Facebook',
+           description: data.message || 'Something went wrong.',
+           variant: 'destructive',
+         });
+       }
+     } catch (error) {
+       toast({
+         title: 'Failed to disconnect Facebook',
+         description: error instanceof Error ? error.message : 'Something went wrong.',
+         variant: 'destructive',
+       });
+     }
+   };
 
   if (isLoading) {
     return (
@@ -271,94 +308,122 @@ export default function ProfilePage() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       {/* Header */}
-      <div className="text-center space-y-4">
-        <Avatar className="w-24 h-24 mx-auto">
-          <AvatarImage src={user.avatar} />
-          <AvatarFallback className="text-2xl">
-            {getInitials(user.name)}
-          </AvatarFallback>
-        </Avatar>
-        <div>
-          <h1 className="text-3xl font-bold">{user.name}</h1>
-          <p className="text-muted-foreground">Member since {new Date(user.joinedAt).toLocaleDateString()}</p>
-        </div>
-      </div>
+      <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5 hover:border-solid transition-all duration-200">
+        <CardContent className="p-8">
+          <div className="text-center space-y-4">
+            <div className="relative mx-auto w-24 h-24">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-full border-2 border-dashed border-primary/30" />
+              <Avatar className="relative w-24 h-24 border-2 border-solid border-background shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)]">
+                <AvatarImage src={profileData?.user?.profilePicture || ''} />
+                <AvatarFallback className="text-2xl font-mono bg-gradient-to-r from-primary/10 to-purple-500/10">
+                  {getInitials(profileData?.user?.firstName && profileData?.user?.lastName ? `${profileData.user.firstName} ${profileData.user.lastName}` : profileData?.user?.username || 'User')}
+                </AvatarFallback>
+              </Avatar>
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold font-mono bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">{profileData?.user?.firstName && profileData?.user?.lastName ? `${profileData.user.firstName} ${profileData.user.lastName}` : profileData?.user?.username || 'User'}</h1>
+              <p className="text-muted-foreground font-mono text-sm">{'>'} Member since {profileData?.user?.created_at ? new Date(profileData.user.created_at).toLocaleDateString() : 'Unknown'}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       <Tabs defaultValue="profile" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="profile">Profile</TabsTrigger>
-          <TabsTrigger value="account">Account</TabsTrigger>
-          <TabsTrigger value="privacy">Privacy</TabsTrigger>
+          <TabsTrigger 
+            value="profile" 
+            className="font-mono text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/20 data-[state=active]:to-purple-500/20 data-[state=active]:border data-[state=active]:border-dashed data-[state=active]:border-primary/30 data-[state=active]:text-primary transition-all duration-200"
+          >
+            👤 PROFILE
+          </TabsTrigger>
+          <TabsTrigger 
+            value="account" 
+            className="font-mono text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/20 data-[state=active]:to-purple-500/20 data-[state=active]:border data-[state=active]:border-dashed data-[state=active]:border-primary/30 data-[state=active]:text-primary transition-all duration-200"
+          >
+            ⚙️ ACCOUNT
+          </TabsTrigger>
+          <TabsTrigger 
+            value="privacy" 
+            className="font-mono text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/20 data-[state=active]:to-purple-500/20 data-[state=active]:border data-[state=active]:border-dashed data-[state=active]:border-primary/30 data-[state=active]:text-primary transition-all duration-200"
+          >
+            🔒 PRIVACY
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <UserIcon className="w-5 h-5" />
-                Profile Information
+          <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5 hover:border-solid transition-all duration-200">
+            <CardHeader className="border-b border-dashed border-primary/20">
+              <CardTitle className="flex items-center gap-2 font-mono text-lg">
+                <div className="p-1 bg-primary/10 rounded border border-dashed border-primary/30">
+                  <UserIcon className="w-4 h-4 text-primary" />
+                </div>
+                {'>'} PROFILE_INFORMATION
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-6">
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="name">Full Name</Label>
+                    <Label htmlFor="name" className="font-mono text-sm text-primary">FULL_NAME</Label>
                     <Input
                       id="name"
                       {...register('name')}
-                      
+                      className="font-mono border-2 border-dashed border-primary/20 focus:border-solid focus:border-primary/50 bg-gradient-to-r from-primary/5 to-purple-500/5"
                     />
                     {errors.name && (
-                      <p className="text-sm text-destructive mt-1">{errors.name.message}</p>
+                      <p className="text-sm text-destructive mt-1 font-mono">{'>'} {errors.name.message}</p>
                     )}
                   </div>
 
                   <div>
-                    <Label htmlFor="email">Email Address</Label>
+                    <Label htmlFor="email" className="font-mono text-sm text-primary">EMAIL_ADDRESS</Label>
                     <Input
                       id="email"
                       type="email"
                       {...register('email')}
-                      
+                      className="font-mono border-2 border-dashed border-primary/20 focus:border-solid focus:border-primary/50 bg-gradient-to-r from-primary/5 to-purple-500/5"
                     />
                     {errors.email && (
-                      <p className="text-sm text-destructive mt-1">{errors.email.message}</p>
+                      <p className="text-sm text-destructive mt-1 font-mono">{'>'} {errors.email.message}</p>
                     )}
                   </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="hederaAccountId">Hedera Account ID</Label>
+                  <Label htmlFor="hederaAccountId" className="font-mono text-sm text-primary">HEDERA_ACCOUNT_ID</Label>
                   <Input
                     id="hederaAccountId"
                     {...register('hederaAccountId')}
-                    
+                    className="font-mono border-2 border-dashed border-primary/20 focus:border-solid focus:border-primary/50 bg-gradient-to-r from-primary/5 to-purple-500/5"
                   />
                   {errors.hederaAccountId && (
-                    <p className="text-sm text-destructive mt-1">{errors.hederaAccountId.message}</p>
+                    <p className="text-sm text-destructive mt-1 font-mono">{'>'} {errors.hederaAccountId.message}</p>
                   )}
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Format: 0.0.XXXXXX (e.g., 0.0.123456)
+                  <p className="text-xs text-muted-foreground mt-1 font-mono">
+                    {'>'} Format: 0.0.XXXXXX (e.g., 0.0.123456)
                   </p>
                 </div>
 
                 {saveError && (
-                  <Alert variant="destructive">
+                  <Alert variant="destructive" className="border-2 border-dashed border-red-500/20 bg-gradient-to-r from-red-500/5 to-pink-500/5">
                     <AlertCircle className="w-4 h-4" />
-                    <AlertDescription>{saveError}</AlertDescription>
+                    <AlertDescription className="font-mono">{'>'} {saveError}</AlertDescription>
                   </Alert>
                 )}
 
                 {saveSuccess && (
-                  <Alert>
+                  <Alert className="border-2 border-dashed border-green-500/20 bg-gradient-to-r from-green-500/5 to-emerald-500/5">
                     <CheckCircle className="w-4 h-4" />
-                    <AlertDescription>Profile updated successfully!</AlertDescription>
+                    <AlertDescription className="font-mono">{'>'} Profile updated successfully!</AlertDescription>
                   </Alert>
                 )}
 
-                <Button type="submit" disabled={isSaving}>
-                  {isSaving ? 'Saving...' : 'Save Changes'}
+                <Button 
+                  type="submit" 
+                  disabled={isSaving}
+                  className="font-mono border-2 border-dashed border-primary/30 hover:border-solid hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all duration-200"
+                >
+                  {isSaving ? 'SAVING...' : 'SAVE_CHANGES'}
                 </Button>
               </form>
             </CardContent>
@@ -366,22 +431,31 @@ export default function ProfilePage() {
 
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card>
+            <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5 hover:border-solid transition-all duration-200">
               <CardContent className="p-6 text-center">
-                <div className="text-2xl font-bold text-primary">{user.points.toLocaleString()}</div>
-                <div className="text-sm text-muted-foreground">Total Points</div>
+                <div className="p-2 bg-primary/10 rounded-lg border border-dashed border-primary/30 w-fit mx-auto mb-2">
+                  <UserIcon className="w-4 h-4 text-primary" />
+                </div>
+                <div className="text-2xl font-bold font-mono bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">{profileData?.user?.points?.toLocaleString() || '0'}</div>
+                <div className="text-xs text-muted-foreground font-mono uppercase tracking-wider">TOTAL_POINTS</div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="border-2 border-dashed border-green-500/20 bg-gradient-to-br from-green-500/5 to-emerald-500/5 hover:border-solid transition-all duration-200">
               <CardContent className="p-6 text-center">
-                <div className="text-2xl font-bold text-primary">{user.level}</div>
-                <div className="text-sm text-muted-foreground">Current Level</div>
+                <div className="p-2 bg-green-500/10 rounded-lg border border-dashed border-green-500/30 w-fit mx-auto mb-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                </div>
+                <div className="text-2xl font-bold font-mono bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">{profileData?.user?.level || '1'}</div>
+                <div className="text-xs text-muted-foreground font-mono uppercase tracking-wider">CURRENT_LEVEL</div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="border-2 border-dashed border-blue-500/20 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 hover:border-solid transition-all duration-200">
               <CardContent className="p-6 text-center">
-                <div className="text-2xl font-bold text-primary">{user.completedQuests.length}</div>
-                <div className="text-sm text-muted-foreground">Quests Completed</div>
+                <div className="p-2 bg-blue-500/10 rounded-lg border border-dashed border-blue-500/30 w-fit mx-auto mb-2">
+                  <CheckCircle className="w-4 h-4 text-blue-500" />
+                </div>
+                <div className="text-2xl font-bold font-mono bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">{profileData?.user?.completedQuests?.length || '0'}</div>
+                <div className="text-xs text-muted-foreground font-mono uppercase tracking-wider">QUESTS_COMPLETED</div>
               </CardContent>
             </Card>
           </div>
@@ -546,7 +620,7 @@ export default function ProfilePage() {
                         <AvatarFallback>FB</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <p className="font-medium">{profileData.user.facebookProfile.facebook_name}</p>
+                        <p className="font-medium">{profileData.user.facebookProfile.firstname} {profileData.user.facebookProfile.lastname}</p>
                         <p className="text-sm text-muted-foreground">Facebook ID: {profileData.user.facebookProfile.facebook_id}</p>
                       </div>
                     </div>
@@ -560,14 +634,14 @@ export default function ProfilePage() {
                         View Profile
                       </Button>
                       <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="text-red-600 hover:text-red-700"
-                        onClick={() => console.log('Disconnect Facebook - to be implemented')}
-                      >
-                        <Link className="w-4 h-4 mr-1" />
-                        Disconnect
-                      </Button>
+                         variant="outline" 
+                         size="sm" 
+                         className="text-red-600 hover:text-red-700"
+                         onClick={handleDisconnectFacebook}
+                       >
+                         <Link className="w-4 h-4 mr-1" />
+                         Disconnect
+                       </Button>
                     </div>
                   </div>
                 ) : (
@@ -644,73 +718,76 @@ export default function ProfilePage() {
           </Card>
         </TabsContent>
 
+
         <TabsContent value="privacy" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="w-5 h-5" />
-                Privacy & Security
+          <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5 hover:border-solid transition-all duration-200">
+            <CardHeader className="border-b border-dashed border-primary/20">
+              <CardTitle className="flex items-center gap-2 font-mono text-lg">
+                <div className="p-1 bg-primary/10 rounded border border-dashed border-primary/30">
+                  <Shield className="w-4 h-4 text-primary" />
+                </div>
+                {'>'} PRIVACY_&_SECURITY
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-6 p-6">
               {/* Privacy Settings */}
               <div>
-                <h3 className="font-semibold mb-3">Profile Visibility</h3>
+                <h3 className="font-mono font-semibold mb-3 text-primary uppercase tracking-wider">{'>'} PROFILE_VISIBILITY</h3>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between p-3 border-2 border-dashed border-green-500/20 rounded-lg bg-gradient-to-r from-green-500/5 to-emerald-500/5">
                     <div>
-                      <div className="font-medium">Show on Leaderboard</div>
-                      <div className="text-sm text-muted-foreground">
-                        Allow others to see your rank and points
+                      <div className="font-medium font-mono text-primary">SHOW_ON_LEADERBOARD</div>
+                      <div className="text-sm text-muted-foreground font-mono">
+                        {'>'} Allow others to see your rank and points
                       </div>
                     </div>
-                    <Button variant="outline" size="sm">Enabled</Button>
+                    <Button variant="outline" size="sm" className="font-mono border-2 border-dashed border-green-500/30 bg-green-500/10 text-green-600 hover:border-solid">ENABLED</Button>
                   </div>
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between p-3 border-2 border-dashed border-green-500/20 rounded-lg bg-gradient-to-r from-green-500/5 to-emerald-500/5">
                     <div>
-                      <div className="font-medium">Public Profile</div>
-                      <div className="text-sm text-muted-foreground">
-                        Make your achievements and badges visible to others
+                      <div className="font-medium font-mono text-primary">PUBLIC_PROFILE</div>
+                      <div className="text-sm text-muted-foreground font-mono">
+                        {'>'} Make your achievements and badges visible to others
                       </div>
                     </div>
-                    <Button variant="outline" size="sm">Enabled</Button>
+                    <Button variant="outline" size="sm" className="font-mono border-2 border-dashed border-green-500/30 bg-green-500/10 text-green-600 hover:border-solid">ENABLED</Button>
                   </div>
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between p-3 border-2 border-dashed border-red-500/20 rounded-lg bg-gradient-to-r from-red-500/5 to-pink-500/5">
                     <div>
-                      <div className="font-medium">Show Activity</div>
-                      <div className="text-sm text-muted-foreground">
-                        Display your recent quest completions
+                      <div className="font-medium font-mono text-primary">SHOW_ACTIVITY</div>
+                      <div className="text-sm text-muted-foreground font-mono">
+                        {'>'} Display your recent quest completions
                       </div>
                     </div>
-                    <Button variant="outline" size="sm">Disabled</Button>
+                    <Button variant="outline" size="sm" className="font-mono border-2 border-dashed border-red-500/30 bg-red-500/10 text-red-600 hover:border-solid">DISABLED</Button>
                   </div>
                 </div>
               </div>
 
               {/* Data Export */}
-              <div className="border-t pt-6">
-                <h3 className="font-semibold mb-3">Data Management</h3>
+              <div className="border-t border-dashed border-primary/20 pt-6">
+                <h3 className="font-mono font-semibold mb-3 text-primary uppercase tracking-wider">{'>'} DATA_MANAGEMENT</h3>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between p-3 border-2 border-dashed border-blue-500/20 rounded-lg bg-gradient-to-r from-blue-500/5 to-cyan-500/5">
                     <div>
-                      <div className="font-medium">Export Data</div>
-                      <div className="text-sm text-muted-foreground">
-                        Download a copy of your data
+                      <div className="font-medium font-mono text-primary">EXPORT_DATA</div>
+                      <div className="text-sm text-muted-foreground font-mono">
+                        {'>'} Download a copy of your data
                       </div>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="font-mono border-2 border-dashed border-primary/30 hover:border-solid hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all duration-200">
                       <Link className="w-4 h-4 mr-1" />
-                      Export
+                      EXPORT
                     </Button>
                   </div>
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between p-3 border-2 border-dashed border-yellow-500/20 rounded-lg bg-gradient-to-r from-yellow-500/5 to-orange-500/5">
                     <div>
-                      <div className="font-medium">Data Retention</div>
-                      <div className="text-sm text-muted-foreground">
-                        How long we keep your data
+                      <div className="font-medium font-mono text-primary">DATA_RETENTION</div>
+                      <div className="text-sm text-muted-foreground font-mono">
+                        {'>'} How long we keep your data
                       </div>
                     </div>
-                    <Badge variant="outline">Indefinitely</Badge>
+                    <Badge variant="outline" className="font-mono border-2 border-dashed border-yellow-500/30 bg-yellow-500/10 text-yellow-600">INDEFINITELY</Badge>
                   </div>
                 </div>
               </div>
