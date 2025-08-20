@@ -154,13 +154,13 @@ export function Header({ onMenuClick }: HeaderProps) {
   };
 
   return (
-    <header className="bg-card border-b px-4 lg:px-6 h-16 flex items-center justify-between">
+    <header className="bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border-b-2 border-dashed border-purple-500/30 px-4 lg:px-6 h-16 flex items-center justify-between font-mono">
       <div className="flex items-center space-x-4">
         <Button
           variant="ghost"
           size="sm"
           onClick={onMenuClick}
-          className="lg:hidden"
+          className="lg:hidden border-2 border-dashed border-purple-500/50 hover:border-cyan-500/50 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-cyan-500/20 font-mono"
         >
           <Menu className="h-5 w-5" />
         </Button>
@@ -168,10 +168,10 @@ export function Header({ onMenuClick }: HeaderProps) {
 
 
         <div className="relative w-64">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-purple-500" />
           <Input
-            placeholder="Search quests..."
-            className="pl-10"
+            placeholder="[SEARCH_QUESTS...]"
+            className="pl-10 border-2 border-dashed border-purple-500/50 bg-gradient-to-r from-purple-500/5 to-cyan-500/5 font-mono placeholder:text-purple-500/70 focus:border-cyan-500/70 focus:bg-gradient-to-r focus:from-cyan-500/10 focus:to-purple-500/10"
           />
         </div>
       </div>
@@ -181,32 +181,34 @@ export function Header({ onMenuClick }: HeaderProps) {
           variant="ghost"
           size="sm"
           onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+          className="border-2 border-dashed border-purple-500/50 hover:border-cyan-500/50 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-cyan-500/20 font-mono"
+          title={theme === 'light' ? '[DARK_MODE]' : '[LIGHT_MODE]'}
         >
           {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
         </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="relative">
+            <Button variant="ghost" size="sm" className="relative border-2 border-dashed border-purple-500/50 hover:border-cyan-500/50 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-cyan-500/20 font-mono" title="[NOTIFICATIONS]">
               <Bell className="h-5 w-5" />
               {unreadCount > 0 && (
-                <Badge className="absolute -top-1 -right-1 px-1 py-0 text-xs min-w-[1rem] h-5 flex items-center justify-center bg-red-500 hover:bg-red-600">
+                <Badge className="absolute -top-1 -right-1 px-1 py-0 text-xs min-w-[1rem] h-5 flex items-center justify-center bg-red-500 hover:bg-red-600 border border-dashed border-red-700 font-mono">
                   {unreadCount}
                 </Badge>
               )}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-80">
-            <div className="flex items-center justify-between p-2">
-              <DropdownMenuLabel className="p-0">Notifications</DropdownMenuLabel>
+          <DropdownMenuContent align="end" className="w-80 border-2 border-dashed border-purple-500/50 bg-gradient-to-br from-purple-500/5 to-cyan-500/5 font-mono">
+            <div className="flex items-center justify-between p-2 border-b border-dashed border-purple-500/30">
+              <DropdownMenuLabel className="p-0 font-mono text-purple-600">[NOTIFICATIONS]</DropdownMenuLabel>
               {unreadCount > 0 && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={markAllAsRead}
-                  className="text-xs h-auto p-1"
+                  className="text-xs h-auto p-1 border border-dashed border-cyan-500/50 hover:border-purple-500/50 hover:bg-gradient-to-r hover:from-cyan-500/20 hover:to-purple-500/20 font-mono"
                 >
-                  Mark all read
+                  [MARK_ALL_READ]
                 </Button>
               )}
             </div>
@@ -218,8 +220,8 @@ export function Header({ onMenuClick }: HeaderProps) {
                     <DropdownMenuItem
                       key={notification.id}
                       className={cn(
-                        "flex items-start gap-3 p-3 cursor-pointer",
-                        !notification.read && "bg-blue-50 dark:bg-blue-950/20"
+                        "flex items-start gap-3 p-3 cursor-pointer border border-dashed border-transparent hover:border-purple-500/30 hover:bg-gradient-to-r hover:from-purple-500/10 hover:to-cyan-500/10 font-mono",
+                        !notification.read && "bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/30"
                       )}
                       onClick={() => handleNotificationClick(notification)}
                     >
@@ -247,15 +249,15 @@ export function Header({ onMenuClick }: HeaderProps) {
                   ))}
                 </div>
               ) : (
-                <div className="p-4 text-center text-sm text-muted-foreground">
-                  No notifications yet
+                <div className="p-4 text-center text-sm text-muted-foreground font-mono">
+                  [NO_NOTIFICATIONS_YET]
                 </div>
               )}
             </ScrollArea>
-            <DropdownMenuSeparator />
+            <DropdownMenuSeparator className="border-dashed border-purple-500/30" />
             <DropdownMenuItem className="justify-center">
-              <Button variant="ghost" size="sm" className="w-full">
-                View All Notifications
+              <Button variant="ghost" size="sm" className="w-full border border-dashed border-purple-500/50 hover:border-cyan-500/50 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-cyan-500/20 font-mono">
+                [VIEW_ALL_NOTIFICATIONS]
               </Button>
             </DropdownMenuItem>
           </DropdownMenuContent>
