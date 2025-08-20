@@ -265,36 +265,38 @@ export function Header({ onMenuClick }: HeaderProps) {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="flex items-center space-x-2 p-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-cyan-500" />
+            <Button variant="ghost" size="sm" className="flex items-center space-x-2 p-2 border-2 border-dashed border-purple-500/50 hover:border-cyan-500/50 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-cyan-500/20 font-mono">
+              <div className="w-8 h-8 border-2 border-dashed border-purple-500 bg-gradient-to-r from-purple-600 to-cyan-500 flex items-center justify-center">
+                <span className="text-white font-bold text-xs font-mono">[U]</span>
+              </div>
               <div className="hidden md:block text-left">
-                <p className="text-sm font-medium">
-                  {currentUser?.name || 'Loading...'}
+                <p className="text-sm font-medium font-mono">
+                  [{currentUser?.name || 'LOADING...'}]
                 </p>
-                <p className="text-xs text-muted-foreground">
-                  {currentUser?.points ? `${currentUser.points} points` : 'Loading...'}
+                <p className="text-xs text-muted-foreground font-mono">
+                  {currentUser?.points ? `[${currentUser.points}_POINTS]` : '[LOADING...]'}
                 </p>
               </div>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer">
+          <DropdownMenuContent align="end" className="w-56 border-2 border-dashed border-purple-500/50 bg-gradient-to-br from-purple-500/5 to-cyan-500/5 font-mono">
+            <DropdownMenuLabel className="font-mono text-purple-600">[MY_ACCOUNT]</DropdownMenuLabel>
+            <DropdownMenuSeparator className="border-dashed border-purple-500/30" />
+            <DropdownMenuItem className="cursor-pointer border border-dashed border-transparent hover:border-purple-500/30 hover:bg-gradient-to-r hover:from-purple-500/10 hover:to-cyan-500/10 font-mono">
               <User className="mr-2 h-4 w-4" />
-              <span>Profile</span>
+              <span>[PROFILE]</span>
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">
+            <DropdownMenuItem className="cursor-pointer border border-dashed border-transparent hover:border-purple-500/30 hover:bg-gradient-to-r hover:from-purple-500/10 hover:to-cyan-500/10 font-mono">
               <Settings className="mr-2 h-4 w-4" />
-              <span>Settings</span>
+              <span>[SETTINGS]</span>
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
+            <DropdownMenuSeparator className="border-dashed border-purple-500/30" />
             <DropdownMenuItem 
-              className="cursor-pointer text-red-600 focus:text-red-600"
+              className="cursor-pointer text-red-600 focus:text-red-600 border border-dashed border-transparent hover:border-red-500/30 hover:bg-gradient-to-r hover:from-red-500/10 hover:to-orange-500/10 font-mono"
               onClick={handleLogout}
             >
               <LogOut className="mr-2 h-4 w-4" />
-              <span>Logout</span>
+              <span>[LOGOUT]</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
