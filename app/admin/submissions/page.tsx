@@ -160,53 +160,53 @@ export default function ReviewSubmissionsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="p-4 bg-black border-2 border-dashed border-gray-600 rounded">
-        <h1 className="text-3xl font-bold font-mono text-green-400">[REVIEW_SUBMISSIONS]</h1>
-        <p className="text-gray-400 font-mono text-sm">Review and approve user quest submissions</p>
+      <div className="p-6 bg-gray-900 border border-gray-700 rounded-lg">
+        <h1 className="text-3xl font-bold text-white">Review Submissions</h1>
+        <p className="text-gray-400 text-sm mt-1">Review and approve user quest submissions</p>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="bg-black border-2 border-dashed border-gray-600">
+        <Card className="bg-gray-900 border border-gray-700">
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
               <FileText className="w-4 h-4 text-cyan-400" />
               <div>
-                <p className="text-xs font-mono text-gray-400">[TOTAL_SUBMISSIONS]</p>
-                <p className="text-2xl font-bold font-mono text-green-400">{submissions.length}</p>
+                <p className="text-xs text-white">Total Submissions</p>
+                <p className="text-2xl font-bold text-white">{submissions.length}</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-black border-2 border-dashed border-gray-600">
+        <Card className="bg-gray-900 border border-gray-700">
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-yellow-400" />
               <div>
-                <p className="text-xs font-mono text-gray-400">[PENDING_REVIEW]</p>
-                <p className="text-2xl font-bold font-mono text-green-400">{submissions.filter(s => s.status === 'pending').length}</p>
+                <p className="text-xs text-white">Pending Review</p>
+                <p className="text-2xl font-bold text-white">{submissions.filter(s => s.status === 'pending').length}</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-black border-2 border-dashed border-gray-600">
+        <Card className="bg-gray-900 border border-gray-700">
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-green-400" />
               <div>
-                <p className="text-xs font-mono text-gray-400">[APPROVED]</p>
-                <p className="text-2xl font-bold font-mono text-green-400">{submissions.filter(s => s.status === 'approved').length}</p>
+                <p className="text-xs text-white">Approved</p>
+                <p className="text-2xl font-bold text-white">{submissions.filter(s => s.status === 'approved').length}</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-black border-2 border-dashed border-gray-600">
+        <Card className="bg-gray-900 border border-gray-700">
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-orange-400" />
               <div>
-                <p className="text-xs font-mono text-gray-400">[NEEDS_REVIEW]</p>
-                <p className="text-2xl font-bold font-mono text-green-400">{submissions.filter(s => s.status === 'needs-revision').length}</p>
+                <p className="text-xs text-white">Needs Review</p>
+                <p className="text-2xl font-bold text-white">{submissions.filter(s => s.status === 'needs-revision').length}</p>
               </div>
             </div>
           </CardContent>
@@ -215,39 +215,39 @@ export default function ReviewSubmissionsPage() {
 
       {/* Platform Tabs */}
       <Tabs value={activePlatform} onValueChange={(value) => setActivePlatform(value as 'twitter'|'facebook'|'discord'|'others')} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 bg-black border-2 border-dashed border-gray-600">
-          <TabsTrigger value="twitter" className="font-mono data-[state=active]:bg-gray-800 data-[state=active]:text-green-400 text-gray-400">[TWITTER]</TabsTrigger>
-          <TabsTrigger value="facebook" className="font-mono data-[state=active]:bg-gray-800 data-[state=active]:text-green-400 text-gray-400">[FACEBOOK]</TabsTrigger>
-          <TabsTrigger value="discord" className="font-mono data-[state=active]:bg-gray-800 data-[state=active]:text-green-400 text-gray-400">[DISCORD]</TabsTrigger>
-          <TabsTrigger value="others" className="font-mono data-[state=active]:bg-gray-800 data-[state=active]:text-green-400 text-gray-400">[OTHERS]</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-4 bg-gray-900 border border-gray-700">
+          <TabsTrigger value="twitter" className="data-[state=active]:bg-gray-800 data-[state=active]:text-green-400 text-gray-400">Twitter</TabsTrigger>
+          <TabsTrigger value="facebook" className="data-[state=active]:bg-gray-800 data-[state=active]:text-green-400 text-gray-400">Facebook</TabsTrigger>
+          <TabsTrigger value="discord" className="data-[state=active]:bg-gray-800 data-[state=active]:text-green-400 text-gray-400">Discord</TabsTrigger>
+          <TabsTrigger value="others" className="data-[state=active]:bg-gray-800 data-[state=active]:text-green-400 text-gray-400">Others</TabsTrigger>
         </TabsList>
         
 
         
         <TabsContent value="twitter" className="space-y-6">
           {/* Filters */}
-          <Card className="bg-black border-2 border-dashed border-gray-600">
+          <Card className="bg-gray-900 border border-gray-700">
             <CardContent className="p-4">
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
-                    placeholder="[SEARCH_SUBMISSIONS...]"
+                    placeholder="Search submissions..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 bg-black border-2 border-dashed border-gray-600 text-green-400 font-mono placeholder:text-gray-500"
+                    className="pl-10 bg-gray-800 border border-gray-600 text-green-400 placeholder:text-gray-500"
                   />
                 </div>
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3 py-2 border-2 border-dashed border-gray-600 rounded-md bg-black text-green-400 font-mono"
+                  className="px-3 py-2 border border-gray-600 rounded-md bg-gray-800 text-green-400"
                 >
-                  <option value="all" className="bg-black text-gray-400">[ALL_STATUS]</option>
-                  <option value="pending" className="bg-black text-gray-400">[PENDING]</option>
-                  <option value="approved" className="bg-black text-gray-400">[APPROVED]</option>
-                  <option value="rejected" className="bg-black text-gray-400">[REJECTED]</option>
-                  <option value="needs-revision" className="bg-black text-gray-400">[NEEDS_REVISION]</option>
+                  <option value="all" className="bg-gray-800 text-gray-400">All Status</option>
+                  <option value="pending" className="bg-gray-800 text-gray-400">Pending</option>
+                  <option value="approved" className="bg-gray-800 text-gray-400">Approved</option>
+                  <option value="rejected" className="bg-gray-800 text-gray-400">Rejected</option>
+                  <option value="needs-revision" className="bg-gray-800 text-gray-400">Needs Revision</option>
                 </select>
               </div>
             </CardContent>
@@ -256,70 +256,70 @@ export default function ReviewSubmissionsPage() {
 
 
           {/* Submissions Table */}
-          <Card className="bg-black border-2 border-dashed border-gray-600">
+          <Card className="bg-gray-900 border border-gray-700">
             <CardHeader>
-              <CardTitle className="font-mono text-green-400">[TWITTER_SUBMISSIONS] ({filteredSubmissions.length})</CardTitle>
+              <CardTitle className="text-white">Twitter Submissions ({filteredSubmissions.length})</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-b-2 border-dashed border-gray-600">
-                      <TableHead className="font-mono text-gray-400">[QUEST]</TableHead>
-                      <TableHead className="font-mono text-gray-400">[USER]</TableHead>
-                      <TableHead className="font-mono text-gray-400">[CONTENT]</TableHead>
-                      <TableHead className="font-mono text-gray-400">[SUBMITTED]</TableHead>
-                      <TableHead className="font-mono text-gray-400">[STATUS]</TableHead>
-                      <TableHead className="font-mono text-gray-400">[ACTIONS]</TableHead>
+                    <TableRow className="border-b border-gray-700">
+                      <TableHead className="text-gray-400">Quest</TableHead>
+                      <TableHead className="text-gray-400">User</TableHead>
+                      <TableHead className="text-gray-400">Content</TableHead>
+                      <TableHead className="text-gray-400">Submitted</TableHead>
+                      <TableHead className="text-gray-400">Status</TableHead>
+                      <TableHead className="text-gray-400">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredSubmissions.map((submission) => (
-                      <TableRow key={submission.id} className="border-b-2 border-dashed border-gray-600 hover:bg-gray-900">
+                      <TableRow key={submission.id} className="border-b border-gray-700 hover:bg-gray-800">
                         <TableCell>
-                          <div className="font-mono text-green-400">{submission.questTitle}</div>
-                          <div className="text-xs text-gray-400 font-mono">#{submission.questId}</div>
+                          <div className="text-white">{submission.questTitle}</div>
+                          <div className="text-xs text-gray-400">#{submission.questId}</div>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-black border-2 border-dashed border-gray-600 flex items-center justify-center">
+                            <div className="w-8 h-8 rounded-full bg-gray-800 border border-gray-600 flex items-center justify-center">
                               <UserIcon className="w-4 h-4 text-green-400" />
                             </div>
                             <div>
-                              <div className="font-mono text-green-400">{submission.user?.name || 'Unknown User'}</div>
-                              <div className="text-xs text-gray-400 font-mono">@{submission.user?.username || submission.user?.email}</div>
+                              <div className="text-white">{submission.user?.name || 'Unknown User'}</div>
+                              <div className="text-xs text-gray-400">@{submission.user?.username || submission.user?.email}</div>
                             </div>
                           </div>
                         </TableCell>
                         <TableCell>
                           <div className="max-w-xs">
                             {submission.content?.type === 'text' && (
-                              <p className="text-sm truncate font-mono text-gray-400">{submission.content.text}</p>
+                              <p className="text-sm truncate text-gray-400">{submission.content.text}</p>
                             )}
                             {submission.content?.type === 'url' && (
                               <a 
                                 href={submission.content.url} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
-                                className="text-cyan-400 hover:text-green-400 text-sm truncate block font-mono"
+                                className="text-cyan-400 hover:text-green-400 text-sm truncate block"
                               >
                                 {submission.content.url}
                               </a>
                             )}
                             {submission.content?.type === 'account-id' && (
-                              <code className="text-xs bg-black border-2 border-dashed border-gray-600 px-2 py-1 rounded font-mono text-green-400">
+                              <code className="text-xs bg-gray-800 border border-gray-600 px-2 py-1 rounded text-green-400">
                                 {submission.content.accountId}
                               </code>
                             )}
                             {submission.content?.type === 'transaction-id' && (
-                              <code className="text-xs bg-black border-2 border-dashed border-gray-600 px-2 py-1 rounded font-mono text-green-400">
+                              <code className="text-xs bg-gray-800 border border-gray-600 px-2 py-1 rounded text-green-400">
                                 {submission.content.transactionId}
                               </code>
                             )}
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-1 text-sm text-gray-400 font-mono">
+                          <div className="flex items-center gap-1 text-sm text-gray-400">
                             <Calendar className="w-3 h-3" />
                             {new Date(submission.submittedAt || submission.created_at || Date.now()).toLocaleDateString()}
                           </div>
@@ -330,11 +330,11 @@ export default function ReviewSubmissionsPage() {
                             <Badge 
                               variant="secondary" 
                               className={cn(
-                                "text-xs font-mono bg-black border-2 border-dashed border-gray-600",
+                                "text-xs bg-gray-800 border border-gray-600",
                                 getStatusColor(submission.status)
                               )}
                             >
-                              [{submission.status.replace('-', '_').toUpperCase()}]
+                              {submission.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                             </Badge>
                           </div>
                         </TableCell>
@@ -346,9 +346,9 @@ export default function ReviewSubmissionsPage() {
                               console.log('Navigating to submission:', submission.id, 'Type:', typeof submission.id);
                               router.push(`/admin/submissions/${submission.id}`);
                             }}
-                            className="bg-black border-2 border-dashed border-gray-600 text-green-400 font-mono hover:bg-gray-800"
+                            className="bg-gray-800 border border-gray-600 text-green-400 hover:bg-gray-700"
                           >
-                            [REVIEW]
+                            Review
                           </Button>
                         </TableCell>
                       </TableRow>
