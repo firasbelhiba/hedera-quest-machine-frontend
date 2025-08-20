@@ -362,98 +362,98 @@ export default function ReviewSubmissionsPage() {
         
         <TabsContent value="facebook" className="space-y-6">
           {/* Filters */}
-          <Card>
+          <Card className="bg-gray-900 border border-gray-700">
             <CardContent className="p-4">
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
-                    placeholder="Search by quest title, user name, or username..."
+                    placeholder="Search submissions..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 bg-gray-800 border border-gray-600 text-green-400 placeholder:text-gray-500"
                   />
                 </div>
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3 py-2 border rounded-md bg-background"
+                  className="px-3 py-2 border border-gray-600 rounded-md bg-gray-800 text-green-400"
                 >
-                  <option value="all">All Status</option>
-                  <option value="pending">Pending</option>
-                  <option value="approved">Approved</option>
-                  <option value="rejected">Rejected</option>
-                  <option value="needs-revision">Needs Revision</option>
+                  <option value="all" className="bg-gray-800 text-gray-400">All Status</option>
+                  <option value="pending" className="bg-gray-800 text-gray-400">Pending</option>
+                  <option value="approved" className="bg-gray-800 text-gray-400">Approved</option>
+                  <option value="rejected" className="bg-gray-800 text-gray-400">Rejected</option>
+                  <option value="needs-revision" className="bg-gray-800 text-gray-400">Needs Revision</option>
                 </select>
               </div>
             </CardContent>
           </Card>
 
           {/* Submissions Table */}
-          <Card className="bg-black border-2 border-dashed border-gray-600">
+          <Card className="bg-gray-900 border border-gray-700">
             <CardHeader>
-              <CardTitle className="font-mono text-green-400">[FACEBOOK_SUBMISSIONS] ({filteredSubmissions.length})</CardTitle>
+              <CardTitle className="text-white">Facebook Submissions ({filteredSubmissions.length})</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-b-2 border-dashed border-gray-600">
-                      <TableHead className="font-mono text-gray-400">[QUEST]</TableHead>
-                      <TableHead className="font-mono text-gray-400">[USER]</TableHead>
-                      <TableHead className="font-mono text-gray-400">[CONTENT]</TableHead>
-                      <TableHead className="font-mono text-gray-400">[SUBMITTED]</TableHead>
-                      <TableHead className="font-mono text-gray-400">[STATUS]</TableHead>
-                      <TableHead className="font-mono text-gray-400">[ACTIONS]</TableHead>
+                    <TableRow className="border-b border-gray-700">
+                      <TableHead className="text-gray-400">Quest</TableHead>
+                      <TableHead className="text-gray-400">User</TableHead>
+                      <TableHead className="text-gray-400">Content</TableHead>
+                      <TableHead className="text-gray-400">Submitted</TableHead>
+                      <TableHead className="text-gray-400">Status</TableHead>
+                      <TableHead className="text-gray-400">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredSubmissions.map((submission) => (
-                      <TableRow key={submission.id}>
+                      <TableRow key={submission.id} className="border-b border-gray-700 hover:bg-gray-800">
                         <TableCell>
-                          <div className="font-medium">{submission.questTitle}</div>
-                          <div className="text-xs text-muted-foreground font-mono">#{submission.questId}</div>
+                          <div className="text-white">{submission.questTitle}</div>
+                          <div className="text-xs text-gray-400">#{submission.questId}</div>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                              <UserIcon className="w-4 h-4" />
+                            <div className="w-8 h-8 rounded-full bg-gray-800 border border-gray-600 flex items-center justify-center">
+                              <UserIcon className="w-4 h-4 text-green-400" />
                             </div>
                             <div>
-                              <div className="font-medium">{submission.user?.name || 'Unknown User'}</div>
-                              <div className="text-xs text-muted-foreground">@{submission.user?.username || submission.user?.email}</div>
+                              <div className="text-white">{submission.user?.name || 'Unknown User'}</div>
+                              <div className="text-xs text-gray-400">@{submission.user?.username || submission.user?.email}</div>
                             </div>
                           </div>
                         </TableCell>
                         <TableCell>
                           <div className="max-w-xs">
                             {submission.content?.type === 'text' && (
-                              <p className="text-sm truncate">{submission.content.text}</p>
+                              <p className="text-sm truncate text-gray-400">{submission.content.text}</p>
                             )}
                             {submission.content?.type === 'url' && (
                               <a 
                                 href={submission.content.url} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
-                                className="text-blue-600 hover:underline text-sm truncate block"
+                                className="text-cyan-400 hover:text-green-400 text-sm truncate block"
                               >
                                 {submission.content.url}
                               </a>
                             )}
                             {submission.content?.type === 'account-id' && (
-                              <code className="text-xs bg-muted px-2 py-1 rounded">
+                              <code className="text-xs bg-gray-800 border border-gray-600 px-2 py-1 rounded text-green-400">
                                 {submission.content.accountId}
                               </code>
                             )}
                             {submission.content?.type === 'transaction-id' && (
-                              <code className="text-xs bg-muted px-2 py-1 rounded">
+                              <code className="text-xs bg-gray-800 border border-gray-600 px-2 py-1 rounded text-green-400">
                                 {submission.content.transactionId}
                               </code>
                             )}
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-1 text-sm text-gray-400">
                             <Calendar className="w-3 h-3" />
                             {new Date(submission.submittedAt || submission.created_at || Date.now()).toLocaleDateString()}
                           </div>
@@ -464,11 +464,11 @@ export default function ReviewSubmissionsPage() {
                             <Badge 
                               variant="secondary" 
                               className={cn(
-                                "text-xs",
+                                "text-xs bg-gray-800 border border-gray-600",
                                 getStatusColor(submission.status)
                               )}
                             >
-                              {submission.status.replace('-', ' ')}
+                              {submission.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                             </Badge>
                           </div>
                         </TableCell>
@@ -480,6 +480,7 @@ export default function ReviewSubmissionsPage() {
                               console.log('Navigating to submission:', submission.id, 'Type:', typeof submission.id);
                               router.push(`/admin/submissions/${submission.id}`);
                             }}
+                            className="bg-gray-800 border border-gray-600 text-green-400 hover:bg-gray-700"
                           >
                             Review
                           </Button>
@@ -495,98 +496,98 @@ export default function ReviewSubmissionsPage() {
         
         <TabsContent value="discord" className="space-y-6">
           {/* Filters */}
-          <Card>
+          <Card className="bg-gray-900 border border-gray-700">
             <CardContent className="p-4">
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                   <Input
-                    placeholder="Search by quest title, user name, or username..."
+                    placeholder="Search submissions..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 bg-gray-800 border border-gray-600 text-green-400 placeholder:text-gray-500"
                   />
                 </div>
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3 py-2 border rounded-md bg-background"
+                  className="px-3 py-2 border border-gray-600 rounded-md bg-gray-800 text-green-400"
                 >
-                  <option value="all">All Status</option>
-                  <option value="pending">Pending</option>
-                  <option value="approved">Approved</option>
-                  <option value="rejected">Rejected</option>
-                  <option value="needs-revision">Needs Revision</option>
+                  <option value="all" className="bg-gray-800 text-gray-400">All Status</option>
+                  <option value="pending" className="bg-gray-800 text-gray-400">Pending</option>
+                  <option value="approved" className="bg-gray-800 text-gray-400">Approved</option>
+                  <option value="rejected" className="bg-gray-800 text-gray-400">Rejected</option>
+                  <option value="needs-revision" className="bg-gray-800 text-gray-400">Needs Revision</option>
                 </select>
               </div>
             </CardContent>
           </Card>
 
           {/* Submissions Table */}
-          <Card className="bg-black border-2 border-dashed border-gray-600">
+          <Card className="bg-gray-900 border border-gray-700">
             <CardHeader>
-              <CardTitle className="font-mono text-green-400">[DISCORD_SUBMISSIONS] ({filteredSubmissions.length})</CardTitle>
+              <CardTitle className="text-white">Discord Submissions ({filteredSubmissions.length})</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-b-2 border-dashed border-gray-600">
-                      <TableHead className="font-mono text-gray-400">[QUEST]</TableHead>
-                      <TableHead className="font-mono text-gray-400">[USER]</TableHead>
-                      <TableHead className="font-mono text-gray-400">[CONTENT]</TableHead>
-                      <TableHead className="font-mono text-gray-400">[SUBMITTED]</TableHead>
-                      <TableHead className="font-mono text-gray-400">[STATUS]</TableHead>
-                      <TableHead className="font-mono text-gray-400">[ACTIONS]</TableHead>
+                    <TableRow className="border-b border-gray-700">
+                      <TableHead className="text-gray-400">Quest</TableHead>
+                      <TableHead className="text-gray-400">User</TableHead>
+                      <TableHead className="text-gray-400">Content</TableHead>
+                      <TableHead className="text-gray-400">Submitted</TableHead>
+                      <TableHead className="text-gray-400">Status</TableHead>
+                      <TableHead className="text-gray-400">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredSubmissions.map((submission) => (
-                      <TableRow key={submission.id}>
+                      <TableRow key={submission.id} className="border-b border-gray-700 hover:bg-gray-800">
                         <TableCell>
-                          <div className="font-medium">{submission.questTitle}</div>
-                          <div className="text-xs text-muted-foreground font-mono">#{submission.questId}</div>
+                          <div className="text-white">{submission.questTitle}</div>
+                          <div className="text-xs text-gray-400">#{submission.questId}</div>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                              <UserIcon className="w-4 h-4" />
+                            <div className="w-8 h-8 rounded-full bg-gray-800 border border-gray-600 flex items-center justify-center">
+                              <UserIcon className="w-4 h-4 text-green-400" />
                             </div>
                             <div>
-                              <div className="font-medium">{submission.user?.name || 'Unknown User'}</div>
-                              <div className="text-xs text-muted-foreground">@{submission.user?.username || submission.user?.email}</div>
+                              <div className="text-white">{submission.user?.name || 'Unknown User'}</div>
+                              <div className="text-xs text-gray-400">@{submission.user?.username || submission.user?.email}</div>
                             </div>
                           </div>
                         </TableCell>
                         <TableCell>
                           <div className="max-w-xs">
                             {submission.content?.type === 'text' && (
-                              <p className="text-sm truncate">{submission.content.text}</p>
+                              <p className="text-sm truncate text-gray-400">{submission.content.text}</p>
                             )}
                             {submission.content?.type === 'url' && (
                               <a 
                                 href={submission.content.url} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
-                                className="text-blue-600 hover:underline text-sm truncate block"
+                                className="text-cyan-400 hover:text-green-400 text-sm truncate block"
                               >
                                 {submission.content.url}
                               </a>
                             )}
                             {submission.content?.type === 'account-id' && (
-                              <code className="text-xs bg-muted px-2 py-1 rounded">
+                              <code className="text-xs bg-gray-800 border border-gray-600 px-2 py-1 rounded text-green-400">
                                 {submission.content.accountId}
                               </code>
                             )}
                             {submission.content?.type === 'transaction-id' && (
-                              <code className="text-xs bg-muted px-2 py-1 rounded">
+                              <code className="text-xs bg-gray-800 border border-gray-600 px-2 py-1 rounded text-green-400">
                                 {submission.content.transactionId}
                               </code>
                             )}
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-1 text-sm text-gray-400">
                             <Calendar className="w-3 h-3" />
                             {new Date(submission.submittedAt || submission.created_at || Date.now()).toLocaleDateString()}
                           </div>
@@ -597,11 +598,11 @@ export default function ReviewSubmissionsPage() {
                             <Badge 
                               variant="secondary" 
                               className={cn(
-                                "text-xs",
+                                "text-xs bg-gray-800 border border-gray-600",
                                 getStatusColor(submission.status)
                               )}
                             >
-                              {submission.status.replace('-', ' ')}
+                              {submission.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
                             </Badge>
                           </div>
                         </TableCell>
@@ -613,6 +614,7 @@ export default function ReviewSubmissionsPage() {
                               console.log('Navigating to submission:', submission.id, 'Type:', typeof submission.id);
                               router.push(`/admin/submissions/${submission.id}`);
                             }}
+                            className="bg-gray-800 border border-gray-600 text-green-400 hover:bg-gray-700"
                           >
                             Review
                           </Button>
@@ -628,7 +630,7 @@ export default function ReviewSubmissionsPage() {
         
         <TabsContent value="others" className="space-y-6">
           {/* Filters */}
-          <Card>
+          <Card className="bg-gray-900 border border-gray-700">
             <CardContent className="p-4">
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="relative flex-1">
@@ -637,13 +639,13 @@ export default function ReviewSubmissionsPage() {
                     placeholder="Search by quest title, user name, or username..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
+                    className="pl-10 bg-gray-800 border-gray-600 text-white"
                   />
                 </div>
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3 py-2 border rounded-md bg-background"
+                  className="px-3 py-2 border border-gray-600 rounded-md bg-gray-800 text-white"
                 >
                   <option value="all">All Status</option>
                   <option value="pending">Pending</option>
@@ -656,63 +658,63 @@ export default function ReviewSubmissionsPage() {
           </Card>
 
           {/* Submissions Table */}
-          <Card className="bg-black border-2 border-dashed border-gray-600">
+          <Card className="bg-gray-900 border border-gray-700">
             <CardHeader>
-              <CardTitle className="font-mono text-green-400">[OTHER_PLATFORM_SUBMISSIONS] ({filteredSubmissions.length})</CardTitle>
+              <CardTitle className="text-white">Other Platform Submissions ({filteredSubmissions.length})</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-b-2 border-dashed border-gray-600">
-                      <TableHead className="font-mono text-gray-400">[QUEST]</TableHead>
-                      <TableHead className="font-mono text-gray-400">[USER]</TableHead>
-                      <TableHead className="font-mono text-gray-400">[CONTENT]</TableHead>
-                      <TableHead className="font-mono text-gray-400">[SUBMITTED]</TableHead>
-                      <TableHead className="font-mono text-gray-400">[STATUS]</TableHead>
-                      <TableHead className="font-mono text-gray-400">[ACTIONS]</TableHead>
+                    <TableRow className="border-b border-gray-700">
+                      <TableHead className="text-gray-400">Quest</TableHead>
+                      <TableHead className="text-gray-400">User</TableHead>
+                      <TableHead className="text-gray-400">Content</TableHead>
+                      <TableHead className="text-gray-400">Submitted</TableHead>
+                      <TableHead className="text-gray-400">Status</TableHead>
+                      <TableHead className="text-gray-400">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredSubmissions.map((submission) => (
-                      <TableRow key={submission.id}>
+                      <TableRow key={submission.id} className="border-b border-gray-700 hover:bg-gray-800">
                         <TableCell>
-                          <div className="font-medium">{submission.questTitle}</div>
-                          <div className="text-xs text-muted-foreground font-mono">#{submission.questId}</div>
+                          <div className="font-medium text-white">{submission.questTitle}</div>
+                          <div className="text-xs text-gray-400">#{submission.questId}</div>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                              <UserIcon className="w-4 h-4" />
+                            <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
+                              <UserIcon className="w-4 h-4 text-gray-400" />
                             </div>
                             <div>
-                              <div className="font-medium">{submission.user?.name || 'Unknown User'}</div>
-                              <div className="text-xs text-muted-foreground">@{submission.user?.username || submission.user?.email}</div>
+                              <div className="font-medium text-white">{submission.user?.name || 'Unknown User'}</div>
+                              <div className="text-xs text-gray-400">@{submission.user?.username || submission.user?.email}</div>
                             </div>
                           </div>
                         </TableCell>
                         <TableCell>
                           <div className="max-w-xs">
                             {submission.content?.type === 'text' && (
-                              <p className="text-sm truncate">{submission.content.text}</p>
+                              <p className="text-sm truncate text-gray-400">{submission.content.text}</p>
                             )}
                             {submission.content?.type === 'url' && (
                               <a 
                                 href={submission.content.url} 
                                 target="_blank" 
                                 rel="noopener noreferrer"
-                                className="text-blue-600 hover:underline text-sm truncate block"
+                                className="text-cyan-400 hover:text-green-400 text-sm truncate block"
                               >
                                 {submission.content.url}
                               </a>
                             )}
                             {submission.content?.type === 'account-id' && (
-                              <code className="text-xs bg-muted px-2 py-1 rounded">
+                              <code className="text-xs bg-gray-800 border border-gray-600 text-green-400 px-2 py-1 rounded">
                                 {submission.content.accountId}
                               </code>
                             )}
                             {submission.content?.type === 'transaction-id' && (
-                              <code className="text-xs bg-muted px-2 py-1 rounded">
+                              <code className="text-xs bg-gray-800 border border-gray-600 text-green-400 px-2 py-1 rounded">
                                 {submission.content.transactionId}
                               </code>
                             )}
@@ -730,7 +732,7 @@ export default function ReviewSubmissionsPage() {
                             <Badge 
                               variant="secondary" 
                               className={cn(
-                                "text-xs",
+                                "text-xs bg-gray-800 border border-gray-600",
                                 getStatusColor(submission.status)
                               )}
                             >
@@ -742,6 +744,7 @@ export default function ReviewSubmissionsPage() {
                           <Button 
                             size="sm" 
                             variant="outline"
+                            className="bg-gray-800 border border-gray-600 text-white hover:bg-gray-700"
                             onClick={() => {
                               console.log('Navigating to submission:', submission.id, 'Type:', typeof submission.id);
                               router.push(`/admin/submissions/${submission.id}`);
