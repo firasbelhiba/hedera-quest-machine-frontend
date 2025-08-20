@@ -90,7 +90,7 @@ export default function Dashboard() {
               </div>
               <div className="ml-4">
                 <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">LEVEL</p>
-                <p className="text-2xl font-bold font-mono">{user?.level || 1}</p>
+                <p className="text-2xl font-bold font-mono">{user?.userLevel?.level || user?.level || 1}</p>
               </div>
             </div>
           </CardContent>
@@ -149,22 +149,29 @@ export default function Dashboard() {
             ⚡ LEVEL_PROGRESS
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 mt-2">
           <div className="space-y-3">
             <div className="flex justify-between text-sm font-mono">
               <span className="bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent font-bold">
-                LVL_{user?.level || 1}
+                LVL_{user?.userLevel?.level || user?.level || 1}
               </span>
               <span className="bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent font-bold">
-                LVL_{(user?.level || 1) + 1}
+                LVL_{(user?.userLevel?.level || user?.level || 1) + 1}
               </span>
             </div>
             <div className="relative">
-              <Progress value={75} className="h-4 border border-dashed border-primary/20" />
+              <Progress 
+                value={user?.userLevel ? (user.userLevel.progress / user.userLevel.max_progress) * 100 : 0} 
+                className="h-4 border border-dashed border-primary/20" 
+              />
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent rounded-full" />
             </div>
+            <div className="flex justify-between text-xs font-mono text-muted-foreground">
+              <span>{user?.userLevel?.progress || 0} XP</span>
+              <span>{user?.userLevel?.max_progress || 100} XP</span>
+            </div>
             <p className="text-sm text-muted-foreground font-mono">
-              {'>'} Earn 150 more points to reach the next level
+              {'>'} Earn {(user?.userLevel?.max_progress || 100) - (user?.userLevel?.progress || 0)} more XP to reach the next level
             </p>
           </div>
         </CardContent>

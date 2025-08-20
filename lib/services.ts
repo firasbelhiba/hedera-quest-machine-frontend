@@ -119,18 +119,26 @@ export class QuestService {
         
         // Convert API response to User object
         const user: User = {
-          id: String(profileData.admin.id),
-          name: profileData.admin.name,
-          email: profileData.admin.email,
+          id: String(profileData.user.id),
+          firstName: profileData.user.firstName,
+          lastName: profileData.user.lastName,
+          username: profileData.user.username,
+          name: `${profileData.user.firstName} ${profileData.user.lastName}`.trim() || profileData.user.username,
+          email: profileData.user.email,
+          bio: profileData.user.bio || '',
           avatar: '/logo.png',
-          hederaAccountId: '',
+          hederaAccountId: null,
           points: 0, // These fields might need separate API calls
-          level: 1,
+          level: profileData.user.userLevel?.level || 1,
           streak: 0,
-          joinedAt: profileData.admin.created_at,
+          joinedAt: profileData.user.created_at || new Date().toISOString(),
           role: profileData.is_admin ? 'admin' : 'user',
           badges: [],
-          completedQuests: []
+          completedQuests: [],
+          userLevel: profileData.user.userLevel,
+          facebookProfile: profileData.user.facebookProfile,
+          twitterProfile: profileData.user.twitterProfile,
+          discordProfile: profileData.user.discordProfile
         };
         
         return user;

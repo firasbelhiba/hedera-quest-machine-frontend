@@ -1,9 +1,23 @@
 // Core types for the Hedera Quest Machine
+export interface UserLevel {
+  id: number;
+  user_id: number;
+  level: number;
+  progress: number;
+  max_progress: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface User {
-  id: string;
+  id: string | number;
+  firstName?: string;
+  lastName?: string;
+  username?: string;
   name: string;
   email: string;
-  avatar: string;
+  avatar?: string;
+  bio?: string;
   hederaAccountId: string | null;
   points: number;
   level: number;
@@ -12,6 +26,10 @@ export interface User {
   role: 'user' | 'admin' | 'moderator';
   badges: Badge[];
   completedQuests: string[];
+  userLevel?: UserLevel;
+  facebookProfile?: any;
+  twitterProfile?: any;
+  discordProfile?: any;
 }
 
 export interface Quest {
