@@ -27,8 +27,8 @@ export default function ProgressPage() {
         
         if (userData) {
           const [badgesData, submissionsData] = await Promise.all([
-            QuestService.getUserBadges(userData.id),
-            QuestService.getSubmissions(undefined, userData.id)
+            QuestService.getUserBadges(String(userData.id)),
+            QuestService.getSubmissions(undefined, String(userData.id))
           ]);
           setBadges(badgesData);
           setSubmissions(submissionsData);

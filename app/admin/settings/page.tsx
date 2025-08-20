@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 
 export default function SettingsPage() {
-  const [adminProfile, setAdminProfile] = useState(null);
+  const [adminProfile, setAdminProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   
   const [settings, setSettings] = useState({
@@ -100,7 +100,12 @@ export default function SettingsPage() {
       
       if (response.ok) {
         // Update admin profile to reflect the change
-        setAdminProfile(prev => prev ? { ...prev, auto_verify: checked } : null);
+        setAdminProfile((prev: any) => {
+          if (prev && typeof prev === 'object' && !Array.isArray(prev)) {
+            return { ...prev, auto_verify: checked };
+          }
+          return prev;
+        });
         toast.success(`Quest validation automation ${checked ? 'enabled' : 'disabled'} successfully`);
       } else {
         // Revert local state if API call failed

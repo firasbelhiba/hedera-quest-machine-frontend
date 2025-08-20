@@ -18,7 +18,7 @@ export default function VerifyEmailPage() {
 
   useEffect(() => {
     // Extract token from URL query parameters
-    const tokenParam = searchParams.get('token');
+    const tokenParam = searchParams?.get('token');
     if (tokenParam) {
       setToken(tokenParam);
     } else {

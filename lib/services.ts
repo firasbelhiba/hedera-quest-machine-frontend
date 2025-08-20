@@ -119,26 +119,26 @@ export class QuestService {
         
         // Convert API response to User object
         const user: User = {
-          id: String(profileData.user.id),
-          firstName: profileData.user.firstName,
-          lastName: profileData.user.lastName,
-          username: profileData.user.username,
-          name: `${profileData.user.firstName} ${profileData.user.lastName}`.trim() || profileData.user.username,
-          email: profileData.user.email,
-          bio: profileData.user.bio || '',
+          id: String(profileData.admin.id),
+          firstName: profileData.admin.firstName,
+          lastName: profileData.admin.lastName,
+          username: profileData.admin.username,
+          name: `${profileData.admin.firstName} ${profileData.admin.lastName}`.trim() || profileData.admin.username,
+          email: profileData.admin.email,
+          bio: profileData.admin.bio || '',
           avatar: '/logo.png',
           hederaAccountId: null,
-          points: profileData.user.userLevel ? ((profileData.user.userLevel.level - 1) * 1000 + profileData.user.userLevel.progress) : 0,
-          level: profileData.user.userLevel?.level || 1,
+          points: profileData.admin.userLevel ? ((profileData.admin.userLevel.level - 1) * 1000 + profileData.admin.userLevel.progress) : 0,
+          level: profileData.admin.userLevel?.level || 1,
           streak: 0,
-          joinedAt: profileData.user.created_at || new Date().toISOString(),
+          joinedAt: profileData.admin.created_at || new Date().toISOString(),
           role: profileData.is_admin ? 'admin' : 'user',
           badges: [],
           completedQuests: [],
-          userLevel: profileData.user.userLevel,
-          facebookProfile: profileData.user.facebookProfile,
-          twitterProfile: profileData.user.twitterProfile,
-          discordProfile: profileData.user.discordProfile
+          userLevel: profileData.admin.userLevel,
+          facebookProfile: profileData.admin.facebookProfile,
+          twitterProfile: profileData.admin.twitterProfile,
+          discordProfile: profileData.admin.discordProfile
         };
         
         return user;

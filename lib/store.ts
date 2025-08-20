@@ -163,7 +163,7 @@ const useStore = create<AppState>((set, get) => ({
     if (!user) throw new Error('Not authenticated');
     
     try {
-      await QuestService.submitQuest(questId, user.id, content);
+      await QuestService.submitQuest(questId, String(user.id), content);
       get().loadSubmissions();
     } catch (error) {
       throw error;
@@ -175,7 +175,7 @@ const useStore = create<AppState>((set, get) => ({
     if (!user) return;
     
     try {
-      const submissions = await QuestService.getSubmissions(undefined, user.id);
+      const submissions = await QuestService.getSubmissions(undefined, String(user.id));
       set({ submissions });
     } catch (error) {
       throw error;

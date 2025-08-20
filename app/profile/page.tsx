@@ -143,7 +143,7 @@ export default function ProfilePage() {
         reset({
           name: userData.name || '',
           email: userData.email,
-          hederaAccountId: userData.hederaAccountId
+          hederaAccountId: userData.hederaAccountId || undefined
         });
     } catch (error) {
       console.error('Failed to load user data:', error);
@@ -165,7 +165,7 @@ export default function ProfilePage() {
     setSaveSuccess(false);
 
     try {
-      const updatedUser = await QuestService.updateUserProfile(user.id, data);
+      const updatedUser = await QuestService.updateUserProfile(String(user.id), data);
       setUser(updatedUser);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
@@ -613,7 +613,7 @@ export default function ProfilePage() {
                     variant="outline"
                     size="sm"
                     className="border-dashed border-purple-500/50 hover:border-solid font-mono"
-                    onClick={() => window.open(QuestService.generateHashScanUrl(user.hederaAccountId), '_blank')}
+                    onClick={() => user.hederaAccountId && window.open(QuestService.generateHashScanUrl(user.hederaAccountId), '_blank')}
                   >
                     <ExternalLink className="w-4 h-4 mr-1" />
                     View on HashScan
