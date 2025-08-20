@@ -323,8 +323,6 @@ export default function SettingsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-
-
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -365,8 +363,6 @@ export default function SettingsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-
-
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
