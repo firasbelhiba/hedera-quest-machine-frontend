@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { tokenStorage } from '@/lib/api/client';
+import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -43,6 +44,7 @@ export default function SettingsPage() {
     maxQuestAttempts: 3,
     questApprovalRequired: true,
     autoApproveThreshold: 0.8,
+    questValidationAutomation: false,
     
     // User Settings
     defaultUserRole: 'user',
@@ -78,6 +80,40 @@ export default function SettingsPage() {
     setSettings(prev => ({ ...prev, [key]: value }));
   };
 
+  const handleQuestValidationAutomationChange = async (checked: boolean) => {
+    // Update local state immediately
+    setSettings(prev => ({ ...prev, questValidationAutomation: checked }));
+    
+    try {
+      const token = tokenStorage.getAccessToken();
+      if (!token) return;
+      
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://hedera-quests.com';
+      const response = await fetch(`${baseUrl}/quests/admin/auto_verify`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ auto_verify: checked })
+      });
+      
+      if (response.ok) {
+        // Update admin profile to reflect the change
+        setAdminProfile(prev => prev ? { ...prev, auto_verify: checked } : null);
+        toast.success(`Quest validation automation ${checked ? 'enabled' : 'disabled'} successfully`);
+      } else {
+        // Revert local state if API call failed
+        setSettings(prev => ({ ...prev, questValidationAutomation: !checked }));
+        toast.error("Failed to update quest validation automation setting");
+      }
+    } catch (error) {
+      // Revert local state if API call failed
+      setSettings(prev => ({ ...prev, questValidationAutomation: !checked }));
+      toast.error("An error occurred while updating the setting");
+    }
+   };
+
   const fetchAdminProfile = async () => {
     try {
       const token = tokenStorage.getAccessToken();
@@ -97,6 +133,13 @@ export default function SettingsPage() {
       if (response.ok) {
         const data = await response.json();
         setAdminProfile(data.admin);
+        // Sync quest validation automation with admin's auto_verify setting
+        if (data.admin && typeof data.admin.auto_verify === 'boolean') {
+          setSettings(prev => ({
+            ...prev,
+            questValidationAutomation: data.admin.auto_verify
+          }));
+        }
       }
     } catch (error) {
       console.error('Error fetching admin profile:', error);
@@ -280,26 +323,7 @@ export default function SettingsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="siteName">Site Name</Label>
-                  <Input
-                    id="siteName"
-                    value={settings.siteName}
-                    onChange={(e) => handleSettingChange('siteName', e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="siteDescription">Site Description</Label>
-                  <Input
-                    id="siteDescription"
-                    value={settings.siteDescription}
-                    onChange={(e) => handleSettingChange('siteDescription', e.target.value)}
-                  />
-                </div>
-              </div>
 
-              <Separator />
 
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -341,28 +365,7 @@ export default function SettingsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="defaultQuestPoints">Default Quest Points</Label>
-                  <Input
-                    id="defaultQuestPoints"
-                    type="number"
-                    value={settings.defaultQuestPoints}
-                    onChange={(e) => handleSettingChange('defaultQuestPoints', parseInt(e.target.value))}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="maxQuestAttempts">Max Quest Attempts</Label>
-                  <Input
-                    id="maxQuestAttempts"
-                    type="number"
-                    value={settings.maxQuestAttempts}
-                    onChange={(e) => handleSettingChange('maxQuestAttempts', parseInt(e.target.value))}
-                  />
-                </div>
-              </div>
 
-              <Separator />
 
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -375,6 +378,19 @@ export default function SettingsPage() {
                   <Switch
                     checked={settings.questApprovalRequired}
                     onCheckedChange={(checked) => handleSettingChange('questApprovalRequired', checked)}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Enable Quest Validation Automation</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Automatically validate quest submissions using AI
+                    </p>
+                  </div>
+                  <Switch
+                    checked={settings.questValidationAutomation}
+                    onCheckedChange={handleQuestValidationAutomationChange}
                   />
                 </div>
 
