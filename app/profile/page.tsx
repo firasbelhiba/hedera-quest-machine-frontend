@@ -96,8 +96,8 @@ export default function ProfilePage() {
         
         setUser(userData);
         reset({
-          name: userData.firstName && userData.lastName ? `${userData.firstName} ${userData.lastName}` : userData.username || '',
-           email: userData.email,
+          name: userData.name || '',
+          email: userData.email,
           hederaAccountId: userData.hederaAccountId
         });
     } catch (error) {
