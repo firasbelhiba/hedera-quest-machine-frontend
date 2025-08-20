@@ -27,6 +27,7 @@ import {
   Facebook,
   MessageSquare
 } from 'lucide-react';
+import { SiDiscord } from 'react-icons/si';
 
 const profileSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -552,78 +553,80 @@ export default function ProfilePage() {
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Hedera Integration */}
-              <div className="border rounded-lg p-4">
+              <div className="border-2 border-dashed border-purple-500/30 bg-gradient-to-br from-purple-500/5 to-indigo-500/5 hover:border-solid transition-all duration-200 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <h3 className="font-semibold">Hedera Integration</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Your connected Hedera account: {user.hederaAccountId}
+                    <h3 className="font-mono font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider">{'>'} HEDERA_INTEGRATION</h3>
+                    <p className="text-sm text-muted-foreground font-mono">
+                      [ACCOUNT] {user.hederaAccountId}
                     </p>
                   </div>
-                  <Badge variant="outline" className="text-green-600">
+                  <Badge className="bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-dashed border-purple-500/50 font-mono">
                     <CheckCircle className="w-3 h-3 mr-1" />
-                    Connected
+                    CONNECTED
                   </Badge>
                 </div>
                 <div className="flex gap-2">
                   <Button
                     variant="outline"
                     size="sm"
+                    className="border-dashed border-purple-500/50 hover:border-solid font-mono"
                     onClick={() => window.open(QuestService.generateHashScanUrl(user.hederaAccountId), '_blank')}
                   >
                     <ExternalLink className="w-4 h-4 mr-1" />
                     View on HashScan
                   </Button>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" className="border-dashed border-purple-500/50 hover:border-solid font-mono">
                     Update Account
                   </Button>
                 </div>
               </div>
 
               {/* Social Media Integration */}
-              <div className="border rounded-lg p-4">
+              <div className="border-2 border-dashed border-blue-500/30 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 hover:border-solid transition-all duration-200 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <h3 className="font-semibold">Twitter Integration</h3>
+                    <h3 className="font-mono font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">{'>'} TWITTER_INTEGRATION</h3>
                     {profileData?.user?.twitterProfile ? (
-                      <p className="text-sm text-muted-foreground">
-                        Connected as @{profileData.user.twitterProfile.twitter_username}
+                      <p className="text-sm text-muted-foreground font-mono">
+                        [CONNECTED] @{profileData.user.twitterProfile.twitter_username}
                       </p>
                     ) : (
-                      <p className="text-sm text-muted-foreground">
-                        Link your Twitter account to verify social media quests
+                      <p className="text-sm text-muted-foreground font-mono">
+                        [DISCONNECTED] Link your Twitter account to verify social media quests
                       </p>
                     )}
                   </div>
                   {profileData?.user?.twitterProfile ? (
-                    <Badge variant="outline" className="text-green-600">
+                    <Badge className="bg-green-500/20 text-green-700 dark:text-green-300 border border-dashed border-green-500/50 font-mono">
                       <CheckCircle className="w-3 h-3 mr-1" />
-                      Connected
+                      CONNECTED
                     </Badge>
                   ) : (
-                    <Badge variant="outline" className="text-gray-600">
+                    <Badge className="bg-gray-500/20 text-gray-700 dark:text-gray-300 border border-dashed border-gray-500/50 font-mono">
                       <AlertCircle className="w-3 h-3 mr-1" />
-                      Not Connected
+                      NOT_CONNECTED
                     </Badge>
                   )}
                 </div>
                 
                 {profileData?.user?.twitterProfile ? (
                   <div className="space-y-3">
-                    <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                      <Avatar className="w-10 h-10">
+                    <div className="flex items-center gap-3 p-3 bg-blue-500/10 rounded-lg border border-dashed border-blue-500/30">
+                      <Avatar className="w-10 h-10 border border-dashed border-blue-500/50">
                         <AvatarImage src={profileData.user.twitterProfile.twitter_profile_picture} />
-                        <AvatarFallback>@</AvatarFallback>
+                        <AvatarFallback className="font-mono">@</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <p className="font-medium">@{profileData.user.twitterProfile.twitter_username}</p>
-                        <p className="text-sm text-muted-foreground">Twitter ID: {profileData.user.twitterProfile.twitter_id}</p>
+                        <p className="font-medium font-mono">@{profileData.user.twitterProfile.twitter_username}</p>
+                        <p className="text-sm text-muted-foreground font-mono">ID: {profileData.user.twitterProfile.twitter_id}</p>
                       </div>
                     </div>
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
                         size="sm"
+                        className="border-dashed border-blue-500/50 hover:border-solid font-mono"
                         onClick={() => window.open(`https://twitter.com/${profileData.user.twitterProfile.twitter_username}`, '_blank')}
                       >
                         <ExternalLink className="w-4 h-4 mr-1" />
@@ -632,7 +635,7 @@ export default function ProfilePage() {
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        className="text-red-600 hover:text-red-700"
+                        className="text-red-600 hover:text-red-700 border-dashed border-red-500/50 hover:border-solid font-mono"
                         onClick={handleDisconnectTwitter}
                       >
                         <Link className="w-4 h-4 mr-1" />
@@ -646,69 +649,70 @@ export default function ProfilePage() {
                       <Button
                          variant="default"
                          size="sm"
-                         className="bg-blue-500 hover:bg-blue-600 text-white"
+                         className="bg-blue-500 hover:bg-blue-600 text-white border-dashed border-blue-600/50 hover:border-solid font-mono"
                          onClick={handleConnectTwitter}
                          disabled={isConnectingTwitter}
                        >
                          <Twitter className="w-4 h-4 mr-1" />
-                         {isConnectingTwitter ? 'Connecting...' : 'Connect Twitter'}
+                         {isConnectingTwitter ? 'CONNECTING...' : 'CONNECT_TWITTER'}
                        </Button>
-                      <Button variant="outline" size="sm" disabled>
+                      <Button variant="outline" size="sm" className="border-dashed border-gray-500/50 font-mono" disabled>
                         <ExternalLink className="w-4 h-4 mr-1" />
                         View Profile
                       </Button>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Connecting your Twitter account allows you to participate in social media quests and earn additional rewards.
+                    <p className="text-xs text-muted-foreground mt-2 font-mono">
+                      [INFO] Connecting your Twitter account allows you to participate in social media quests and earn additional rewards.
                     </p>
                   </div>
                 )}
               </div>
 
               {/* Facebook Integration */}
-              <div className="border rounded-lg p-4">
+              <div className="border-2 border-dashed border-indigo-500/30 bg-gradient-to-br from-indigo-500/5 to-blue-500/5 hover:border-solid transition-all duration-200 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <h3 className="font-semibold">Facebook Integration</h3>
+                    <h3 className="font-mono font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">{'>'} FACEBOOK_INTEGRATION</h3>
                     {profileData?.user?.facebookProfile ? (
-                      <p className="text-sm text-muted-foreground">
-                        Connected as {profileData.user.facebookProfile.facebook_name}
+                      <p className="text-sm text-muted-foreground font-mono">
+                        [CONNECTED] {profileData.user.facebookProfile.facebook_name}
                       </p>
                     ) : (
-                      <p className="text-sm text-muted-foreground">
-                        Link your Facebook account to verify social media quests
+                      <p className="text-sm text-muted-foreground font-mono">
+                        [DISCONNECTED] Link your Facebook account to verify social media quests
                       </p>
                     )}
                   </div>
                   {profileData?.user?.facebookProfile ? (
-                    <Badge variant="outline" className="text-green-600">
+                    <Badge className="bg-green-500/20 text-green-700 dark:text-green-300 border border-dashed border-green-500/50 font-mono">
                       <CheckCircle className="w-3 h-3 mr-1" />
-                      Connected
+                      CONNECTED
                     </Badge>
                   ) : (
-                    <Badge variant="outline" className="text-gray-600">
+                    <Badge className="bg-gray-500/20 text-gray-700 dark:text-gray-300 border border-dashed border-gray-500/50 font-mono">
                       <AlertCircle className="w-3 h-3 mr-1" />
-                      Not Connected
+                      NOT_CONNECTED
                     </Badge>
                   )}
                 </div>
                 
                 {profileData?.user?.facebookProfile ? (
                   <div className="space-y-3">
-                    <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                      <Avatar className="w-10 h-10">
+                    <div className="flex items-center gap-3 p-3 bg-indigo-500/10 rounded-lg border border-dashed border-indigo-500/30">
+                      <Avatar className="w-10 h-10 border border-dashed border-indigo-500/50">
                         <AvatarImage src={profileData.user.facebookProfile.facebook_profile_picture} />
-                        <AvatarFallback>FB</AvatarFallback>
+                        <AvatarFallback className="font-mono">FB</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <p className="font-medium">{profileData.user.facebookProfile.firstname} {profileData.user.facebookProfile.lastname}</p>
-                        <p className="text-sm text-muted-foreground">Facebook ID: {profileData.user.facebookProfile.facebook_id}</p>
+                        <p className="font-medium font-mono">{profileData.user.facebookProfile.firstname} {profileData.user.facebookProfile.lastname}</p>
+                        <p className="text-sm text-muted-foreground font-mono">ID: {profileData.user.facebookProfile.facebook_id}</p>
                       </div>
                     </div>
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
                         size="sm"
+                        className="border-dashed border-indigo-500/50 hover:border-solid font-mono"
                         onClick={() => window.open(`https://facebook.com/${profileData.user.facebookProfile.facebook_id}`, '_blank')}
                       >
                         <ExternalLink className="w-4 h-4 mr-1" />
@@ -717,7 +721,7 @@ export default function ProfilePage() {
                       <Button 
                          variant="outline" 
                          size="sm" 
-                         className="text-red-600 hover:text-red-700"
+                         className="text-red-600 hover:text-red-700 border-dashed border-red-500/50 hover:border-solid font-mono"
                          onClick={handleDisconnectFacebook}
                        >
                          <Link className="w-4 h-4 mr-1" />
@@ -731,69 +735,55 @@ export default function ProfilePage() {
                       <Button
                          variant="default"
                          size="sm"
-                         className="bg-blue-600 hover:bg-blue-700 text-white"
+                         className="bg-blue-600 hover:bg-blue-700 text-white border-dashed border-blue-700/50 hover:border-solid font-mono"
                          onClick={handleConnectFacebook}
                          disabled={isConnectingFacebook}
                        >
                          <Facebook className="w-4 h-4 mr-1" />
-                         {isConnectingFacebook ? 'Connecting...' : 'Connect Facebook'}
+                         {isConnectingFacebook ? 'CONNECTING...' : 'CONNECT_FACEBOOK'}
                        </Button>
-                      <Button variant="outline" size="sm" disabled>
+                      <Button variant="outline" size="sm" className="border-dashed border-gray-500/50 font-mono" disabled>
                         <ExternalLink className="w-4 h-4 mr-1" />
                         View Profile
                       </Button>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Connecting your Facebook account allows you to participate in social media quests and earn additional rewards.
+                    <p className="text-xs text-muted-foreground mt-2 font-mono">
+                      [INFO] Connecting your Facebook account allows you to participate in social media quests and earn additional rewards.
                     </p>
                   </div>
                 )}
               </div>
 
               {/* Discord Integration */}
-              <div className="border rounded-lg p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div>
-                    <h3 className="font-semibold">Discord Integration</h3>
-                    {profileData?.user?.discordProfile ? (
-                      <p className="text-sm text-muted-foreground">
-                        Connected as {profileData.user.discordProfile.discord_username}
-                      </p>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">
-                        Link your Discord account to verify social media quests
-                      </p>
-                    )}
-                  </div>
-                  {profileData?.user?.discordProfile ? (
-                    <Badge variant="outline" className="text-green-600">
-                      <CheckCircle className="w-3 h-3 mr-1" />
-                      Connected
-                    </Badge>
-                  ) : (
-                    <Badge variant="outline" className="text-gray-600">
-                      <AlertCircle className="w-3 h-3 mr-1" />
-                      Not Connected
-                    </Badge>
-                  )}
-                </div>
+               <Card className="border-2 border-dashed border-[#5865F2]/30 bg-gradient-to-br from-[#5865F2]/5 to-indigo-600/5 hover:border-solid transition-all duration-200">
+                 <CardHeader className="border-b border-dashed border-[#5865F2]/30 bg-gradient-to-r from-[#5865F2]/5 to-transparent">
+                   <CardTitle className="flex items-center gap-2 font-mono">
+                     <SiDiscord className="w-5 h-5 text-[#5865F2]" />
+                     [DISCORD_INTEGRATION]
+                     <Badge variant="secondary" className="ml-auto border border-dashed border-[#5865F2]/50 bg-[#5865F2]/10 text-[#5865F2] font-mono">
+                       {profileData?.user?.discordProfile ? '[CONNECTED]' : '[NOT_CONNECTED]'}
+                     </Badge>
+                   </CardTitle>
+                 </CardHeader>
+                 <CardContent className="pt-6">
                 
                 {profileData?.user?.discordProfile ? (
                   <div className="space-y-3">
-                    <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                      <Avatar className="w-10 h-10">
+                    <div className="flex items-center gap-3 p-3 bg-purple-600/10 rounded-lg border border-dashed border-purple-600/30">
+                      <Avatar className="w-10 h-10 border border-dashed border-purple-600/50">
                         <AvatarImage src={profileData.user.discordProfile.discord_avatar} />
-                        <AvatarFallback>DC</AvatarFallback>
+                        <AvatarFallback className="font-mono">DC</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <p className="font-medium">{profileData.user.discordProfile.discord_username}</p>
-                        <p className="text-sm text-muted-foreground">Discord ID: {profileData.user.discordProfile.discord_id}</p>
+                        <p className="font-medium font-mono">{profileData.user.discordProfile.discord_username}</p>
+                        <p className="text-sm text-muted-foreground font-mono">ID: {profileData.user.discordProfile.discord_id}</p>
                       </div>
                     </div>
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
                         size="sm"
+                        className="border-dashed border-purple-600/50 hover:border-solid font-mono"
                         onClick={() => window.open(`https://discord.com/users/${profileData.user.discordProfile.discord_id}`, '_blank')}
                       >
                         <ExternalLink className="w-4 h-4 mr-1" />
@@ -802,7 +792,7 @@ export default function ProfilePage() {
                       <Button 
                          variant="outline" 
                          size="sm" 
-                         className="text-red-600 hover:text-red-700"
+                         className="text-red-600 hover:text-red-700 border-dashed border-red-500/50 hover:border-solid font-mono"
                          onClick={handleDisconnectDiscord}
                        >
                          <Link className="w-4 h-4 mr-1" />
@@ -816,24 +806,25 @@ export default function ProfilePage() {
                       <Button
                          variant="default"
                          size="sm"
-                         className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                         className="bg-purple-600 hover:bg-purple-700 text-white border-dashed border-purple-700/50 hover:border-solid font-mono"
                          onClick={handleConnectDiscord}
                          disabled={isConnectingDiscord}
                        >
                          <MessageSquare className="w-4 h-4 mr-1" />
-                         {isConnectingDiscord ? 'Connecting...' : 'Connect Discord'}
+                         {isConnectingDiscord ? 'CONNECTING...' : 'CONNECT_DISCORD'}
                        </Button>
-                      <Button variant="outline" size="sm" disabled>
+                      <Button variant="outline" size="sm" className="border-dashed border-gray-500/50 font-mono" disabled>
                         <ExternalLink className="w-4 h-4 mr-1" />
                         View Profile
                       </Button>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Connecting your Discord account allows you to participate in social media quests and earn additional rewards.
-                    </p>
-                  </div>
-                )}
-              </div>
+                    <p className="text-xs text-muted-foreground mt-2 font-mono">
+                       [INFO] Connecting your Discord account allows you to participate in social media quests and earn additional rewards.
+                     </p>
+                   </div>
+                 )}
+                 </CardContent>
+               </Card>
 
               {/* Account Status */}
               <div className="border-2 border-dashed border-green-500/30 bg-gradient-to-br from-green-500/5 to-emerald-500/5 hover:border-solid transition-all duration-200 rounded-lg p-4">
