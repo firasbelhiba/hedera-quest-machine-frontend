@@ -26,20 +26,20 @@ import {
 } from 'lucide-react';
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: BarChart3 },
-  { name: 'Discover Quests', href: '/quests', icon: Compass },
-  { name: 'My Progress', href: '/progress', icon: Trophy },
-  { name: 'Leaderboard', href: '/leaderboard', icon: Users },
-  { name: 'Profile', href: '/profile', icon: User },
+  { name: '[DASHBOARD]', href: '/', icon: BarChart3 },
+  { name: '[DISCOVER_QUESTS]', href: '/quests', icon: Compass },
+  { name: '[MY_PROGRESS]', href: '/progress', icon: Trophy },
+  { name: '[LEADERBOARD]', href: '/leaderboard', icon: Users },
+  { name: '[PROFILE]', href: '/profile', icon: User },
 ];
 
 const adminNavigation = [
-  { name: 'Admin Dashboard', href: '/admin', icon: Shield },
-  { name: 'Manage Quests', href: '/admin/quests', icon: FileText },
-  { name: 'Manage Badges', href: '/admin/badges', icon: Award },
-  { name: 'Review Submissions', href: '/admin/submissions', icon: FileText },
-  { name: 'Events', href: '/admin/events', icon: Calendar },
-  { name: 'Settings', href: '/admin/settings', icon: Settings },
+  { name: '[ADMIN_DASHBOARD]', href: '/admin', icon: Shield },
+  { name: '[MANAGE_QUESTS]', href: '/admin/quests', icon: FileText },
+  { name: '[MANAGE_BADGES]', href: '/admin/badges', icon: Award },
+  { name: '[REVIEW_SUBMISSIONS]', href: '/admin/submissions', icon: FileText },
+  { name: '[EVENTS]', href: '/admin/events', icon: Calendar },
+  { name: '[SETTINGS]', href: '/admin/settings', icon: Settings },
 ];
 
 interface SidebarProps {
@@ -57,8 +57,8 @@ export function Sidebar({ isCollapsed, onToggle, userRole = 'user' }: SidebarPro
   return (
     <div
       className={cn(
-        'bg-card/95 backdrop-blur-sm border-r border-border/50 transition-all duration-300 ease-in-out flex flex-col shadow-lg',
-        'h-screen sticky top-0 z-40',
+        'bg-card/95 backdrop-blur-sm border-r-2 border-dashed border-purple-500/30 hover:border-solid transition-all duration-300 ease-in-out flex flex-col shadow-lg',
+        'h-screen sticky top-0 z-40 font-mono',
         // Responsive widths
         isCollapsed ? 'w-16' : 'w-64 max-w-[280px]',
         // Mobile responsiveness
@@ -66,18 +66,20 @@ export function Sidebar({ isCollapsed, onToggle, userRole = 'user' }: SidebarPro
         !isCollapsed && 'fixed md:static inset-y-0 left-0'
       )}
     >
-		<div className="p-4 border-b border-border/50 flex items-center justify-between bg-gradient-to-r from-background/50 to-muted/20">
-			<div className="flex items-center space-x-2 transition-all duration-300">
-				<div className={cn(
-          'transition-all duration-300 ease-in-out',
-          isCollapsed ? 'scale-75' : 'scale-100'
-        )}>
-          <Image src="/logo.png" alt="Hedera Quest" width={140} height={140} className="rounded-lg drop-shadow-sm" />
+      {/* Logo Section */}
+      <div className="p-4 border-b-2 border-dashed border-purple-500/30 flex items-center justify-between bg-gradient-to-r from-background/50 to-muted/20">
+        <div className="flex items-center space-x-2 transition-all duration-300">
+          <div className={cn(
+            'transition-all duration-300 ease-in-out',
+            isCollapsed ? 'scale-75' : 'scale-100'
+          )}>
+            <Image src="/logo.png" alt="Hedera Quest" width={140} height={140} className="rounded-lg drop-shadow-sm" />
+          </div>
         </div>
-			</div>
         <button
           onClick={onToggle}
-          className="p-2 rounded-xl hover:bg-muted/50 transition-all duration-200 hover:scale-110 active:scale-95 group"
+          className="p-2 border border-dashed border-purple-500/50 hover:border-solid hover:bg-purple-500/10 transition-all duration-200 group font-mono"
+          aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           <div className="transition-transform duration-200 group-hover:rotate-12">
             {isCollapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
@@ -85,13 +87,15 @@ export function Sidebar({ isCollapsed, onToggle, userRole = 'user' }: SidebarPro
         </button>
       </div>
 
+
+
       <nav className="flex-1 p-4 space-y-2 overflow-y-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
         {isAdminPage ? (
           // Admin pages: Show only admin navigation
           <div className="space-y-1">
             {!isCollapsed && (
-              <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2 transition-opacity duration-200">
-                Administration
+              <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2 transition-opacity duration-200 font-mono">
+                [ADMINISTRATION]
               </p>
             )}
             {adminNavigation.map((item) => {
@@ -101,10 +105,10 @@ export function Sidebar({ isCollapsed, onToggle, userRole = 'user' }: SidebarPro
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    'group flex items-center px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ease-in-out relative overflow-hidden',
+                    'group flex items-center px-3 py-2.5 border border-dashed text-sm font-medium font-mono transition-all duration-200 ease-in-out relative overflow-hidden',
                     isActive
-                      ? 'bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg shadow-primary/25 scale-[1.02]'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-gradient-to-r hover:from-muted/50 hover:to-muted hover:scale-[1.01] hover:shadow-sm',
+                      ? 'bg-gradient-to-r from-purple-500/20 to-cyan-500/20 text-foreground border-purple-500 border-solid shadow-lg shadow-purple-500/25 scale-[1.02]'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-gradient-to-r hover:from-purple-500/10 hover:to-cyan-500/10 hover:border-solid hover:border-purple-500/50 hover:scale-[1.01] hover:shadow-sm border-transparent',
                     isCollapsed && 'justify-center px-2.5'
                   )}
                 >
@@ -137,10 +141,10 @@ export function Sidebar({ isCollapsed, onToggle, userRole = 'user' }: SidebarPro
                     key={item.name}
                     href={item.href}
                     className={cn(
-                      'group flex items-center px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ease-in-out relative overflow-hidden',
+                      'group flex items-center px-3 py-2.5 border border-dashed text-sm font-medium font-mono transition-all duration-200 ease-in-out relative overflow-hidden',
                       isActive
-                        ? 'bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg shadow-primary/25 scale-[1.02]'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-gradient-to-r hover:from-muted/50 hover:to-muted hover:scale-[1.01] hover:shadow-sm',
+                        ? 'bg-gradient-to-r from-purple-500/20 to-cyan-500/20 text-foreground border-purple-500 border-solid shadow-lg shadow-purple-500/25 scale-[1.02]'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-gradient-to-r hover:from-purple-500/10 hover:to-cyan-500/10 hover:border-solid hover:border-purple-500/50 hover:scale-[1.01] hover:shadow-sm border-transparent',
                       isCollapsed && 'justify-center px-2.5'
                     )}
                   >
@@ -166,10 +170,10 @@ export function Sidebar({ isCollapsed, onToggle, userRole = 'user' }: SidebarPro
             {/* Admin Navigation */}
             {isAdmin && (
               <>
-                <div className="pt-4 border-t">
+                <div className="pt-4 border-t-2 border-dashed border-purple-500/30">
                   {!isCollapsed && (
-                    <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2 transition-opacity duration-200">
-                      Administration
+                    <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2 transition-opacity duration-200 font-mono">
+                      [ADMINISTRATION]
                     </p>
                   )}
                   <div className="space-y-1">
@@ -180,10 +184,10 @@ export function Sidebar({ isCollapsed, onToggle, userRole = 'user' }: SidebarPro
                           key={item.name}
                           href={item.href}
                           className={cn(
-                            'group flex items-center px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ease-in-out relative overflow-hidden',
+                            'group flex items-center px-3 py-2.5 border border-dashed text-sm font-medium font-mono transition-all duration-200 ease-in-out relative overflow-hidden',
                             isActive
-                              ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg shadow-orange-500/25 scale-[1.02]'
-                              : 'text-muted-foreground hover:text-foreground hover:bg-gradient-to-r hover:from-orange-50 hover:to-red-50 dark:hover:from-orange-950/20 dark:hover:to-red-950/20 hover:scale-[1.01] hover:shadow-sm',
+                              ? 'bg-gradient-to-r from-orange-500/20 to-red-500/20 text-foreground border-orange-500 border-solid shadow-lg shadow-orange-500/25 scale-[1.02]'
+                              : 'text-muted-foreground hover:text-foreground hover:bg-gradient-to-r hover:from-orange-500/10 hover:to-red-500/10 hover:border-solid hover:border-orange-500/50 hover:scale-[1.01] hover:shadow-sm border-transparent',
                             isCollapsed && 'justify-center px-2.5'
                           )}
                         >
@@ -214,29 +218,29 @@ export function Sidebar({ isCollapsed, onToggle, userRole = 'user' }: SidebarPro
 
       {/* User Info */}
       {!isCollapsed && (
-        <div className="p-4 border-t bg-gradient-to-r from-muted/30 to-muted/10">
+        <div className="p-4 border-t-2 border-dashed border-purple-500/30 bg-gradient-to-r from-purple-500/10 to-cyan-500/10">
           <div className="flex items-center space-x-3 mb-3">
             <div className="relative">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 p-0.5">
-                <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
-                  <span className="text-sm font-bold bg-gradient-to-r from-purple-600 to-cyan-600 bg-clip-text text-transparent">
-                    {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+              <div className="w-10 h-10 border-2 border-dashed border-purple-500 bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 p-0.5">
+                <div className="w-full h-full bg-background flex items-center justify-center">
+                  <span className="text-sm font-bold font-mono bg-gradient-to-r from-purple-600 to-cyan-600 bg-clip-text text-transparent">
+                    [{user?.name ? user.name.charAt(0).toUpperCase() : 'U'}]
                   </span>
                 </div>
               </div>
-              <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full border-2 border-background flex items-center justify-center">
-                <div className="w-1.5 h-1.5 bg-white rounded-full" />
+              <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 border border-dashed border-green-600 flex items-center justify-center">
+                <div className="w-1.5 h-1.5 bg-white" />
               </div>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold truncate flex items-center gap-1">
-                {user?.name ? user.name.charAt(0).toUpperCase() + user.name.slice(1) : 'Loading...'}
+              <p className="text-sm font-semibold font-mono truncate flex items-center gap-1">
+                [{user?.name ? user.name.charAt(0).toUpperCase() + user.name.slice(1) : 'LOADING...'}]
                 <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
               </p>
               <div className="flex items-center gap-2 mt-1">
-                <Badge variant="secondary" className="text-xs px-2 py-0.5 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 border-0">
+                <Badge variant="secondary" className="text-xs px-2 py-0.5 font-mono bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-dashed border-blue-500/50">
                   <Zap className="w-3 h-3 mr-1" />
-                  Level {user?.level || 1}
+                  [LVL_{user?.level || 1}]
                 </Badge>
               </div>
             </div>
@@ -244,13 +248,13 @@ export function Sidebar({ isCollapsed, onToggle, userRole = 'user' }: SidebarPro
           
           {/* Progress Bar */}
           <div className="space-y-2">
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>Progress to Level {(user?.level || 1) + 1}</span>
-              <span>{Math.min(((user?.level || 1) * 100) % 100, 85)}%</span>
+            <div className="flex justify-between text-xs text-muted-foreground font-mono">
+              <span>[PROGRESS_TO_LVL_{(user?.level || 1) + 1}]</span>
+              <span>[{Math.min(((user?.level || 1) * 100) % 100, 85)}%]</span>
             </div>
             <Progress 
               value={Math.min(((user?.level || 1) * 100) % 100, 85)} 
-              className="h-2 bg-muted"
+              className="h-2 bg-muted border border-dashed border-purple-500/30"
             />
           </div>
         </div>
@@ -258,16 +262,16 @@ export function Sidebar({ isCollapsed, onToggle, userRole = 'user' }: SidebarPro
       
       {/* Collapsed User Avatar */}
       {isCollapsed && (
-        <div className="p-2 border-t flex justify-center">
+        <div className="p-2 border-t-2 border-dashed border-purple-500/30 flex justify-center">
           <div className="relative">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 p-0.5">
-              <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
-                <span className="text-xs font-bold bg-gradient-to-r from-purple-600 to-cyan-600 bg-clip-text text-transparent">
+            <div className="w-8 h-8 border border-dashed border-purple-500 bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 p-0.5">
+              <div className="w-full h-full bg-background flex items-center justify-center">
+                <span className="text-xs font-bold font-mono bg-gradient-to-r from-purple-600 to-cyan-600 bg-clip-text text-transparent">
                   {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
                 </span>
               </div>
             </div>
-            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border border-background" />
+            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border border-dashed border-green-600" />
           </div>
         </div>
       )}
