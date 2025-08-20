@@ -32,11 +32,20 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+// Extended submission interface with additional properties
+interface ExtendedSubmission extends Submission {
+  questTitle?: string;
+  quest?: any;
+  user?: any;
+  completedAt?: string;
+  created_at?: string;
+}
+
 export default function ReviewSubmissionsPage() {
   const router = useRouter();
   const [questsWithCompletions, setQuestsWithCompletions] = useState<any[]>([]);
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
-  const [filteredSubmissions, setFilteredSubmissions] = useState<Submission[]>([]);
+  const [submissions, setSubmissions] = useState<ExtendedSubmission[]>([]);
+  const [filteredSubmissions, setFilteredSubmissions] = useState<ExtendedSubmission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -57,8 +66,8 @@ export default function ReviewSubmissionsPage() {
       const questsData = response.quests || [];
       setQuestsWithCompletions(questsData);
       // Extract submissions from the new format
-      const allSubmissions = questsData.flatMap(quest => 
-        quest.completions.map(completion => ({
+      const allSubmissions = questsData.flatMap((quest: any) => 
+        quest.completions.map((completion: any) => ({
           ...completion,
           questId: quest.id,
           questTitle: quest.title,
@@ -101,7 +110,7 @@ export default function ReviewSubmissionsPage() {
     );
 
     // Sort by submission date (newest first)
-    filtered.sort((a, b) => new Date(b.completedAt || b.created_at).getTime() - new Date(a.completedAt || a.created_at).getTime());
+    filtered.sort((a, b) => new Date(b.completedAt || b.created_at || b.submittedAt).getTime() - new Date(a.completedAt || a.created_at || a.submittedAt).getTime());
 
     setFilteredSubmissions(filtered);
   };
@@ -205,7 +214,7 @@ export default function ReviewSubmissionsPage() {
       </div>
 
       {/* Platform Tabs */}
-      <Tabs value={activePlatform} onValueChange={setActivePlatform} className="w-full">
+      <Tabs value={activePlatform} onValueChange={(value) => setActivePlatform(value as 'twitter'|'facebook'|'discord'|'others')} className="w-full">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="twitter">Twitter</TabsTrigger>
           <TabsTrigger value="facebook">Facebook</TabsTrigger>
@@ -310,7 +319,7 @@ export default function ReviewSubmissionsPage() {
                         <TableCell>
                           <div className="flex items-center gap-1 text-sm text-muted-foreground">
                             <Calendar className="w-3 h-3" />
-                            {new Date(submission.submittedAt || submission.created_at).toLocaleDateString()}
+                            {new Date(submission.submittedAt || submission.created_at || Date.now()).toLocaleDateString()}
                           </div>
                         </TableCell>
                         <TableCell>
@@ -443,7 +452,7 @@ export default function ReviewSubmissionsPage() {
                         <TableCell>
                           <div className="flex items-center gap-1 text-sm text-muted-foreground">
                             <Calendar className="w-3 h-3" />
-                            {new Date(submission.submittedAt || submission.created_at).toLocaleDateString()}
+                            {new Date(submission.submittedAt || submission.created_at || Date.now()).toLocaleDateString()}
                           </div>
                         </TableCell>
                         <TableCell>
@@ -576,7 +585,7 @@ export default function ReviewSubmissionsPage() {
                         <TableCell>
                           <div className="flex items-center gap-1 text-sm text-muted-foreground">
                             <Calendar className="w-3 h-3" />
-                            {new Date(submission.submittedAt || submission.created_at).toLocaleDateString()}
+                            {new Date(submission.submittedAt || submission.created_at || Date.now()).toLocaleDateString()}
                           </div>
                         </TableCell>
                         <TableCell>
@@ -709,7 +718,7 @@ export default function ReviewSubmissionsPage() {
                         <TableCell>
                           <div className="flex items-center gap-1 text-sm text-muted-foreground">
                             <Calendar className="w-3 h-3" />
-                            {new Date(submission.submittedAt || submission.created_at).toLocaleDateString()}
+                            {new Date(submission.submittedAt || submission.created_at || Date.now()).toLocaleDateString()}
                           </div>
                         </TableCell>
                         <TableCell>

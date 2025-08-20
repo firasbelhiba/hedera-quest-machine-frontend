@@ -230,13 +230,13 @@ export default function QuestDetailPage() {
                 <div className="border-2 border-dashed border-pink-300 dark:border-pink-600 bg-pink-50 dark:bg-pink-950/20 p-4 rounded-lg shadow-sm hover:shadow-md transition-all">
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">
-                      {quest.interaction_type === 'like' ? '❤️' :
-                       quest.interaction_type === 'comment' ? '💬' :
-                       quest.interaction_type === 'share' ? '🔄' :
+                      {quest.platform_type === 'like' ? '❤️' :
+                       quest.platform_type === 'comment' ? '💬' :
+                       quest.platform_type === 'share' ? '🔄' :
                        '👁️'}
                     </div>
                     <div>
-                      <div className="font-mono font-semibold text-gray-900 dark:text-white capitalize">{quest.interaction_type}</div>
+                      <div className="font-mono font-semibold text-gray-900 dark:text-white capitalize">{quest.platform_type || 'Social'}</div>
                       <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">ACTION</div>
                     </div>
                   </div>
@@ -254,7 +254,7 @@ export default function QuestDetailPage() {
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">📅</div>
                     <div>
-                      <div className="font-mono font-semibold text-gray-900 dark:text-white">{new Date(quest.startDate).toLocaleDateString()}</div>
+                      <div className="font-mono font-semibold text-gray-900 dark:text-white">{new Date(quest.startDate || Date.now()).toLocaleDateString()}</div>
                       <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">START_DATE</div>
                     </div>
                   </div>
@@ -263,7 +263,7 @@ export default function QuestDetailPage() {
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">⏰</div>
                     <div>
-                      <div className="font-mono font-semibold text-gray-900 dark:text-white">{new Date(quest.endDate).toLocaleDateString()}</div>
+                      <div className="font-mono font-semibold text-gray-900 dark:text-white">{new Date(quest.endDate || Date.now()).toLocaleDateString()}</div>
                       <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">END_DATE</div>
                     </div>
                   </div>
@@ -279,7 +279,7 @@ export default function QuestDetailPage() {
                       <div className="text-3xl">🔗</div>
                       <div>
                         <h3 className="font-mono font-semibold text-gray-900 dark:text-white">QUEST_LINK.exe</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-300 font-mono">>>> Execute quest on external platform</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-300 font-mono">{'>>>'} Execute quest on external platform</p>
                       </div>
                     </div>
                     <div className="flex flex-col gap-3">
@@ -413,7 +413,7 @@ export default function QuestDetailPage() {
                       <div className="text-2xl group-hover:scale-110 transition-transform">📖</div>
                       <div>
                         <div className="font-mono font-medium text-gray-900 dark:text-gray-100">HEDERA_DOCS.html</div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">>>> Official development documentation</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">{'>>>'} Official development documentation</div>
                       </div>
                     </a>
                     <a
@@ -425,7 +425,7 @@ export default function QuestDetailPage() {
                       <div className="text-2xl group-hover:scale-110 transition-transform">🚪</div>
                       <div>
                         <div className="font-mono font-medium text-gray-900 dark:text-gray-100">HEDERA_PORTAL.exe</div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">>>> Developer portal and tools</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">{'>>>'} Developer portal and tools</div>
                       </div>
                     </a>
                     <a
@@ -437,7 +437,7 @@ export default function QuestDetailPage() {
                       <div className="text-2xl group-hover:scale-110 transition-transform">🔍</div>
                       <div>
                         <div className="font-mono font-medium text-gray-900 dark:text-gray-100">HASHSCAN_EXPLORER.app</div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">>>> Blockchain explorer for Hedera</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">{'>>>'} Blockchain explorer for Hedera</div>
                       </div>
                     </a>
                   </div>
@@ -509,7 +509,7 @@ export default function QuestDetailPage() {
                     {(!quest.badges || quest.badges.length === 0) && (
                       <div className="col-span-full text-center py-8 text-gray-500 dark:text-gray-400">
                         <span className="text-6xl mb-3 block">🏆</span>
-                        <p className="font-mono">>>> NO BADGES FOUND</p>
+                        <p className="font-mono">{'>>>'} NO BADGES FOUND</p>
                       </div>
                     )}
                   </div>
@@ -541,7 +541,7 @@ export default function QuestDetailPage() {
                     </div>
                   </div>
                   <h3 className="font-mono font-bold text-lg text-green-600 dark:text-green-400 mb-2">
-                    >>> QUEST_COMPLETED!
+                    {'>>>'} QUEST_COMPLETED!
                   </h3>
                   <div className="border-2 border-dashed border-green-300 dark:border-green-600 bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
                     <p className="text-sm font-mono font-medium text-green-700 dark:text-green-300">
@@ -555,7 +555,7 @@ export default function QuestDetailPage() {
                     <span className="text-3xl">⚡</span>
                   </div>
                   <h3 className="font-mono font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                    >>> READY_TO_START?
+                    {'>>>'} READY_TO_START?
                   </h3>
                   <div className="border-2 border-dashed border-blue-300 dark:border-blue-600 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
                     <p className="text-sm font-mono text-blue-700 dark:text-blue-300">

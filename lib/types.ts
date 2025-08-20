@@ -49,6 +49,8 @@ export interface Quest {
   };
   badges?: any[];
   platform_type?: string;
+  quest_link?: string;
+  user_status?: string;
 }
 
 export interface Submission {
@@ -102,7 +104,8 @@ export type QuestCategory =
   | 'consensus'
   | 'smart-contracts'
   | 'token-service'
-  | 'file-service';
+  | 'file-service'
+  | 'community';
 
 export type Difficulty = 'beginner' | 'intermediate' | 'advanced' | 'expert';
 

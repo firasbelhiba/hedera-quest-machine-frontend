@@ -24,7 +24,7 @@ import { cn } from '@/lib/utils';
 export default function ReviewSubmissionPage() {
   const router = useRouter();
   const params = useParams();
-  const submissionId = params.id as string;
+  const submissionId = params?.id as string;
   
   const [submission, setSubmission] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -45,7 +45,7 @@ export default function ReviewSubmissionPage() {
       // Find the submission by ID (handle both string and number comparison)
       let foundSubmission = null;
       for (const quest of data.quests || []) {
-        console.log('Quest completions:', quest.completions?.map(c => ({ id: c.id, type: typeof c.id })));
+        console.log('Quest completions:', quest.completions?.map((c: any) => ({ id: c.id, type: typeof c.id })));
         const found = quest.completions?.find((comp: any) => 
           comp.id.toString() === submissionId
         );

@@ -94,7 +94,7 @@ export default function ProgressPage() {
                 🏆 {user.name}
               </h1>
               <p className="text-muted-foreground font-mono text-sm mt-2">
-                > HEDERA_ID: {user.hederaAccountId}
+                {'>'} HEDERA_ID: {user.hederaAccountId}
               </p>
             </div>
           </div>
@@ -159,7 +159,7 @@ export default function ProgressPage() {
             <div className="p-1 bg-primary/10 rounded border border-dashed border-primary/30">
               <TrendingUp className="w-4 h-4 text-primary" />
             </div>
-            > LEVEL_PROGRESS
+            {'>'} LEVEL_PROGRESS
           </CardTitle>
         </CardHeader>
         <CardContent className="p-6">
@@ -174,7 +174,7 @@ export default function ProgressPage() {
               <div className="text-right">
                 <div className="text-lg font-semibold font-mono bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">LEVEL_{nextLevel}</div>
                 <div className="text-sm text-muted-foreground font-mono">
-                  > {pointsForNextLevel - user.points} points to go
+                  {'>'} {pointsForNextLevel - user.points} points to go
                 </div>
               </div>
             </div>
@@ -218,7 +218,7 @@ export default function ProgressPage() {
                 <div className="p-1 bg-primary/10 rounded border border-dashed border-primary/30">
                   <Award className="w-4 h-4 text-primary" />
                 </div>
-                > BADGE_COLLECTION
+                {'>'} BADGE_COLLECTION
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
@@ -234,7 +234,7 @@ export default function ProgressPage() {
                   </div>
                   <h3 className="text-lg font-semibold mb-2 font-mono text-primary">NO_BADGES_YET</h3>
                   <p className="text-muted-foreground mb-4 font-mono text-sm">
-                    > Complete quests to earn your first badge!
+                    {'>'} Complete quests to earn your first badge!
                   </p>
                   <Button className="font-mono">DISCOVER_QUESTS</Button>
                 </div>
@@ -300,7 +300,7 @@ export default function ProgressPage() {
                 <div className="p-1 bg-primary/10 rounded border border-dashed border-primary/30">
                   <FileText className="w-4 h-4 text-primary" />
                 </div>
-                > ALL_SUBMISSIONS
+                {'>'} ALL_SUBMISSIONS
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
@@ -325,7 +325,7 @@ export default function ProgressPage() {
                       </div>
                       
                       <div className="text-sm text-muted-foreground mb-2 font-mono">
-                        > SUBMITTED: {new Date(submission.submittedAt).toLocaleDateString()}
+                        {'>'} SUBMITTED: {new Date(submission.submittedAt).toLocaleDateString()}
                         {submission.reviewedAt && (
                           <> • REVIEWED: {new Date(submission.reviewedAt).toLocaleDateString()}</>
                         )}
@@ -355,7 +355,7 @@ export default function ProgressPage() {
                   </div>
                   <h3 className="text-lg font-semibold mb-2 font-mono text-primary">NO_SUBMISSIONS_YET</h3>
                   <p className="text-muted-foreground mb-4 font-mono text-sm">
-                    > Start completing quests to see your submissions here.
+                    {'>'} Start completing quests to see your submissions here.
                   </p>
                   <Button className="font-mono">BROWSE_QUESTS</Button>
                 </div>
@@ -371,7 +371,7 @@ export default function ProgressPage() {
                 <div className="p-1 bg-primary/10 rounded border border-dashed border-primary/30">
                   <Clock className="w-4 h-4 text-primary" />
                 </div>
-                > RECENT_ACTIVITY
+                {'>'} RECENT_ACTIVITY
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
@@ -400,7 +400,7 @@ export default function ProgressPage() {
                           {submission.status === 'rejected' && '❌ SUBMISSION_REJECTED'}
                         </div>
                         <div className="text-sm text-muted-foreground font-mono">
-                          > QUEST_#{submission.questId} • {new Date(submission.submittedAt).toLocaleDateString()}
+                          {'>'} QUEST_#{submission.questId} • {new Date(submission.submittedAt).toLocaleDateString()}
                         </div>
                       </div>
                       
@@ -422,7 +422,7 @@ export default function ProgressPage() {
                   </div>
                   <h3 className="text-lg font-semibold mb-2 font-mono text-primary">NO_RECENT_ACTIVITY</h3>
                   <p className="text-muted-foreground font-mono text-sm">
-                    > Your quest submissions and achievements will appear here.
+                    {'>'} Your quest submissions and achievements will appear here.
                   </p>
                 </div>
               )}

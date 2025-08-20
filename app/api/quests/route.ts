@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { mockQuests } from '@/lib/mock-data';
-import type { Quest, FilterOptions } from '@/lib/types';
+import type { Quest, FilterOptions, QuestCategory, Difficulty } from '@/lib/types';
 
 export async function GET(request: NextRequest) {
   try {
@@ -8,9 +8,10 @@ export async function GET(request: NextRequest) {
     
     // Extract filter parameters
     const filters: FilterOptions = {
-      categories: searchParams.get('categories')?.split(',') || [],
-      difficulties: searchParams.get('difficulties')?.split(',') || [],
+      categories: (searchParams.get('categories')?.split(',') || []) as QuestCategory[],
+      difficulties: (searchParams.get('difficulties')?.split(',') || []) as Difficulty[],
       search: searchParams.get('search') || '',
+      showCompleted: searchParams.get('showCompleted') === 'true',
     };
 
     console.log('API: Fetching quests with filters:', filters);
@@ -19,8 +20,8 @@ export async function GET(request: NextRequest) {
     let filteredQuests = mockQuests;
 
     if (filters.categories && filters.categories.length > 0) {
-      filteredQuests = filteredQuests.filter(quest => 
-        filters.categories!.includes(quest.category)
+      filteredQuests = filteredQuests.filter(quest =>
+        quest.category && filters.categories!.includes(quest.category)
       );
     }
 
@@ -68,13 +69,11 @@ export async function POST(request: NextRequest) {
       reward: body.reward,
       difficulty: body.difficulty,
       status: body.status || 'active',
-      category: body.category || 'general',
+      category: body.category,
       estimatedTime: '15 minutes',
-      completedCount: 0,
-      totalParticipants: 0,
+      completions: 0,
+      currentParticipants: 0,
       requirements: [],
-      instructions: [],
-      resources: [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };

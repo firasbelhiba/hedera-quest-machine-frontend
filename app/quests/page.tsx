@@ -86,7 +86,7 @@ export default function QuestsPage() {
                 🎮 Discover Quests
               </h1>
               <p className="text-muted-foreground font-mono text-sm">
-                > Explore {quests.length} quests to master the Hedera ecosystem
+                {'>'} Explore {quests.length} quests to master the Hedera ecosystem
               </p>
             </div>
         

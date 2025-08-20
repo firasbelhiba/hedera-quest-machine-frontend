@@ -92,7 +92,7 @@ export default function AdminDashboard() {
                 🛡️ Admin Dashboard
               </h1>
               <p className="text-muted-foreground font-mono text-sm mt-2">
-                > PLATFORM_MANAGEMENT_AND_ANALYTICS
+                {'>'} PLATFORM_MANAGEMENT_AND_ANALYTICS
               </p>
             </div>
           </div>

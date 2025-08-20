@@ -246,7 +246,7 @@ export default function ProfilePage() {
     } catch (error) {
       toast({
         title: 'Failed to disconnect Twitter',
-        description: error.message || 'Something went wrong.',
+        description: error instanceof Error ? error.message : 'Something went wrong.',
         variant: 'destructive',
       });
     }

@@ -67,7 +67,7 @@ export default function Dashboard() {
                 🚀 Welcome back, {user?.name}!
               </h1>
               <p className="text-muted-foreground font-mono text-sm mt-2">
-                > Ready to continue your Hedera journey? Streak: {user?.streak || 0} days
+                {'>'} Ready to continue your Hedera journey? Streak: {user?.streak || 0} days
               </p>
             </div>
             <div className="text-right bg-gradient-to-br from-primary/5 to-cyan-500/5 p-4 rounded-lg border border-dashed border-primary/20">
@@ -164,7 +164,7 @@ export default function Dashboard() {
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent rounded-full" />
             </div>
             <p className="text-sm text-muted-foreground font-mono">
-              > Earn 150 more points to reach the next level
+              {'>'} Earn 150 more points to reach the next level
             </p>
           </div>
         </CardContent>
