@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AuthService } from '@/lib/api/auth';
 import { QuestService } from '@/lib/services';
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
 import { HydrationSafe } from '@/components/hydration-safe';
@@ -42,8 +43,13 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
     setError(null);
 
     try {
-      const result = await QuestService.login(data.email, data.password);
-      onSuccess(result.user, result.isAdmin);
+      const authResult = await AuthService.login({ email: data.email, password: data.password });
+      const user = await QuestService.getCurrentUser();
+      if (!user) {
+        throw new Error('Failed to fetch user data after login');
+      }
+      const isAdmin = user.role === 'admin';
+      onSuccess(user, isAdmin);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
     } finally {

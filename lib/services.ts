@@ -12,21 +12,6 @@ import { UsersApi } from './api/users';
 
 export class QuestService {
   // Authentication methods
-  static async login(email: string, password: string): Promise<{ user: User; isAdmin: boolean }> {
-    try {
-      const response = await ApiAuth.login(email, password);
-      const user = await this.getCurrentUser();
-      if (!user) {
-        throw new Error('Failed to fetch user data after login');
-      }
-      return {
-        user,
-        isAdmin: user.role === 'admin'
-      };
-    } catch (error) {
-      throw error;
-    }
-  }
 
   static async logout(): Promise<void> {
     try {
@@ -36,29 +21,20 @@ export class QuestService {
     }
   }
 
-  static async register(userData: {
-    name: string;
-    email: string;
-    password: string;
-  }): Promise<User> {
-    try {
-      const response = await ApiAuth.register(userData.name, userData.email, userData.password);
-      const user = await this.getCurrentUser();
-      if (!user) throw new Error('Failed to fetch user data after registration');
-      return user;
-    } catch (error) {
-      throw error;
-    }
-  }
+
 
   static async getCurrentUser(): Promise<User | null> {
     try {
       const profileData = await ApiAuth.me();
-      if (!profileData || !profileData.admin) {
+      if (!profileData) {
         return null;
       }
 
-      const userData = profileData.admin;
+      // Handle both admin and regular user data structures
+      const userData = profileData.admin || profileData.user || profileData;
+      if (!userData) {
+        return null;
+      }
       
       // Clean username by removing any brackets like [Admin]
       const cleanUsername = userData.username ? userData.username.replace(/\[.*?\]/g, '').trim() : '';

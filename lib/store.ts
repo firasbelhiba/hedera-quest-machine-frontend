@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { User, Quest, Submission, FilterOptions } from './types';
 import { QuestService } from './services';
+import { AuthService } from './api/auth';
 import { tokenStorage } from './api/client';
 
 interface AppState {
@@ -61,8 +62,12 @@ const useStore = create<AppState>((set, get) => ({
   login: async (email: string, password: string) => {
     set({ isLoading: true });
     try {
-      const result = await QuestService.login(email, password);
-      set({ user: result.user, isAuthenticated: true, isLoading: false });
+      await AuthService.login({ email, password });
+      const user = await QuestService.getCurrentUser();
+      if (!user) {
+        throw new Error('Failed to fetch user data after login');
+      }
+      set({ user, isAuthenticated: true, isLoading: false });
     } catch (error) {
       set({ isLoading: false });
       throw error;
@@ -72,7 +77,14 @@ const useStore = create<AppState>((set, get) => ({
   register: async (userData: any) => {
     set({ isLoading: true });
     try {
-      const user = await QuestService.register(userData);
+      await AuthService.register({
+        name: userData.name,
+        email: userData.email,
+        password: userData.password,
+        confirmPassword: userData.confirmPassword || userData.password
+      });
+      const user = await QuestService.getCurrentUser();
+      if (!user) throw new Error('Failed to fetch user data after registration');
       set({ user, isAuthenticated: true, isLoading: false });
     } catch (error) {
       set({ isLoading: false });

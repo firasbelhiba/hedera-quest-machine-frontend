@@ -11,7 +11,7 @@ export const AuthService = {
     // Use Next.js API proxy to avoid CORS issues
     console.log('Logging in with proxy URL: /auth/login');
     console.log('Request body:', payload);
-    
+
     const { data } = await api.post('/auth/login', payload);
 
     console.log('Login response:', data);
@@ -20,21 +20,22 @@ export const AuthService = {
     if (data.token) {
       tokenStorage.setAccessToken(data.token);
     }
+    console.log("3asba", data)
 
-    // Create user object from response
+    // Create user object from response data
     const user: User = {
-      id: '1', // You might want to decode the JWT to get the actual user ID
-      name: payload.email.split('@')[0], // Use email prefix as name for now
-      email: payload.email,
-      avatar: '/logo.png',
-      hederaAccountId: '',
-      points: 0,
-      level: 1,
-      streak: 0,
-      joinedAt: new Date().toISOString(),
-      role: data.is_admin ? 'admin' : 'user',
-      badges: [],
-      completedQuests: []
+      id: String(data.user?.id || data.id || Date.now()),
+      name: data.user?.name || data.name || `${data.user?.firstName || ''} ${data.user?.lastName || ''}`.trim() || payload.email.split('@')[0],
+      email: data.user?.email || data.email || payload.email,
+      avatar: data.user?.avatar || data.avatar || '/logo.png',
+      hederaAccountId: data.user?.hederaAccountId || data.hederaAccountId || '',
+      points: data.user?.points || data.points || 0,
+      level: data.user?.level || data.level || 1,
+      streak: data.user?.streak || data.streak || 0,
+      joinedAt: data.user?.joinedAt || data.joinedAt || data.user?.createdAt || data.createdAt || new Date().toISOString(),
+      role: data.is_admin || data.user?.is_admin ? 'admin' : 'user',
+      badges: data.user?.badges || data.badges || [],
+      completedQuests: data.user?.completedQuests || data.completedQuests || []
     };
 
     return { user, isAdmin: data.is_admin };
@@ -57,7 +58,7 @@ export const AuthService = {
     // Use Next.js API proxy to avoid CORS issues
     console.log('Registering with proxy URL: /user/register');
     console.log('Request body:', body);
-    
+
     const { data } = await api.post('/user/register', body);
 
     // Best-effort user construction until backend spec is finalized
@@ -87,7 +88,7 @@ export const AuthService = {
 
   async me(): Promise<{ admin: any; is_admin: boolean }> {
     console.log('Fetching user profile with token');
-    
+
     const { data } = await api.get('/profile/me');
 
     console.log('Profile response:', data);
@@ -104,7 +105,7 @@ export const AuthService = {
 
   async verifyToken(token: string): Promise<{ success: boolean; message: string }> {
     console.log('Verifying token:', token);
-    
+
     const { data } = await api.get('/profile/verify-token', {
       params: { token }
     });
