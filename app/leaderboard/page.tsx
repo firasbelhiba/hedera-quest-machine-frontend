@@ -2,6 +2,23 @@
 
 import { useState, useEffect } from 'react';
 import { LeaderboardEntry, LeaderboardResponse } from '@/lib/types';
+
+// Local interface for component usage
+interface LeaderboardDisplayEntry {
+  rank: number;
+  user: {
+    id: number;
+    name: string;
+    username: string;
+    email: string;
+    avatar: string;
+    level: number;
+    completedQuests: any[];
+  };
+  totalPoints: number;
+  recentPoints: number;
+  previousRank: number | null;
+}
 import { QuestService } from '@/lib/services';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -29,7 +46,7 @@ const LEADERBOARD_PERIODS = [
 ];
 
 export default function LeaderboardPage() {
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardDisplayEntry[]>([]);
   const [userRank, setUserRank] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState('all-time');
@@ -40,7 +57,7 @@ export default function LeaderboardPage() {
       try {
         const response = await QuestService.getLeaderboard();
         // Transform API response to match component expectations
-        const transformedData: LeaderboardEntry[] = response.data.users.map((user, index) => ({
+        const transformedData: LeaderboardDisplayEntry[] = response.data.users.map((user, index) => ({
           rank: index + 1,
           user: {
             id: user.id,
@@ -80,7 +97,7 @@ export default function LeaderboardPage() {
     }
   };
 
-  const getRankChange = (entry: LeaderboardEntry) => {
+  const getRankChange = (entry: LeaderboardDisplayEntry) => {
     if (!entry.previousRank) return null;
     
     const change = entry.previousRank - entry.rank;

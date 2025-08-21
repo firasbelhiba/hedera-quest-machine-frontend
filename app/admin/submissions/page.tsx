@@ -279,12 +279,12 @@ export default function ReviewSubmissionsPage() {
                         </TableCell>
                         <TableCell>
                           <div className="text-yellow-400 font-medium">
-                            {quest.completions?.filter(c => c.status === 'pending').length || 0}
+                            {quest.completions?.filter((c: any) => c.status === 'pending').length || 0}
                           </div>
                         </TableCell>
                         <TableCell>
                           <div className="text-green-400 font-medium">
-                            {quest.completions?.filter(c => c.status === 'approved').length || 0}
+                            {quest.completions?.filter((c: any) => c.status === 'approved').length || 0}
                           </div>
                         </TableCell>
                         <TableCell>
@@ -372,12 +372,12 @@ export default function ReviewSubmissionsPage() {
                         </TableCell>
                         <TableCell>
                           <div className="text-yellow-400 font-medium">
-                            {quest.completions?.filter(c => c.status === 'pending').length || 0}
+                            {quest.completions?.filter((c: any) => c.status === 'pending').length || 0}
                           </div>
                         </TableCell>
                         <TableCell>
                           <div className="text-green-400 font-medium">
-                            {quest.completions?.filter(c => c.status === 'approved').length || 0}
+                            {quest.completions?.filter((c: any) => c.status === 'approved').length || 0}
                           </div>
                         </TableCell>
                         <TableCell>
@@ -465,12 +465,12 @@ export default function ReviewSubmissionsPage() {
                         </TableCell>
                         <TableCell>
                           <div className="text-yellow-400 font-medium">
-                            {quest.completions?.filter(c => c.status === 'pending').length || 0}
+                            {quest.completions?.filter((c: any) => c.status === 'pending').length || 0}
                           </div>
                         </TableCell>
                         <TableCell>
                           <div className="text-green-400 font-medium">
-                            {quest.completions?.filter(c => c.status === 'approved').length || 0}
+                            {quest.completions?.filter((c: any) => c.status === 'approved').length || 0}
                           </div>
                         </TableCell>
                         <TableCell>
@@ -558,12 +558,12 @@ export default function ReviewSubmissionsPage() {
                         </TableCell>
                         <TableCell>
                           <div className="text-yellow-400 font-medium">
-                            {quest.completions?.filter(c => c.status === 'pending').length || 0}
+                            {quest.completions?.filter((c: any) => c.status === 'pending').length || 0}
                           </div>
                         </TableCell>
                         <TableCell>
                           <div className="text-green-400 font-medium">
-                            {quest.completions?.filter(c => c.status === 'approved').length || 0}
+                            {quest.completions?.filter((c: any) => c.status === 'approved').length || 0}
                           </div>
                         </TableCell>
                         <TableCell>

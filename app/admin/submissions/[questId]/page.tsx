@@ -46,7 +46,11 @@ interface ExtendedSubmission extends Submission {
 export default function QuestSubmissionsPage() {
   const params = useParams();
   const router = useRouter();
-  const questId = params.questId as string;
+  const questId = params?.questId as string;
+  
+  if (!questId) {
+    return <div>Loading...</div>;
+  }
   
   const [quest, setQuest] = useState<Quest | null>(null);
   const [submissions, setSubmissions] = useState<ExtendedSubmission[]>([]);

@@ -1,6 +1,6 @@
 import { 
   User, Quest, Submission, Badge, Event, LeaderboardEntry, LeaderboardResponse,
-  DashboardStats, FilterOptions, SubmissionContent 
+  DashboardStats, FilterOptions, SubmissionContent, QuestCategory 
 } from './types';
 import { AuthService as ApiAuth } from './api/auth';
 import { QuestsApi } from './api/quests';
@@ -31,7 +31,7 @@ export class QuestService {
       }
 
       // Handle both admin and regular user data structures
-      const userData = profileData.admin || profileData.user || profileData;
+      const userData = (profileData as any).admin || (profileData as any).user || profileData;
       if (!userData) {
         return null;
       }
@@ -110,7 +110,7 @@ export class QuestService {
       return {
         ...response,
         id: String(response.id),
-        createdAt: response.createdAt || response.created_at,
+        createdAt: response.createdAt || (response as any).created_at,
         updatedAt: response.updatedAt || response.updated_at
       };
     } catch (error) {
@@ -137,7 +137,7 @@ export class QuestService {
       return {
         ...response,
         id: String(response.id),
-        createdAt: response.createdAt || response.created_at,
+        createdAt: response.createdAt || (response as any).created_at,
         updatedAt: response.updatedAt || response.updated_at
       };
     } catch (error) {
@@ -161,8 +161,8 @@ export class QuestService {
       return {
         ...response,
         id: String(response.id),
-        createdAt: response.createdAt || response.created_at,
-        updatedAt: response.updatedAt || response.updated_at
+        createdAt: response.createdAt || (response as any).created_at,
+        updatedAt: response.updatedAt || (response as any).updated_at
       };
     } catch (error) {
       throw error;
@@ -175,8 +175,8 @@ export class QuestService {
       return {
         ...response,
         id: String(response.id),
-        createdAt: response.createdAt || response.created_at,
-        updatedAt: response.updatedAt || response.updated_at
+        createdAt: response.createdAt || (response as any).created_at,
+        updatedAt: response.updatedAt || (response as any).updated_at
       };
     } catch (error) {
       throw error;
@@ -199,7 +199,7 @@ export class QuestService {
       return {
         ...response,
         id: String(response.id),
-        submittedAt: response.submittedAt || response.created_at
+        submittedAt: response.submittedAt || (response as any).created_at
       };
     } catch (error) {
       throw error;
@@ -241,7 +241,7 @@ export class QuestService {
       return {
         ...response,
         id: String(response.id),
-        submittedAt: response.submittedAt || response.created_at
+        submittedAt: response.submittedAt || (response as any).created_at
       };
     } catch (error) {
       throw error;
@@ -334,30 +334,28 @@ export class QuestService {
       });
       
       const popularCategories = Object.entries(categoryCount)
-        .map(([category, count]) => ({ category, count }))
+        .map(([category, count]) => ({ category: category as QuestCategory, count }))
         .sort((a, b) => b.count - a.count)
         .slice(0, 5);
 
       return {
         totalUsers: 0, // This would need a users API endpoint
-        totalQuests,
-        totalSubmissions,
         activeQuests,
-        popularCategories,
-        recentActivity: [], // This would need activity tracking
-        completionRate: totalSubmissions > 0 ? (totalSubmissions / totalQuests) * 100 : 0
+        totalSubmissions,
+        approvalRate: 0, // This would need approval tracking
+        avgCompletionTime: 0, // This would need completion time tracking
+        popularCategories
       };
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);
       // Return default stats on error
       return {
         totalUsers: 0,
-        totalQuests: 0,
-        totalSubmissions: 0,
         activeQuests: 0,
-        popularCategories: [],
-        recentActivity: [],
-        completionRate: 0
+        totalSubmissions: 0,
+        approvalRate: 0,
+        avgCompletionTime: 0,
+        popularCategories: []
       };
     }
   }
