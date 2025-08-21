@@ -34,57 +34,12 @@ interface Notification {
   actionUrl?: string;
 }
 
-const mockNotifications: Notification[] = [
-  {
-    id: '1',
-    type: 'submission_approved',
-    title: 'Quest Submission Approved!',
-    message: 'Your submission for "Create Your First Hedera Account" has been approved. You earned 100 points!',
-    timestamp: '2024-01-20T10:30:00Z',
-    read: false,
-    actionUrl: '/progress'
-  },
-  {
-    id: '2',
-    type: 'new_quest',
-    title: 'New Quest Available',
-    message: 'A new quest "Advanced Smart Contract Development" is now available in the Development category.',
-    timestamp: '2024-01-20T09:15:00Z',
-    read: false,
-    actionUrl: '/quests'
-  },
-  {
-    id: '3',
-    type: 'event_reminder',
-    title: 'Hackathon Starting Soon',
-    message: 'The Hedera Hackathon 2024 starts in 2 days. Make sure you\'re registered!',
-    timestamp: '2024-01-19T16:45:00Z',
-    read: true,
-    actionUrl: '/events'
-  },
-  {
-    id: '4',
-    type: 'quest_completed',
-    title: 'Level Up!',
-    message: 'Congratulations! You\'ve reached Level 16 and unlocked new advanced quests.',
-    timestamp: '2024-01-19T14:20:00Z',
-    read: true,
-    actionUrl: '/profile'
-  },
-  {
-    id: '5',
-    type: 'submission_rejected',
-    title: 'Submission Needs Revision',
-    message: 'Your submission for "Deploy Your First Smart Contract" needs some revisions. Check the feedback.',
-    timestamp: '2024-01-19T11:30:00Z',
-    read: true,
-    actionUrl: '/progress'
-  }
-];
+// Notifications will be loaded from API
+const initialNotifications: Notification[] = [];
 
 export function Header({ onMenuClick }: HeaderProps) {
   const { theme, setTheme } = useTheme();
-  const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
+  const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
   const { user: currentUser, loadCurrentUser, logout } = useStore();
   const router = useRouter();
   const pathname = usePathname();

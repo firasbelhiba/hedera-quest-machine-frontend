@@ -43,28 +43,21 @@ export default function AdminDashboard() {
     loadStats();
   }, []);
 
-  // Mock data for charts
+  // Chart data derived from API stats
   const categoryData = stats?.popularCategories.map(cat => ({
     name: cat.category.replace('-', ' '),
     value: cat.count
   })) || [];
 
   const submissionData = [
-    { name: 'Approved', value: 245, color: '#10b981' },
-    { name: 'Pending', value: 67, color: '#f59e0b' },
-    { name: 'Needs Revision', value: 23, color: '#ef4444' },
-    { name: 'Rejected', value: 12, color: '#6b7280' }
+    { name: 'Approved', value: stats?.totalSubmissions || 0, color: '#10b981' },
+    { name: 'Pending', value: 0, color: '#f59e0b' },
+    { name: 'Needs Revision', value: 0, color: '#ef4444' },
+    { name: 'Rejected', value: 0, color: '#6b7280' }
   ];
 
-  const activityData = [
-    { date: 'Jan 1', users: 120, submissions: 45 },
-    { date: 'Jan 2', users: 145, submissions: 52 },
-    { date: 'Jan 3', users: 167, submissions: 61 },
-    { date: 'Jan 4', users: 198, submissions: 78 },
-    { date: 'Jan 5', users: 234, submissions: 89 },
-    { date: 'Jan 6', users: 267, submissions: 95 },
-    { date: 'Jan 7', users: 289, submissions: 102 }
-  ];
+  // Activity data will be populated from API when available
+  const activityData: { date: string; users: number; submissions: number; }[] = [];
 
   if (isLoading) {
     return (

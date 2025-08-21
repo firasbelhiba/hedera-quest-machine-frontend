@@ -2,7 +2,6 @@
 const nextConfig = {
   env: {
     NEXT_PUBLIC_API_URL: 'https://hedera-quests.com',
-    NEXT_PUBLIC_USE_API: 'true',
   },
   eslint: {
     ignoreDuringBuilds: true,
