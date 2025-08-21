@@ -216,8 +216,8 @@ export function Sidebar({ isCollapsed, onToggle, userRole = 'user' }: SidebarPro
         )}
       </nav>
 
-      {/* User Info */}
-      {!isCollapsed && (
+      {/* User Info - Only show for regular users, not admins */}
+      {!isCollapsed && userRole === 'user' && (
         <div className="p-4 border-t-2 border-dashed border-purple-500/30 bg-gradient-to-r from-purple-500/10 to-cyan-500/10">
           <div className="flex items-center space-x-3 mb-3">
             <div className="relative">
@@ -260,8 +260,8 @@ export function Sidebar({ isCollapsed, onToggle, userRole = 'user' }: SidebarPro
         </div>
       )}
       
-      {/* Collapsed User Avatar */}
-      {isCollapsed && (
+      {/* Collapsed User Avatar - Only show for regular users, not admins */}
+      {isCollapsed && userRole === 'user' && (
         <div className="p-2 border-t-2 border-dashed border-purple-500/30 flex justify-center">
           <div className="relative">
             <div className="w-8 h-8 border border-dashed border-purple-500 bg-gradient-to-br from-purple-500 via-blue-500 to-cyan-500 p-0.5">

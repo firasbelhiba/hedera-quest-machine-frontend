@@ -145,11 +145,22 @@ export interface SubmissionContent {
 }
 
 export interface LeaderboardEntry {
-  user: User;
-  rank: number;
-  previousRank?: number;
-  recentPoints: number;
-  totalPoints: number;
+  id: number;
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  bio: string;
+  email_verified: boolean;
+  total_points: number;
+}
+
+export interface LeaderboardResponse {
+  success: boolean;
+  data: {
+    rank: number;
+    users: LeaderboardEntry[];
+  };
 }
 
 export interface DashboardStats {

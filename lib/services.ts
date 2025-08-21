@@ -1,5 +1,5 @@
 import { 
-  User, Quest, Submission, Badge, Event, LeaderboardEntry, 
+  User, Quest, Submission, Badge, Event, LeaderboardEntry, LeaderboardResponse,
   DashboardStats, FilterOptions, SubmissionContent 
 } from './types';
 import { AuthService as ApiAuth } from './api/auth';
@@ -11,27 +11,29 @@ import { EventsApi } from './api/events';
 import { UsersApi } from './api/users';
 
 export class QuestService {
-
-  // Auth Services
+  // Authentication methods
   static async login(email: string, password: string): Promise<{ user: User; isAdmin: boolean }> {
-    console.log('QuestService.login called with:', { email, password });
-    
-    const result = await ApiAuth.login({ email, password });
-    // Store user data in localStorage for fallback use
-    if (result.user) {
-      localStorage.setItem('user_data', JSON.stringify({
-        name: result.user.name,
-        email: result.user.email,
-        id: result.user.id
-      }));
+    try {
+      const response = await ApiAuth.login(email, password);
+      const user = await this.getCurrentUser();
+      if (!user) {
+        throw new Error('Failed to fetch user data after login');
+      }
+      return {
+        user,
+        isAdmin: user.role === 'admin'
+      };
+    } catch (error) {
+      throw error;
     }
-    return result;
   }
 
   static async logout(): Promise<void> {
-    await ApiAuth.logout();
-    // Clear stored user data
-    localStorage.removeItem('user_data');
+    try {
+      await ApiAuth.logout();
+    } catch (error) {
+      throw error;
+    }
   }
 
   static async register(userData: {
@@ -39,59 +41,64 @@ export class QuestService {
     email: string;
     password: string;
   }): Promise<User> {
-    // Add confirmPassword to match RegisterRequest type
-    const registerData = {
-      ...userData,
-      confirmPassword: userData.password // For API compatibility
-    };
-    return ApiAuth.register(registerData);
+    try {
+      const response = await ApiAuth.register(userData.name, userData.email, userData.password);
+      const user = await this.getCurrentUser();
+      if (!user) throw new Error('Failed to fetch user data after registration');
+      return user;
+    } catch (error) {
+      throw error;
+    }
   }
 
   static async getCurrentUser(): Promise<User | null> {
-    console.log('getCurrentUser called');
-    
     try {
-      console.log('Using API getCurrentUser');
       const profileData = await ApiAuth.me();
-      console.log('Profile data received:', profileData);
-      console.log('Admin object:', profileData.admin);
-      console.log('firstName:', profileData.admin?.firstName);
-      console.log('lastName:', profileData.admin?.lastName);
-      console.log('username:', profileData.admin?.username);
+      if (!profileData || !profileData.admin) {
+        return null;
+      }
+
+      const userData = profileData.admin;
       
-      // Convert API response to User object
+      // Clean username by removing any brackets like [Admin]
+      const cleanUsername = userData.username ? userData.username.replace(/\[.*?\]/g, '').trim() : '';
+      
       const user: User = {
-        id: String(profileData.admin.id),
-        firstName: profileData.admin.firstName,
-        lastName: profileData.admin.lastName,
-        username: profileData.admin.username,
+        id: String(userData.id),
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        username: userData.username,
         name: (() => {
           if (profileData.is_admin) {
             // For admins, show full name
-            const firstName = profileData.admin.firstName || '';
-            const lastName = profileData.admin.lastName || '';
+            const firstName = userData.firstName || '';
+            const lastName = userData.lastName || '';
             const fullName = `${firstName} ${lastName}`.trim();
-            return fullName || profileData.admin.username || 'Admin User';
+            return fullName || cleanUsername || 'Admin';
           } else {
-            // For regular users, show username
-            return profileData.admin.username || 'User';
+            // For regular users, show username or full name
+            const firstName = userData.firstName || '';
+            const lastName = userData.lastName || '';
+            const fullName = `${firstName} ${lastName}`.trim();
+            return fullName || cleanUsername || 'User';
           }
         })(),
-        email: profileData.admin.email,
-        bio: profileData.admin.bio || '',
+        email: userData.email,
+        bio: userData.bio || '',
         avatar: '/logo.png',
         hederaAccountId: null,
-        points: profileData.admin.userLevel ? ((profileData.admin.userLevel.level - 1) * 1000 + profileData.admin.userLevel.progress) : 0,
-        level: profileData.admin.userLevel?.level || 1,
+        // Admin users don't have points
+        points: profileData.is_admin ? undefined : (userData.userLevel ? ((userData.userLevel.level - 1) * 1000 + userData.userLevel.progress) : 0),
+        level: userData.userLevel?.level || 1,
         streak: 0,
-        joinedAt: profileData.admin.created_at || new Date().toISOString(),
+        joinedAt: userData.created_at || new Date().toISOString(),
         role: profileData.is_admin ? 'admin' : 'user',
         badges: [],
         completedQuests: [],
-        userLevel: profileData.admin.userLevel,
-        facebookProfile: profileData.admin.facebookProfile,
-        twitterProfile: profileData.admin.twitterProfile,
-        discordProfile: profileData.admin.discordProfile
+        userLevel: userData.userLevel,
+        facebookProfile: userData.facebookProfile,
+        twitterProfile: userData.twitterProfile,
+        discordProfile: userData.discordProfile
       };
       
       return user;
@@ -102,26 +109,27 @@ export class QuestService {
   }
 
   static async updateUserProfile(userId: string, updates: Partial<User>): Promise<User> {
-    return UsersApi.update(userId, updates);
+    throw new Error('Not implemented');
   }
 
-  // Quest Services
+  // Quest methods
   static async getQuests(filters?: FilterOptions): Promise<Quest[]> {
-    console.log('QuestService.getQuests called with filters:', filters);
-    
-    console.log('Using API getQuests');
     try {
-      const quests = await QuestsApi.list(filters);
-      console.log('API quests received:', quests);
-      return quests;
+      const response = await QuestsApi.getQuests(filters);
+      return response.data.map((quest: any) => ({
+        ...quest,
+        id: String(quest.id),
+        createdAt: quest.created_at,
+        updatedAt: quest.updated_at
+      }));
     } catch (error) {
-      console.error('Error fetching quests from API:', error);
+      console.error('Error fetching quests:', error);
       throw error;
     }
   }
 
   static async getQuest(id: string): Promise<Quest | null> {
-    return QuestsApi.get(id);
+    throw new Error('Not implemented');
   }
 
   static async createQuest(quest: {
@@ -137,15 +145,15 @@ export class QuestService {
     platform_type?: string;
     interaction_type?: string;
   }): Promise<Quest> {
-    console.log('QuestService.createQuest called with:', quest);
-    
-    console.log('Using API createQuest');
     try {
-      const newQuest = await QuestsApi.create(quest);
-      console.log('API quest created:', newQuest);
-      return newQuest;
+      const response = await QuestsApi.createQuest(quest);
+      return {
+        ...response.data,
+        id: String(response.data.id),
+        createdAt: response.data.created_at,
+        updatedAt: response.data.updated_at
+      };
     } catch (error) {
-      console.error('Error creating quest via API:', error);
       throw error;
     }
   }
@@ -161,28 +169,28 @@ export class QuestService {
     maxParticipants?: number;
     badgeIds?: number[];
   }): Promise<Quest> {
-    return QuestsApi.update(id, updates);
+    throw new Error('Not implemented');
   }
 
   static async activateQuest(id: string): Promise<Quest> {
-    return QuestsApi.activate(id);
+    throw new Error('Not implemented');
   }
 
   static async deleteQuest(id: string): Promise<{ success: boolean; message: string }> {
-    return QuestsApi.deleteQuest(id);
+    throw new Error('Not implemented');
   }
 
-  // Submission Services
+  // Submission methods
   static async submitQuest(questId: string, userId: string, content: SubmissionContent): Promise<Submission> {
-    return SubmissionsApi.submit(questId, content);
+    throw new Error('Not implemented');
   }
 
   static async getSubmissions(questId?: string, userId?: string): Promise<Submission[]> {
-    return SubmissionsApi.list({ questId, userId });
+    throw new Error('Not implemented');
   }
 
   static async getQuestCompletions(): Promise<any> {
-    return SubmissionsApi.getQuestCompletions();
+    throw new Error('Not implemented');
   }
 
   static async reviewSubmission(
@@ -191,66 +199,74 @@ export class QuestService {
     feedback?: string,
     points?: number
   ): Promise<Submission> {
-    return SubmissionsApi.review(submissionId, { status, feedback, points });
+    throw new Error('Not implemented');
   }
 
-  // Badge Services
+  // Badge methods
   static async getUserBadges(userId: string): Promise<Badge[]> {
-    return BadgesApi.listByUser(userId);
+    throw new Error('Not implemented');
   }
 
   static async getAllBadges(): Promise<Badge[]> {
-    const response = await BadgesApi.list();
-    return response.data;
+    try {
+      const response = await BadgesApi.getAllBadges();
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 
   static async awardBadge(userId: string, badgeId: string): Promise<Badge> {
-    return BadgesApi.award(userId, badgeId);
+    throw new Error('Not implemented');
   }
 
-  // Leaderboard Services
-  static async getLeaderboard(limit: number = 50): Promise<LeaderboardEntry[]> {
-    return LeaderboardApi.list(limit);
+  // Leaderboard methods
+  static async getLeaderboard(): Promise<LeaderboardResponse> {
+    try {
+      const response = await LeaderboardApi.getLeaderboard();
+      return response;
+    } catch (error) {
+      console.error('Error fetching leaderboard:', error);
+      throw error;
+    }
   }
 
-  // Event Services
+  // Event methods
   static async getEvents(): Promise<Event[]> {
-    return EventsApi.list();
+    throw new Error('Not implemented');
   }
 
   static async getEvent(id: string): Promise<Event | null> {
-    return EventsApi.get(id);
+    throw new Error('Not implemented');
   }
 
-  // Analytics Services
+  // Dashboard methods
   static async getDashboardStats(): Promise<DashboardStats> {
-    // Note: This might need to be implemented when dashboard stats API is available
-    // For now, this will likely throw an error if no API endpoint exists
-    throw new Error('Dashboard stats API endpoint not implemented');
+    throw new Error('Dashboard stats endpoint not implemented');
   }
 
-  // Hedera Services
+  // Utility methods
   static validateHederaAccountId(accountId: string): boolean {
-    const regex = /^0\.0\.\d+$/;
-    return regex.test(accountId);
+    const hederaAccountRegex = /^\d+\.\d+\.\d+$/;
+    return hederaAccountRegex.test(accountId);
   }
 
   static validateTransactionId(transactionId: string): boolean {
-    const regex = /^0\.0\.\d+@\d+\.\d+$/;
-    return regex.test(transactionId);
+    const transactionIdRegex = /^\d+\.\d+\.\d+@\d+\.\d+$/;
+    return transactionIdRegex.test(transactionId);
   }
 
   static generateHashScanUrl(accountId: string, network: 'testnet' | 'mainnet' = 'testnet'): string {
-    const baseUrl = network === 'testnet' 
-      ? 'https://hashscan.io/testnet' 
-      : 'https://hashscan.io/mainnet';
-    return `${baseUrl}/account/${accountId}`;
+    const baseUrl = network === 'mainnet' 
+      ? 'https://hashscan.io/mainnet/account' 
+      : 'https://hashscan.io/testnet/account';
+    return `${baseUrl}/${accountId}`;
   }
 
   static generateTransactionUrl(transactionId: string, network: 'testnet' | 'mainnet' = 'testnet'): string {
-    const baseUrl = network === 'testnet' 
-      ? 'https://hashscan.io/testnet' 
-      : 'https://hashscan.io/mainnet';
-    return `${baseUrl}/transaction/${transactionId}`;
+    const baseUrl = network === 'mainnet' 
+      ? 'https://hashscan.io/mainnet/transaction' 
+      : 'https://hashscan.io/testnet/transaction';
+    return `${baseUrl}/${transactionId}`;
   }
 }

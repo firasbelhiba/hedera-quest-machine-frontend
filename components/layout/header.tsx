@@ -230,7 +230,7 @@ export function Header({ onMenuClick }: HeaderProps) {
                 <p className="text-sm font-medium font-mono">
                   [{currentUser?.name || 'LOADING...'}]
                 </p>
-                {!isAdminPage && (
+                {!isAdminPage && currentUser?.role !== 'admin' && (
                   <p className="text-xs text-muted-foreground font-mono">
                     {currentUser && typeof currentUser.points === 'number' ? `[${currentUser.points}_POINTS]` : '[LOADING...]'}
                   </p>

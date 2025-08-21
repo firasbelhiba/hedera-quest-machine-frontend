@@ -102,7 +102,7 @@ export default function ProgressPage() {
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className={`grid grid-cols-1 md:grid-cols-2 ${user.role === 'admin' ? 'lg:grid-cols-3' : 'lg:grid-cols-4'} gap-6`}>
         <Card className="border-2 border-dashed border-yellow-500/20 bg-gradient-to-br from-yellow-500/5 to-orange-500/5 hover:border-solid transition-all duration-200">
           <CardContent className="p-6 text-center">
             <div className="p-2 bg-yellow-500/10 rounded-lg border border-dashed border-yellow-500/30 w-fit mx-auto mb-3">
@@ -115,17 +115,19 @@ export default function ProgressPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-2 border-dashed border-blue-500/20 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 hover:border-solid transition-all duration-200">
-          <CardContent className="p-6 text-center">
-            <div className="p-2 bg-blue-500/10 rounded-lg border border-dashed border-blue-500/30 w-fit mx-auto mb-3">
-              <Target className="w-6 h-6 text-blue-500" />
-            </div>
-            <div className="text-2xl font-bold font-mono bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
-              {user.points.toLocaleString()}
-            </div>
-            <div className="text-xs text-muted-foreground font-mono uppercase tracking-wider">TOTAL_POINTS</div>
-          </CardContent>
-        </Card>
+        {user.role !== 'admin' && (
+          <Card className="border-2 border-dashed border-blue-500/20 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 hover:border-solid transition-all duration-200">
+            <CardContent className="p-6 text-center">
+              <div className="p-2 bg-blue-500/10 rounded-lg border border-dashed border-blue-500/30 w-fit mx-auto mb-3">
+                <Target className="w-6 h-6 text-blue-500" />
+              </div>
+              <div className="text-2xl font-bold font-mono bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
+                {user.points.toLocaleString()}
+              </div>
+              <div className="text-xs text-muted-foreground font-mono uppercase tracking-wider">TOTAL_POINTS</div>
+            </CardContent>
+          </Card>
+        )}
 
         <Card className="border-2 border-dashed border-red-500/20 bg-gradient-to-br from-red-500/5 to-pink-500/5 hover:border-solid transition-all duration-200">
           <CardContent className="p-6 text-center">
@@ -152,42 +154,44 @@ export default function ProgressPage() {
         </Card>
       </div>
 
-      {/* Level Progress */}
-      <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5 hover:border-solid transition-all duration-200">
-        <CardHeader className="border-b border-dashed border-primary/20">
-          <CardTitle className="flex items-center gap-2 font-mono text-lg">
-            <div className="p-1 bg-primary/10 rounded border border-dashed border-primary/30">
-              <TrendingUp className="w-4 h-4 text-primary" />
-            </div>
-            {'>'} LEVEL_PROGRESS
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6">
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <div>
-                <div className="text-lg font-semibold font-mono bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">LEVEL_{user.level}</div>
-                <div className="text-sm text-muted-foreground font-mono">
-                  {user.points.toLocaleString()} / {pointsForNextLevel.toLocaleString()} points
+      {/* Level Progress - Hidden for Admin Users */}
+      {user.role !== 'admin' && (
+        <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5 hover:border-solid transition-all duration-200">
+          <CardHeader className="border-b border-dashed border-primary/20">
+            <CardTitle className="flex items-center gap-2 font-mono text-lg">
+              <div className="p-1 bg-primary/10 rounded border border-dashed border-primary/30">
+                <TrendingUp className="w-4 h-4 text-primary" />
+              </div>
+              {'>'} LEVEL_PROGRESS
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <div>
+                  <div className="text-lg font-semibold font-mono bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">LEVEL_{user.level}</div>
+                  <div className="text-sm text-muted-foreground font-mono">
+                    {user.points.toLocaleString()} / {pointsForNextLevel.toLocaleString()} points
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-lg font-semibold font-mono bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">LEVEL_{nextLevel}</div>
+                  <div className="text-sm text-muted-foreground font-mono">
+                    {'>'} {pointsForNextLevel - user.points} points to go
+                  </div>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="text-lg font-semibold font-mono bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">LEVEL_{nextLevel}</div>
-                <div className="text-sm text-muted-foreground font-mono">
-                  {'>'} {pointsForNextLevel - user.points} points to go
-                </div>
+              <div className="relative">
+                <div className="h-3 bg-muted rounded-lg border border-dashed border-primary/20" />
+                <div 
+                  className="absolute top-0 left-0 h-3 bg-gradient-to-r from-primary to-purple-500 rounded-lg transition-all duration-500"
+                  style={{ width: `${Math.max(0, Math.min(100, progressToNext))}%` }}
+                />
               </div>
             </div>
-            <div className="relative">
-              <div className="h-3 bg-muted rounded-lg border border-dashed border-primary/20" />
-              <div 
-                className="absolute top-0 left-0 h-3 bg-gradient-to-r from-primary to-purple-500 rounded-lg transition-all duration-500"
-                style={{ width: `${Math.max(0, Math.min(100, progressToNext))}%` }}
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       <Tabs defaultValue="badges" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3 bg-muted/50 border-2 border-dashed border-primary/20 rounded-lg p-1">

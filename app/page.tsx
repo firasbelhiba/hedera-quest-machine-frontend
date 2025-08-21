@@ -64,18 +64,20 @@ export default function Dashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-purple-500 to-cyan-500 bg-clip-text text-transparent font-mono">
-                🚀 Welcome back, {user?.name}!
+                🚀 Welcome back!
               </h1>
               <p className="text-muted-foreground font-mono text-sm mt-2">
                 {'>'} Ready to continue your Hedera journey? Streak: {user?.streak || 0} days
               </p>
             </div>
-            <div className="text-right bg-gradient-to-br from-primary/5 to-cyan-500/5 p-4 rounded-lg border border-dashed border-primary/20">
-              <div className="text-3xl font-bold font-mono bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
-                {user?.points?.toLocaleString() || 0}
+            {user?.role !== 'admin' && (
+              <div className="text-right bg-gradient-to-br from-primary/5 to-cyan-500/5 p-4 rounded-lg border border-dashed border-primary/20">
+                <div className="text-3xl font-bold font-mono bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
+                  {user?.points?.toLocaleString() || 0}
+                </div>
+                <div className="text-muted-foreground text-sm font-mono">TOTAL_POINTS</div>
               </div>
-              <div className="text-muted-foreground text-sm font-mono">TOTAL_POINTS</div>
-            </div>
+            )}
           </div>
         </div>
       </div>

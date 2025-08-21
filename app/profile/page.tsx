@@ -552,16 +552,18 @@ export default function ProfilePage() {
           </Card>
 
           {/* Stats Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5 hover:border-solid transition-all duration-200">
-              <CardContent className="p-6 text-center">
-                <div className="p-2 bg-primary/10 rounded-lg border border-dashed border-primary/30 w-fit mx-auto mb-2">
-                  <UserIcon className="w-4 h-4 text-primary" />
-                </div>
-                <div className="text-2xl font-bold font-mono bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">{profileData?.user?.points?.toLocaleString() || '0'}</div>
-                <div className="text-xs text-muted-foreground font-mono uppercase tracking-wider">TOTAL_POINTS</div>
-              </CardContent>
-            </Card>
+          <div className={`grid grid-cols-1 ${profileData?.user?.role === 'admin' ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-6`}>
+            {profileData?.user?.role !== 'admin' && (
+              <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5 hover:border-solid transition-all duration-200">
+                <CardContent className="p-6 text-center">
+                  <div className="p-2 bg-primary/10 rounded-lg border border-dashed border-primary/30 w-fit mx-auto mb-2">
+                    <UserIcon className="w-4 h-4 text-primary" />
+                  </div>
+                  <div className="text-2xl font-bold font-mono bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">{profileData?.user?.points?.toLocaleString() || '0'}</div>
+                  <div className="text-xs text-muted-foreground font-mono uppercase tracking-wider">TOTAL_POINTS</div>
+                </CardContent>
+              </Card>
+            )}
             <Card className="border-2 border-dashed border-green-500/20 bg-gradient-to-br from-green-500/5 to-emerald-500/5 hover:border-solid transition-all duration-200">
               <CardContent className="p-6 text-center">
                 <div className="p-2 bg-green-500/10 rounded-lg border border-dashed border-green-500/30 w-fit mx-auto mb-2">
