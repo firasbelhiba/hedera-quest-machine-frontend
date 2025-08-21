@@ -20,6 +20,7 @@ export interface User {
   bio?: string;
   hederaAccountId: string | null;
   points: number;
+  total_points?: number;
   level: number;
   streak: number;
   joinedAt: string;

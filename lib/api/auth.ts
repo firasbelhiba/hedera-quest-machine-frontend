@@ -22,23 +22,53 @@ export const AuthService = {
     }
     console.log("3asba", data)
 
-    // Create user object from response data
+    // Handle both admin and regular user data structures (similar to QuestService.getCurrentUser)
+    const userData = data.admin || data.user || data;
+    const isAdmin = data.is_admin || false;
+    
+    // Clean username by removing any brackets like [Admin]
+    const cleanUsername = userData.username ? userData.username.replace(/\[.*?\]/g, '').trim() : '';
+    
+    // Create comprehensive user object from response data
     const user: User = {
-      id: String(data.user?.id || data.id || Date.now()),
-      name: data.user?.name || data.name || `${data.user?.firstName || ''} ${data.user?.lastName || ''}`.trim() || payload.email.split('@')[0],
-      email: data.user?.email || data.email || payload.email,
-      avatar: data.user?.avatar || data.avatar || '/logo.png',
-      hederaAccountId: data.user?.hederaAccountId || data.hederaAccountId || '',
-      points: data.user?.points || data.points || 0,
-      level: data.user?.level || data.level || 1,
-      streak: data.user?.streak || data.streak || 0,
-      joinedAt: data.user?.joinedAt || data.joinedAt || data.user?.createdAt || data.createdAt || new Date().toISOString(),
-      role: data.is_admin || data.user?.is_admin ? 'admin' : 'user',
-      badges: data.user?.badges || data.badges || [],
-      completedQuests: data.user?.completedQuests || data.completedQuests || []
+      id: String(userData.id || Date.now()),
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      username: userData.username,
+      name: (() => {
+        if (isAdmin) {
+          // For admins, show full name
+          const firstName = userData.firstName || '';
+          const lastName = userData.lastName || '';
+          const fullName = `${firstName} ${lastName}`.trim();
+          return fullName || cleanUsername || 'Admin';
+        } else {
+          // For regular users, show username or full name
+          const firstName = userData.firstName || '';
+          const lastName = userData.lastName || '';
+          const fullName = `${firstName} ${lastName}`.trim();
+          return fullName || cleanUsername || 'User';
+        }
+      })(),
+      email: userData.email || payload.email,
+      bio: userData.bio || '',
+      avatar: '/logo.png',
+      hederaAccountId: null,
+      // Admin users don't have points
+      points: isAdmin ? undefined : (userData.total_points || 0),
+      level: userData.userLevel?.level || 1,
+      streak: 0,
+      joinedAt: userData.created_at || new Date().toISOString(),
+      role: isAdmin ? 'admin' : 'user',
+      badges: [],
+      completedQuests: [],
+      userLevel: userData.userLevel,
+      facebookProfile: userData.facebookProfile,
+      twitterProfile: userData.twitterProfile,
+      discordProfile: userData.discordProfile
     };
 
-    return { user, isAdmin: data.is_admin };
+    return { user, isAdmin };
   },
 
   async register(payload: RegisterRequest): Promise<User> {

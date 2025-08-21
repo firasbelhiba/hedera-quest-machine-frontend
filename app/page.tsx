@@ -73,7 +73,7 @@ export default function Dashboard() {
             {user?.role !== 'admin' && (
               <div className="text-right bg-gradient-to-br from-primary/5 to-cyan-500/5 p-4 rounded-lg border border-dashed border-primary/20">
                 <div className="text-3xl font-bold font-mono bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
-                  {user?.points?.toLocaleString() || 0}
+                  {user?.total_points?.toLocaleString() || 0}
                 </div>
                 <div className="text-muted-foreground text-sm font-mono">TOTAL_POINTS</div>
               </div>
@@ -179,36 +179,7 @@ export default function Dashboard() {
         </CardContent>
       </Card>
 
-      {/* Featured Quests */}
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-primary via-blue-500 to-cyan-500 bg-clip-text text-transparent font-mono">
-            🎮 Featured Quests
-          </h2>
-          <Link href="/quests">
-            <Button 
-              variant="outline" 
-              className="gap-2 border-2 border-dashed hover:border-solid transition-all duration-200 font-mono bg-gradient-to-r from-primary/5 to-blue-500/5 hover:shadow-[inset_2px_2px_0px_0px_rgba(0,0,0,0.1)]"
-            >
-              View All <ArrowRight className="w-4 h-4" />
-            </Button>
-          </Link>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6">
-          {featuredQuests.map((quest) => (
-            <QuestCard
-              key={quest.id}
-              quest={quest}
-              isCompleted={user?.completedQuests?.includes(String(quest.id))}
-              onSelect={() => {
-                // Navigate to quest details
-                router.push(`/quests/${quest.id}`);
-              }}
-            />
-          ))}
-        </div>
-      </div>
 
       {/* Platform Stats */}
       {stats && (

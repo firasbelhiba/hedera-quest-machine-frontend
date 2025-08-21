@@ -1,7 +1,6 @@
 'use client';
 
 import { ReactNode, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import useStore from '@/lib/store';
 import ErrorBoundary from '@/components/error-boundary';
 
@@ -15,7 +14,7 @@ interface ClientProviderProps {
  */
 export function ClientProvider({ children }: ClientProviderProps) {
   const [mounted, setMounted] = useState(false);
-  const { loadCurrentUser } = useStore();
+  const { user, loadCurrentUser } = useStore();
   
   // Only run on client-side to prevent hydration mismatch
   useEffect(() => {
@@ -27,10 +26,13 @@ export function ClientProvider({ children }: ClientProviderProps) {
        !!document.cookie.includes('hq_access_token'));
     
     if (hasToken) {
-      // Only load user data if we have a token
-      loadCurrentUser();
+      // Only load user data if we have a token and no user is already loaded
+      // This prevents race conditions after login
+      if (!user) {
+        loadCurrentUser();
+      }
     }
-  }, [loadCurrentUser]);
+  }, [loadCurrentUser, user]);
 
   // Return null during SSR to prevent hydration mismatch
   if (!mounted) {

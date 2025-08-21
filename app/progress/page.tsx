@@ -93,9 +93,6 @@ export default function ProgressPage() {
               <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-purple-500 to-cyan-500 bg-clip-text text-transparent font-mono">
                 🏆 {user.name}
               </h1>
-              <p className="text-muted-foreground font-mono text-sm mt-2">
-                {'>'} HEDERA_ID: {user.hederaAccountId}
-              </p>
             </div>
           </div>
         </div>
@@ -194,22 +191,22 @@ export default function ProgressPage() {
       )}
 
       <Tabs defaultValue="badges" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 bg-muted/50 border-2 border-dashed border-primary/20 rounded-lg p-1">
+        <TabsList className="grid w-full grid-cols-3 bg-muted/50 rounded-lg p-1">
           <TabsTrigger 
             value="badges" 
-            className="font-mono text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/20 data-[state=active]:to-purple-500/20 data-[state=active]:border data-[state=active]:border-dashed data-[state=active]:border-primary/30 data-[state=active]:text-primary transition-all duration-200"
+            className="text-sm data-[state=active]:bg-background data-[state=active]:text-primary"
           >
             🏆 BADGES ({badges.length})
           </TabsTrigger>
           <TabsTrigger 
             value="submissions" 
-            className="font-mono text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/20 data-[state=active]:to-purple-500/20 data-[state=active]:border data-[state=active]:border-dashed data-[state=active]:border-primary/30 data-[state=active]:text-primary transition-all duration-200"
+            className="text-sm data-[state=active]:bg-background data-[state=active]:text-primary"
           >
             📝 SUBMISSIONS ({submissions.length})
           </TabsTrigger>
           <TabsTrigger 
             value="activity" 
-            className="font-mono text-sm data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary/20 data-[state=active]:to-purple-500/20 data-[state=active]:border data-[state=active]:border-dashed data-[state=active]:border-primary/30 data-[state=active]:text-primary transition-all duration-200"
+            className="text-sm data-[state=active]:bg-background data-[state=active]:text-primary"
           >
             📊 RECENT_ACTIVITY
           </TabsTrigger>

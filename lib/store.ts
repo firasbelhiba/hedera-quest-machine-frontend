@@ -103,9 +103,15 @@ const useStore = create<AppState>((set, get) => ({
 
   loadCurrentUser: async () => {
     // Only load if we don't already have a user
-    const { user, isAuthenticated } = get();
+    const { user, isAuthenticated, isLoading } = get();
     if (user) {
       console.log('User already loaded, skipping API call');
+      return;
+    }
+
+    // Prevent multiple concurrent calls
+    if (isLoading) {
+      console.log('Already loading user, skipping API call');
       return;
     }
 
@@ -126,18 +132,36 @@ const useStore = create<AppState>((set, get) => ({
     }
 
     set({ isLoading: true });
+    
+    // Add timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      console.warn('User loading timeout, clearing loading state');
+      set({ isLoading: false });
+    }, 10000); // 10 second timeout
+    
     try {
       const currentUser = await QuestService.getCurrentUser();
+      clearTimeout(timeoutId);
+      
       if (currentUser) {
         set({ user: currentUser, isAuthenticated: true, isLoading: false });
       } else {
-        // Token was invalid
+        // Token was invalid, clear it
+        tokenStorage.clearAll();
         set({ user: null, isAuthenticated: false, isLoading: false });
       }
     } catch (error) {
+      clearTimeout(timeoutId);
       console.error('Error loading current user:', error);
-      // Keep authenticated state if we have a token but API failed
-      set({ isLoading: false });
+      
+      // If it's a 401 error, clear the token
+      if (error && typeof error === 'object' && 'status' in error && error.status === 401) {
+        tokenStorage.clearAll();
+        set({ user: null, isAuthenticated: false, isLoading: false });
+      } else {
+        // Keep authenticated state if we have a token but API failed due to network issues
+        set({ isLoading: false });
+      }
     }
   },
 

@@ -109,20 +109,18 @@ export default function LeaderboardPage() {
       {/* Header */}
       <div className="text-center space-y-4">
         <div className="flex items-center justify-center gap-3">
-          <Trophy className="w-8 h-8 text-yellow-400 drop-shadow-lg" />
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 bg-clip-text text-transparent drop-shadow-sm" style={{fontFamily: 'monospace', letterSpacing: '2px'}}>LEADERBOARD</h1>
-          <Trophy className="w-8 h-8 text-yellow-400 drop-shadow-lg" />
+          <Trophy className="w-8 h-8 text-primary" />
+          <h1 className="text-3xl font-bold">Leaderboard</h1>
         </div>
-        <p className="text-muted-foreground font-mono text-sm tracking-wide">
-          🎮 COMPETE WITH OTHER PLAYERS AND CLIMB THE RANKS! 🎮
+        <p className="text-muted-foreground">
+          Compete with other players and climb the ranks!
         </p>
         {userRank && (
-          <Card className="max-w-md mx-auto bg-gradient-to-r from-cyan-100 via-blue-100 to-purple-100 dark:from-cyan-900/30 dark:via-blue-900/30 dark:to-purple-900/30 border-2 border-dashed border-blue-300 shadow-lg">
+          <Card className="max-w-md mx-auto">
             <CardContent className="p-4">
               <div className="flex items-center justify-center gap-2">
-                <Star className="w-5 h-5 text-yellow-400 animate-pulse" />
-                <span className="font-mono font-semibold text-sm tracking-wider">YOUR RANK:</span>
-                <span className="text-xl font-bold text-blue-600 font-mono bg-white dark:bg-gray-800 px-2 py-1 rounded border-2 border-blue-300">#{userRank}</span>
+                <span className="font-semibold">Your Rank:</span>
+                <span className="text-xl font-bold">#{userRank}</span>
               </div>
             </CardContent>
           </Card>
@@ -131,15 +129,6 @@ export default function LeaderboardPage() {
 
       {/* Period Selection */}
       <Tabs value={selectedPeriod} onValueChange={setSelectedPeriod} className="space-y-6">
-        <div className="flex justify-center">
-          <TabsList className="grid w-full max-w-md grid-cols-4">
-            {LEADERBOARD_PERIODS.map((period) => (
-              <TabsTrigger key={period.value} value={period.value} className="text-xs">
-                {period.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </div>
 
         {LEADERBOARD_PERIODS.map((period) => (
           <TabsContent key={period.value} value={period.value} className="space-y-6">
@@ -148,22 +137,22 @@ export default function LeaderboardPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
                 {/* 2nd Place */}
                 <div className="md:order-1 md:mt-8">
-                  <Card className="text-center bg-gradient-to-b from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 border-2 border-slate-400 shadow-lg transform hover:scale-105 transition-transform">
+                  <Card className="text-center border-2 border-dashed border-gray-400 bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-900 hover:border-solid transition-all duration-300 hover:shadow-lg hover:shadow-gray-500/25">
                     <CardContent className="p-6">
                       <div className="relative mb-4">
-                        <Avatar className="w-16 h-16 mx-auto border-4 border-slate-400 shadow-md">
+                        <Avatar className="w-16 h-16 mx-auto border-2 border-dashed border-gray-400">
                           <AvatarImage src={leaderboard[1].user.avatar} />
-                          <AvatarFallback className="font-mono font-bold">{getInitials(leaderboard[1].user.name)}</AvatarFallback>
+                          <AvatarFallback className="bg-gradient-to-r from-gray-500 to-gray-600 text-white font-mono">{getInitials(leaderboard[1].user.name)}</AvatarFallback>
                         </Avatar>
-                        <div className="absolute -top-2 -right-2 w-8 h-8 bg-slate-500 border-2 border-white rounded-sm flex items-center justify-center text-white font-bold font-mono shadow-md">
+                        <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-gray-500 to-gray-600 border-2 border-dashed border-gray-400 rounded flex items-center justify-center text-sm font-bold text-white">
                           2
                         </div>
                       </div>
-                      <h3 className="font-mono font-semibold text-lg tracking-wide">{leaderboard[1].user.name}</h3>
-                      <p className="text-2xl font-bold text-slate-600 font-mono">{leaderboard[1].totalPoints.toLocaleString()}</p>
-                      <p className="text-sm text-muted-foreground font-mono uppercase tracking-wider">POINTS</p>
+                      <h3 className="font-semibold text-lg font-mono tracking-wide text-gray-700 dark:text-gray-300">{leaderboard[1].user.name}</h3>
+                      <p className="text-2xl font-bold font-mono bg-gradient-to-r from-gray-600 to-gray-700 bg-clip-text text-transparent">{leaderboard[1].totalPoints.toLocaleString()}</p>
+                      <p className="text-sm text-muted-foreground font-mono uppercase tracking-wider">SILVER_MEDAL</p>
                       {leaderboard[1].recentPoints > 0 && (
-                        <Badge variant="outline" className="mt-2 font-mono border-2 border-dashed">
+                        <Badge variant="outline" className="mt-2 border-2 border-dashed border-gray-400 bg-gray-100 text-gray-700 font-mono">
                           +{leaderboard[1].recentPoints} recent
                         </Badge>
                       )}
@@ -173,22 +162,22 @@ export default function LeaderboardPage() {
 
                 {/* 1st Place */}
                 <div className="md:order-2">
-                  <Card className="text-center bg-gradient-to-b from-yellow-100 via-yellow-200 to-orange-200 dark:from-yellow-900/40 dark:via-yellow-800/40 dark:to-orange-800/40 border-4 border-yellow-400 shadow-2xl transform hover:scale-110 transition-transform">
+                  <Card className="text-center border-4 border-dashed border-yellow-400 bg-gradient-to-br from-yellow-100 via-yellow-50 to-orange-50 dark:from-yellow-900/30 dark:via-yellow-800/20 dark:to-orange-900/30 hover:border-solid transition-all duration-300 hover:shadow-xl hover:shadow-yellow-500/50 hover:scale-105">
                     <CardContent className="p-6">
                       <div className="relative mb-4">
-                        <Avatar className="w-20 h-20 mx-auto border-4 border-yellow-500 shadow-lg">
+                        <Avatar className="w-20 h-20 mx-auto border-4 border-dashed border-yellow-400">
                           <AvatarImage src={leaderboard[0].user.avatar} />
-                          <AvatarFallback className="font-mono font-bold text-lg">{getInitials(leaderboard[0].user.name)}</AvatarFallback>
+                          <AvatarFallback className="text-lg bg-gradient-to-r from-yellow-500 to-orange-500 text-white font-mono">{getInitials(leaderboard[0].user.name)}</AvatarFallback>
                         </Avatar>
-                        <div className="absolute -top-3 -right-3 w-12 h-12 bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500 border-2 border-white rounded-sm flex items-center justify-center shadow-lg">
-                          <Crown className="w-6 h-6 text-white drop-shadow-md" />
+                        <div className="absolute -top-3 -right-3 w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-500 border-4 border-dashed border-yellow-400 rounded flex items-center justify-center animate-pulse">
+                          <Crown className="w-6 h-6 text-white" />
                         </div>
                       </div>
-                      <h3 className="font-mono font-bold text-xl tracking-wide bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">{leaderboard[0].user.name}</h3>
-                      <p className="text-3xl font-bold text-yellow-600 font-mono drop-shadow-sm">{leaderboard[0].totalPoints.toLocaleString()}</p>
-                      <p className="text-sm text-muted-foreground font-mono uppercase tracking-widest">👑 CHAMPION 👑</p>
+                      <h3 className="font-bold text-xl font-mono tracking-wide bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">{leaderboard[0].user.name}</h3>
+                      <p className="text-3xl font-bold font-mono bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">{leaderboard[0].totalPoints.toLocaleString()}</p>
+                      <p className="text-sm text-muted-foreground font-mono uppercase tracking-wider">👑 CHAMPION</p>
                       {leaderboard[0].recentPoints > 0 && (
-                        <Badge className="mt-2 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 font-mono border-2 border-yellow-300 shadow-md">
+                        <Badge className="mt-2 bg-gradient-to-r from-yellow-500 to-orange-500 border-2 border-dashed border-yellow-400 text-white font-mono">
                           +{leaderboard[0].recentPoints} recent
                         </Badge>
                       )}
@@ -198,22 +187,22 @@ export default function LeaderboardPage() {
 
                 {/* 3rd Place */}
                 <div className="md:order-3 md:mt-8">
-                  <Card className="text-center bg-gradient-to-b from-orange-100 to-amber-200 dark:from-orange-900/30 dark:to-amber-800/30 border-2 border-amber-400 shadow-lg transform hover:scale-105 transition-transform">
+                  <Card className="text-center border-2 border-dashed border-amber-600 bg-gradient-to-br from-amber-100 to-orange-50 dark:from-amber-900/30 dark:to-orange-900/20 hover:border-solid transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/25">
                     <CardContent className="p-6">
                       <div className="relative mb-4">
-                        <Avatar className="w-16 h-16 mx-auto border-4 border-amber-400 shadow-md">
+                        <Avatar className="w-16 h-16 mx-auto border-2 border-dashed border-amber-600">
                           <AvatarImage src={leaderboard[2].user.avatar} />
-                          <AvatarFallback className="font-mono font-bold">{getInitials(leaderboard[2].user.name)}</AvatarFallback>
+                          <AvatarFallback className="bg-gradient-to-r from-amber-600 to-orange-600 text-white font-mono">{getInitials(leaderboard[2].user.name)}</AvatarFallback>
                         </Avatar>
-                        <div className="absolute -top-2 -right-2 w-8 h-8 bg-amber-600 border-2 border-white rounded-sm flex items-center justify-center text-white font-bold font-mono shadow-md">
+                        <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-amber-600 to-orange-600 border-2 border-dashed border-amber-600 rounded flex items-center justify-center text-sm font-bold text-white">
                           3
                         </div>
                       </div>
-                      <h3 className="font-mono font-semibold text-lg tracking-wide">{leaderboard[2].user.name}</h3>
-                      <p className="text-2xl font-bold text-amber-600 font-mono">{leaderboard[2].totalPoints.toLocaleString()}</p>
-                      <p className="text-sm text-muted-foreground font-mono uppercase tracking-wider">POINTS</p>
+                      <h3 className="font-semibold text-lg font-mono tracking-wide text-amber-700 dark:text-amber-300">{leaderboard[2].user.name}</h3>
+                      <p className="text-2xl font-bold font-mono bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">{leaderboard[2].totalPoints.toLocaleString()}</p>
+                      <p className="text-sm text-muted-foreground font-mono uppercase tracking-wider">BRONZE_MEDAL</p>
                       {leaderboard[2].recentPoints > 0 && (
-                        <Badge variant="outline" className="mt-2 font-mono border-2 border-dashed">
+                        <Badge variant="outline" className="mt-2 border-2 border-dashed border-amber-600 bg-amber-100 text-amber-700 font-mono">
                           +{leaderboard[2].recentPoints} recent
                         </Badge>
                       )}
@@ -224,11 +213,11 @@ export default function LeaderboardPage() {
             )}
 
             {/* Full Leaderboard */}
-            <Card className="border-2 border-dashed border-gray-300 shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-gray-100 to-slate-100 dark:from-gray-800 dark:to-slate-800">
-                <CardTitle className="flex items-center gap-2 font-mono tracking-wide">
-                  <Users className="w-5 h-5 text-blue-500" />
-                  🏆 ALL RANKINGS - {period.label.toUpperCase()} 🏆
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="w-5 h-5" />
+                  All Rankings - {period.label}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -237,8 +226,8 @@ export default function LeaderboardPage() {
                     <div
                       key={entry.user.id}
                       className={cn(
-                        'flex items-center gap-4 p-4 rounded-lg transition-all hover:bg-muted hover:scale-[1.02] border border-transparent hover:border-dashed hover:border-gray-300',
-                        entry.rank <= 3 && 'bg-gradient-to-r from-yellow-50/70 via-orange-50/50 to-transparent dark:from-yellow-900/20 dark:via-orange-900/10 border-yellow-200 dark:border-yellow-800'
+                        'flex items-center gap-4 p-4 rounded-lg hover:bg-muted border',
+                        entry.rank <= 3 && 'bg-muted/50'
                       )}
                     >
                       {/* Rank */}
@@ -254,22 +243,22 @@ export default function LeaderboardPage() {
                           <AvatarFallback>{getInitials(entry.user.name)}</AvatarFallback>
                         </Avatar>
                         <div>
-                          <h4 className="font-mono font-semibold tracking-wide">{entry.user.name}</h4>
-                          <p className="text-sm text-muted-foreground font-mono">
-                            LVL {entry.user.level} • {entry.user.completedQuests.length} QUESTS ✓
+                          <h4 className="font-semibold">{entry.user.name}</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Level {entry.user.level} • {entry.user.completedQuests.length} Quests
                           </p>
                         </div>
                       </div>
 
                       {/* Stats */}
                       <div className="text-right">
-                        <div className="font-bold text-lg font-mono bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">{entry.totalPoints.toLocaleString()}</div>
-                        <div className="text-sm text-muted-foreground font-mono uppercase tracking-wider">PTS</div>
+                        <div className="font-bold text-lg">{entry.totalPoints.toLocaleString()}</div>
+                        <div className="text-sm text-muted-foreground">Points</div>
                       </div>
 
                       {/* Recent Activity */}
                       {entry.recentPoints > 0 && (
-                        <Badge variant="outline" className="text-green-600 border-green-300 font-mono border-2 border-dashed animate-pulse">
+                        <Badge variant="outline">
                           +{entry.recentPoints}
                         </Badge>
                       )}
@@ -281,31 +270,31 @@ export default function LeaderboardPage() {
 
             {/* Stats Summary */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card className="border-2 border-dashed border-blue-300 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20 transform hover:scale-105 transition-transform">
+              <Card>
                 <CardContent className="p-6 text-center">
-                  <Users className="w-8 h-8 text-blue-500 mx-auto mb-2 drop-shadow-md" />
-                  <div className="text-2xl font-bold font-mono text-blue-600">{leaderboard.length}</div>
-                  <div className="text-sm text-muted-foreground font-mono uppercase tracking-wider">🎮 PLAYERS</div>
+                  <Users className="w-8 h-8 mx-auto mb-2" />
+                  <div className="text-2xl font-bold">{leaderboard.length}</div>
+                  <div className="text-sm text-muted-foreground">Players</div>
                 </CardContent>
               </Card>
 
-              <Card className="border-2 border-dashed border-yellow-300 bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 transform hover:scale-105 transition-transform">
+              <Card>
                 <CardContent className="p-6 text-center">
-                  <Star className="w-8 h-8 text-yellow-500 mx-auto mb-2 drop-shadow-md animate-pulse" />
-                  <div className="text-2xl font-bold font-mono text-yellow-600">
+                  <Star className="w-8 h-8 mx-auto mb-2" />
+                  <div className="text-2xl font-bold">
                     {Math.round(leaderboard.reduce((sum, entry) => sum + entry.totalPoints, 0) / leaderboard.length).toLocaleString()}
                   </div>
-                  <div className="text-sm text-muted-foreground font-mono uppercase tracking-wider">⭐ AVG PTS</div>
+                  <div className="text-sm text-muted-foreground">Average Points</div>
                 </CardContent>
               </Card>
 
-              <Card className="border-2 border-dashed border-green-300 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 transform hover:scale-105 transition-transform">
+              <Card>
                 <CardContent className="p-6 text-center">
-                  <TrendingUp className="w-8 h-8 text-green-500 mx-auto mb-2 drop-shadow-md" />
-                  <div className="text-2xl font-bold font-mono text-green-600">
+                  <TrendingUp className="w-8 h-8 mx-auto mb-2" />
+                  <div className="text-2xl font-bold">
                     {leaderboard.filter(entry => entry.recentPoints > 0).length}
                   </div>
-                  <div className="text-sm text-muted-foreground font-mono uppercase tracking-wider">🔥 ACTIVE</div>
+                  <div className="text-sm text-muted-foreground">Active Players</div>
                 </CardContent>
               </Card>
             </div>

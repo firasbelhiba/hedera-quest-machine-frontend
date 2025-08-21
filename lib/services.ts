@@ -64,7 +64,7 @@ export class QuestService {
         avatar: '/logo.png',
         hederaAccountId: null,
         // Admin users don't have points
-        points: profileData.is_admin ? undefined : (userData.userLevel ? ((userData.userLevel.level - 1) * 1000 + userData.userLevel.progress) : 0),
+        points: profileData.is_admin ? undefined : (userData.total_points || 0),
         level: userData.userLevel?.level || 1,
         streak: 0,
         joinedAt: userData.created_at || new Date().toISOString(),
@@ -91,13 +91,13 @@ export class QuestService {
   // Quest methods
   static async getQuests(filters?: FilterOptions): Promise<Quest[]> {
     try {
-      const response = await QuestsApi.getQuests(filters);
-      return response.data.map((quest: any) => ({
+      const response = await QuestsApi.list(filters);
+      return Array.isArray(response) ? response.map((quest: any) => ({
         ...quest,
         id: String(quest.id),
-        createdAt: quest.created_at,
-        updatedAt: quest.updated_at
-      }));
+        createdAt: quest.created_at || quest.createdAt,
+        updatedAt: quest.updated_at || quest.updatedAt
+      })) : [];
     } catch (error) {
       console.error('Error fetching quests:', error);
       throw error;
@@ -105,7 +105,18 @@ export class QuestService {
   }
 
   static async getQuest(id: string): Promise<Quest | null> {
-    throw new Error('Not implemented');
+    try {
+      const response = await QuestsApi.get(id);
+      return {
+        ...response,
+        id: String(response.id),
+        createdAt: response.createdAt || response.created_at,
+        updatedAt: response.updatedAt || response.updated_at
+      };
+    } catch (error) {
+      console.error('Error fetching quest:', error);
+      throw error;
+    }
   }
 
   static async createQuest(quest: {
@@ -122,12 +133,12 @@ export class QuestService {
     interaction_type?: string;
   }): Promise<Quest> {
     try {
-      const response = await QuestsApi.createQuest(quest);
+      const response = await QuestsApi.create(quest);
       return {
-        ...response.data,
-        id: String(response.data.id),
-        createdAt: response.data.created_at,
-        updatedAt: response.data.updated_at
+        ...response,
+        id: String(response.id),
+        createdAt: response.createdAt || response.created_at,
+        updatedAt: response.updatedAt || response.updated_at
       };
     } catch (error) {
       throw error;
@@ -145,28 +156,78 @@ export class QuestService {
     maxParticipants?: number;
     badgeIds?: number[];
   }): Promise<Quest> {
-    throw new Error('Not implemented');
+    try {
+      const response = await QuestsApi.update(id, updates);
+      return {
+        ...response,
+        id: String(response.id),
+        createdAt: response.createdAt || response.created_at,
+        updatedAt: response.updatedAt || response.updated_at
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 
   static async activateQuest(id: string): Promise<Quest> {
-    throw new Error('Not implemented');
+    try {
+      const response = await QuestsApi.activate(id);
+      return {
+        ...response,
+        id: String(response.id),
+        createdAt: response.createdAt || response.created_at,
+        updatedAt: response.updatedAt || response.updated_at
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 
   static async deleteQuest(id: string): Promise<{ success: boolean; message: string }> {
-    throw new Error('Not implemented');
+    try {
+      const response = await QuestsApi.deleteQuest(id);
+      return response;
+    } catch (error) {
+      throw error;
+    }
   }
 
   // Submission methods
   static async submitQuest(questId: string, userId: string, content: SubmissionContent): Promise<Submission> {
-    throw new Error('Not implemented');
+    try {
+      const response = await SubmissionsApi.submit(questId, content);
+      return {
+        ...response,
+        id: String(response.id),
+        submittedAt: response.submittedAt || response.created_at
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 
   static async getSubmissions(questId?: string, userId?: string): Promise<Submission[]> {
-    throw new Error('Not implemented');
+    try {
+      const response = await SubmissionsApi.list({ questId, userId });
+      return Array.isArray(response) ? response.map((submission: any) => ({
+        ...submission,
+        id: String(submission.id),
+        submittedAt: submission.submittedAt || submission.created_at
+      })) : [];
+    } catch (error) {
+      console.error('Error fetching submissions:', error);
+      throw error;
+    }
   }
 
   static async getQuestCompletions(): Promise<any> {
-    throw new Error('Not implemented');
+    try {
+      const response = await SubmissionsApi.getQuestCompletions();
+      return response;
+    } catch (error) {
+      console.error('Error fetching quest completions:', error);
+      throw error;
+    }
   }
 
   static async reviewSubmission(
@@ -175,25 +236,47 @@ export class QuestService {
     feedback?: string,
     points?: number
   ): Promise<Submission> {
-    throw new Error('Not implemented');
-  }
-
-  // Badge methods
-  static async getUserBadges(userId: string): Promise<Badge[]> {
-    throw new Error('Not implemented');
-  }
-
-  static async getAllBadges(): Promise<Badge[]> {
     try {
-      const response = await BadgesApi.getAllBadges();
-      return response.data;
+      const response = await SubmissionsApi.review(submissionId, { status, feedback, points });
+      return {
+        ...response,
+        id: String(response.id),
+        submittedAt: response.submittedAt || response.created_at
+      };
     } catch (error) {
       throw error;
     }
   }
 
+  // Badge methods
+  static async getUserBadges(userId: string): Promise<Badge[]> {
+    try {
+      const badges = await BadgesApi.listByUser(userId);
+      return badges;
+    } catch (error) {
+      console.error('Error fetching user badges:', error);
+      throw error;
+    }
+  }
+
+  static async getAllBadges(): Promise<Badge[]> {
+    try {
+      const response = await BadgesApi.list();
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching all badges:', error);
+      throw error;
+    }
+  }
+
   static async awardBadge(userId: string, badgeId: string): Promise<Badge> {
-    throw new Error('Not implemented');
+    try {
+      const badge = await BadgesApi.award(userId, badgeId);
+      return badge;
+    } catch (error) {
+      console.error('Error awarding badge:', error);
+      throw error;
+    }
   }
 
   // Leaderboard methods
@@ -209,16 +292,74 @@ export class QuestService {
 
   // Event methods
   static async getEvents(): Promise<Event[]> {
-    throw new Error('Not implemented');
+    try {
+      const events = await EventsApi.list();
+      return events;
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      throw error;
+    }
   }
 
   static async getEvent(id: string): Promise<Event | null> {
-    throw new Error('Not implemented');
+    try {
+      const event = await EventsApi.get(id);
+      return event;
+    } catch (error) {
+      console.error('Error fetching event:', error);
+      return null;
+    }
   }
 
   // Dashboard methods
   static async getDashboardStats(): Promise<DashboardStats> {
-    throw new Error('Dashboard stats endpoint not implemented');
+    try {
+      // Since there's no dedicated dashboard stats API, we'll aggregate data from existing APIs
+      const [quests, submissions] = await Promise.all([
+        QuestService.getQuests(),
+        QuestService.getSubmissions()
+      ]);
+
+      // Calculate basic stats
+      const totalQuests = quests.length;
+      const totalSubmissions = submissions.length;
+      const activeQuests = quests.filter(q => q.isActive).length;
+      
+      // Calculate popular categories
+      const categoryCount: Record<string, number> = {};
+      quests.forEach(quest => {
+        if (quest.category) {
+          categoryCount[quest.category] = (categoryCount[quest.category] || 0) + 1;
+        }
+      });
+      
+      const popularCategories = Object.entries(categoryCount)
+        .map(([category, count]) => ({ category, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5);
+
+      return {
+        totalUsers: 0, // This would need a users API endpoint
+        totalQuests,
+        totalSubmissions,
+        activeQuests,
+        popularCategories,
+        recentActivity: [], // This would need activity tracking
+        completionRate: totalSubmissions > 0 ? (totalSubmissions / totalQuests) * 100 : 0
+      };
+    } catch (error) {
+      console.error('Error fetching dashboard stats:', error);
+      // Return default stats on error
+      return {
+        totalUsers: 0,
+        totalQuests: 0,
+        totalSubmissions: 0,
+        activeQuests: 0,
+        popularCategories: [],
+        recentActivity: [],
+        completionRate: 0
+      };
+    }
   }
 
   // Utility methods

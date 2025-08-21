@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Submission, Quest } from '@/lib/types';
 import { QuestService } from '@/lib/services';
+import { tokenStorage } from '@/lib/api/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,9 +23,19 @@ import {
   AlertCircle,
   ArrowLeft,
   User as UserIcon,
-  Calendar
+  Calendar,
+  Eye,
+  ExternalLink
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 interface ExtendedSubmission extends Submission {
   user?: any;
@@ -40,6 +51,8 @@ export default function QuestSubmissionsPage() {
   const [quest, setQuest] = useState<Quest | null>(null);
   const [submissions, setSubmissions] = useState<ExtendedSubmission[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedSubmission, setSelectedSubmission] = useState<ExtendedSubmission | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -68,6 +81,41 @@ export default function QuestSubmissionsPage() {
         return 'text-orange-400 border-orange-400';
       default:
         return 'text-gray-400 border-gray-400';
+    }
+  };
+
+  const handleStatusUpdate = async (submissionId: string, action: string) => {
+    try {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://hedera-quests.com';
+      const endpoint = action === 'approved' 
+        ? `${baseUrl}/quest-completions/completions/${submissionId}/validate`
+        : `${baseUrl}/quest-completions/completions/${submissionId}/reject`;
+      
+      const token = tokenStorage.getAccessToken();
+      if (!token) {
+        console.error('No authentication token found');
+        return;
+      }
+      
+      const response = await fetch(endpoint, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      if (response.ok) {
+        // Update the submission status in the local state
+        const newStatus = action === 'approved' ? 'approved' : 'rejected';
+        setSubmissions(prev => prev.map(sub => 
+          sub.id === submissionId ? { ...sub, status: newStatus } : sub
+        ));
+      } else {
+        console.error('Failed to update submission status:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error updating submission status:', error);
     }
   };
 
@@ -194,6 +242,7 @@ export default function QuestSubmissionsPage() {
                     <TableHead className="text-gray-400">Content</TableHead>
                     <TableHead className="text-gray-400">Submitted</TableHead>
                     <TableHead className="text-gray-400">Status</TableHead>
+                    <TableHead className="text-gray-400">Validation</TableHead>
                     <TableHead className="text-gray-400">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -259,16 +308,195 @@ export default function QuestSubmissionsPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => {
-                            router.push(`/admin/submissions/${submission.id}`);
-                          }}
-                          className="bg-gray-800 border border-gray-600 text-green-400 hover:bg-gray-700"
-                        >
-                          Review
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleStatusUpdate(submission.id, 'approved')}
+                            disabled={submission.status === 'approved'}
+                            className="bg-green-900/20 border border-green-600 text-green-400 hover:bg-green-800/30 disabled:opacity-50"
+                          >
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            Validate
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleStatusUpdate(submission.id, 'rejected')}
+                            disabled={submission.status === 'rejected'}
+                            className="bg-red-900/20 border border-red-600 text-red-400 hover:bg-red-800/30 disabled:opacity-50"
+                          >
+                            <XCircle className="w-3 h-3 mr-1" />
+                            Reject
+                          </Button>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Dialog open={isDialogOpen && selectedSubmission?.id === submission.id} onOpenChange={(open) => {
+                          setIsDialogOpen(open);
+                          if (!open) setSelectedSubmission(null);
+                        }}>
+                          <DialogTrigger asChild>
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => {
+                                setSelectedSubmission(submission);
+                                setIsDialogOpen(true);
+                              }}
+                              className="bg-gray-800 border border-gray-600 text-green-400 hover:bg-gray-700"
+                            >
+                              <Eye className="w-3 h-3 mr-1" />
+                              Review
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="bg-gray-900 border border-gray-700 text-white max-w-2xl">
+                            <DialogHeader>
+                              <DialogTitle className="text-green-400 flex items-center gap-2">
+                                <Eye className="w-4 h-4" />
+                                Submission Details
+                              </DialogTitle>
+                              <DialogDescription className="text-gray-400">
+                                Review submission from {submission.user?.name || 'Unknown User'}
+                              </DialogDescription>
+                            </DialogHeader>
+                            
+                            <div className="space-y-6">
+                              {/* User Info */}
+                              <div className="bg-gray-800 border border-gray-600 rounded-lg p-4">
+                                <h3 className="text-sm font-medium text-gray-400 mb-2">SUBMITTED BY</h3>
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-full bg-gray-700 border border-gray-600 flex items-center justify-center">
+                                    <UserIcon className="w-5 h-5 text-green-400" />
+                                  </div>
+                                  <div>
+                                    <div className="text-white font-medium">{submission.user?.name || 'Unknown User'}</div>
+                                    <div className="text-sm text-gray-400">@{submission.user?.username || submission.user?.email}</div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Submission Content */}
+                              <div className="bg-gray-800 border border-gray-600 rounded-lg p-4">
+                                <h3 className="text-sm font-medium text-gray-400 mb-3">SUBMISSION CONTENT</h3>
+                                <div className="space-y-3">
+                                  {submission.content?.type === 'text' && (
+                                    <div>
+                                      <div className="text-xs text-gray-500 mb-1">TEXT RESPONSE</div>
+                                      <div className="bg-gray-700 border border-gray-600 rounded p-3 text-sm text-white">
+                                        {submission.content.text}
+                                      </div>
+                                    </div>
+                                  )}
+                                  {submission.content?.type === 'url' && (
+                                    <div>
+                                      <div className="text-xs text-gray-500 mb-1">URL SUBMISSION</div>
+                                      <div className="bg-gray-700 border border-gray-600 rounded p-3">
+                                        <a 
+                                          href={submission.content.url} 
+                                          target="_blank" 
+                                          rel="noopener noreferrer"
+                                          className="text-cyan-400 hover:text-green-400 text-sm flex items-center gap-2"
+                                        >
+                                          <ExternalLink className="w-3 h-3" />
+                                          {submission.content.url}
+                                        </a>
+                                      </div>
+                                    </div>
+                                  )}
+                                  {submission.content?.type === 'account-id' && (
+                                    <div>
+                                      <div className="text-xs text-gray-500 mb-1">HEDERA ACCOUNT ID</div>
+                                      <div className="bg-gray-700 border border-gray-600 rounded p-3">
+                                        <code className="text-green-400 text-sm font-mono">
+                                          {submission.content.accountId}
+                                        </code>
+                                      </div>
+                                    </div>
+                                  )}
+                                  {submission.content?.type === 'transaction-id' && (
+                                    <div>
+                                      <div className="text-xs text-gray-500 mb-1">TRANSACTION ID</div>
+                                      <div className="bg-gray-700 border border-gray-600 rounded p-3">
+                                        <code className="text-green-400 text-sm font-mono">
+                                          {submission.content.transactionId}
+                                        </code>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Submission Meta */}
+                              <div className="grid grid-cols-2 gap-4">
+                                <div className="bg-gray-800 border border-gray-600 rounded-lg p-4">
+                                  <h3 className="text-sm font-medium text-gray-400 mb-2">STATUS</h3>
+                                  <div className="flex items-center gap-2">
+                                    {getStatusIcon(submission.status)}
+                                    <Badge 
+                                      variant="secondary" 
+                                      className={cn(
+                                        "text-xs bg-gray-700 border",
+                                        getStatusColor(submission.status)
+                                      )}
+                                    >
+                                      {submission.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                    </Badge>
+                                  </div>
+                                </div>
+                                <div className="bg-gray-800 border border-gray-600 rounded-lg p-4">
+                                  <h3 className="text-sm font-medium text-gray-400 mb-2">SUBMITTED</h3>
+                                  <div className="flex items-center gap-2 text-sm text-white">
+                                    <Calendar className="w-4 h-4 text-gray-400" />
+                                    {new Date(submission.submittedAt || submission.created_at || Date.now()).toLocaleDateString('en-US', {
+                                      year: 'numeric',
+                                      month: 'long',
+                                      day: 'numeric',
+                                      hour: '2-digit',
+                                      minute: '2-digit'
+                                    })}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Action Buttons */}
+                              <div className="flex gap-3 pt-4 border-t border-gray-700">
+                                <Button 
+                                  className="bg-green-600 hover:bg-green-700 text-white flex-1"
+                                  onClick={() => {
+                                    // TODO: Implement approve functionality
+                                    console.log('Approve submission:', submission.id);
+                                  }}
+                                >
+                                  <CheckCircle className="w-4 h-4 mr-2" />
+                                  Approve
+                                </Button>
+                                <Button 
+                                  variant="outline"
+                                  className="bg-yellow-600 hover:bg-yellow-700 text-white border-yellow-600 flex-1"
+                                  onClick={() => {
+                                    // TODO: Implement needs revision functionality
+                                    console.log('Request revision for submission:', submission.id);
+                                  }}
+                                >
+                                  <AlertCircle className="w-4 h-4 mr-2" />
+                                  Needs Revision
+                                </Button>
+                                <Button 
+                                  variant="outline"
+                                  className="bg-red-600 hover:bg-red-700 text-white border-red-600 flex-1"
+                                  onClick={() => {
+                                    // TODO: Implement reject functionality
+                                    console.log('Reject submission:', submission.id);
+                                  }}
+                                >
+                                  <XCircle className="w-4 h-4 mr-2" />
+                                  Reject
+                                </Button>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
                       </TableCell>
                     </TableRow>
                   ))}
