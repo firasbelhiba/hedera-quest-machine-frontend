@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { BadgeCollection } from '@/components/badges/badge-display';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Trophy, Target, Calendar, TrendingUp, Star, Siren as Fire, Award, Clock, CheckCircle, XCircle, AlertCircle, FileText } from 'lucide-react';
+import { Trophy, Target, Calendar, TrendingUp, Star, Flame as Fire, Award, Clock, CheckCircle, XCircle, AlertCircle, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -329,7 +329,7 @@ export default function ProgressPage() {
                       <div className="text-sm text-muted-foreground mb-2 font-mono">
                         {'>'} SUBMITTED: {formatDistanceToNow(new Date(submission.submittedAt), { addSuffix: true })}
                         {submission.reviewedAt && (
-                          <> • REVIEWED: {formatDistanceToNow(new Date(submission.reviewedAt), { addSuffix: true })}</>)
+                          <> • REVIEWED: {formatDistanceToNow(new Date(submission.reviewedAt), { addSuffix: true })}</>
                         )}
                       </div>
                       

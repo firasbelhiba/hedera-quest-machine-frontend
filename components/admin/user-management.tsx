@@ -61,6 +61,8 @@ import {
 import { api } from '@/lib/api/client';
 
 interface User {
+  id?: string;
+  name?: string;
   firstName: string;
   lastName: string;
   username: string;
@@ -197,7 +199,7 @@ export function UserManagement({ className }: UserManagementProps) {
     try {
       // Optimistically update UI
       setUsers(prev => prev.map(user => {
-        if (user.id === userId) {
+        if (String(user.id) === String(userId)) {
           switch (action) {
             case 'suspend':
               return user; // Status not supported in User interface
@@ -276,10 +278,7 @@ export function UserManagement({ className }: UserManagementProps) {
                 <SelectItem value="admin">[ADMIN]</SelectItem>
               </SelectContent>
             </Select>
-            <Button className="font-mono border-2 border-dashed border-green-500/50 hover:border-solid bg-gradient-to-r from-green-500/10 to-emerald-500/10 hover:from-green-500/20 hover:to-emerald-500/20">
-              <UserPlus className="w-4 h-4 mr-2" />
-              [ADD_USER]
-            </Button>
+
           </div>
 
           {/* Users Table */}
@@ -331,7 +330,7 @@ export function UserManagement({ className }: UserManagementProps) {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="py-4">{getRoleBadge(user.role)}</TableCell>
+                    <TableCell className="py-4">{getRoleBadge(user.role || 'user')}</TableCell>
                     <TableCell className="py-4">
                       <div className="flex items-center gap-2">
                         {user.email_verified ? (
@@ -392,22 +391,22 @@ export function UserManagement({ className }: UserManagementProps) {
                             <Edit className="mr-2 h-4 w-4" />
                             [EDIT]
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleUserAction(user.id, 'suspend')} className="text-red-600">
+                          <DropdownMenuItem onClick={() => handleUserAction(user.id || user.username, 'suspend')} className="text-red-600">
                             <Ban className="mr-2 h-4 w-4" />
                             [SUSPEND]
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleUserAction(user.id, 'activate')} className="text-green-600">
+                          <DropdownMenuItem onClick={() => handleUserAction(user.id || user.username, 'activate')} className="text-green-600">
                             <CheckCircle className="mr-2 h-4 w-4" />
                             [ACTIVATE]
                           </DropdownMenuItem>
                           {user.role !== 'admin' && (
-                            <DropdownMenuItem onClick={() => handleUserAction(user.id, 'promote')} className="text-blue-600">
+                            <DropdownMenuItem onClick={() => handleUserAction(user.id || user.username, 'promote')} className="text-blue-600">
                               <Shield className="mr-2 h-4 w-4" />
                               [PROMOTE]
                             </DropdownMenuItem>
                           )}
                           {user.role !== 'user' && (
-                            <DropdownMenuItem onClick={() => handleUserAction(user.id, 'demote')} className="text-orange-600">
+                            <DropdownMenuItem onClick={() => handleUserAction(user.id || user.username, 'demote')} className="text-orange-600">
                               <Shield className="mr-2 h-4 w-4" />
                               [DEMOTE]
                             </DropdownMenuItem>

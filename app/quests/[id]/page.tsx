@@ -141,7 +141,8 @@ export default function QuestDetailPage() {
     beginner: 1,
     intermediate: 2,
     advanced: 3,
-    expert: 4
+    expert: 4,
+    master: 5
   };
 
   return (

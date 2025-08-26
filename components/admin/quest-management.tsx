@@ -20,7 +20,7 @@ import { Search, Plus, MoreHorizontal, Eye, Edit, Play, Pause, XCircle, Trash2, 
 import { QuestService } from '@/lib/services';
 import { CreateQuestForm } from '@/components/admin/create-quest-form';
 import { EditQuestForm } from '@/components/admin/edit-quest-form';
-import type { Quest } from '@/types/quest';
+import type { Quest } from '@/lib/types';
 
 function QuestManagement() {
   const { toast } = useToast();
@@ -422,7 +422,7 @@ function QuestManagement() {
                               [ARCHIVE]
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="border-dashed border-cyan-500/20" />
-                            <DropdownMenuItem onClick={() => confirmDeleteQuest(quest.id)} className="text-red-600">
+                            <DropdownMenuItem onClick={() => confirmDeleteQuest(String(quest.id))} className="text-red-600">
                               <Trash2 className="mr-2 h-4 w-4" />
                               [DELETE]
                             </DropdownMenuItem>
@@ -536,9 +536,7 @@ function QuestManagement() {
                   </div>
 
                   <div className="flex flex-wrap gap-2 mb-4">
-                    <Badge className={getDifficultyColor(selectedQuest.difficulty)}>
-                      {selectedQuest.difficulty}
-                    </Badge>
+                    {getDifficultyBadge(selectedQuest.difficulty)}
                     {getStatusBadge(selectedQuest.status)}
                   </div>
 
@@ -553,11 +551,11 @@ function QuestManagement() {
                     </div>
                   )}
 
-                  {selectedQuest.steps && selectedQuest.steps.length > 0 && (
+                  {(selectedQuest as any).steps && (selectedQuest as any).steps.length > 0 && (
                     <div>
                       <h4 className="font-semibold mb-2">Steps</h4>
                       <ol className="list-decimal list-inside space-y-2">
-                        {selectedQuest.steps.map((step, index) => (
+                        {(selectedQuest as any).steps.map((step: any, index: number) => (
                           <li key={index} className="text-sm">
                             <span className="font-medium">{step.title}</span>
                             {step.description && (
