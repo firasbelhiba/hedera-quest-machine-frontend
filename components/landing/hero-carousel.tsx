@@ -124,8 +124,8 @@ export function HeroCarousel() {
           currentSlideData.gradient
         )} />
         
-        <div className="relative z-10 p-8 md:p-12 lg:p-16">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[500px]">
+        <div className="relative z-10 p-6 md:p-8 lg:p-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center min-h-[350px]">
             {/* Content */}
             <div className="space-y-6">
               <div className="space-y-4">
@@ -133,24 +133,24 @@ export function HeroCarousel() {
                   {currentSlideData.subtitle}
                 </Badge>
                 
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-mono bg-gradient-to-r from-primary via-purple-500 to-cyan-500 bg-clip-text text-transparent leading-tight">
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold font-mono bg-gradient-to-r from-primary via-purple-500 to-cyan-500 bg-clip-text text-transparent leading-tight">
                   {currentSlideData.title}
                 </h1>
                 
-                <p className="text-lg md:text-xl text-muted-foreground font-mono leading-relaxed">
+                <p className="text-base md:text-lg text-muted-foreground font-mono leading-relaxed">
                   {currentSlideData.description}
                 </p>
               </div>
 
               {/* Stats */}
               {currentSlideData.stats && (
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 gap-3">
                   {currentSlideData.stats.map((stat, index) => (
-                    <div key={index} className="text-center p-3 bg-background/50 backdrop-blur-sm rounded-lg border border-dashed border-primary/20">
-                      <div className="flex items-center justify-center mb-2 text-primary">
+                    <div key={index} className="text-center p-2 bg-background/50 backdrop-blur-sm rounded-lg border border-dashed border-primary/20">
+                      <div className="flex items-center justify-center mb-1 text-primary">
                         {stat.icon}
                       </div>
-                      <div className="text-2xl font-bold font-mono text-primary">
+                      <div className="text-lg font-bold font-mono text-primary">
                         {stat.value}
                       </div>
                       <div className="text-xs text-muted-foreground font-mono">
@@ -162,10 +162,10 @@ export function HeroCarousel() {
               )}
 
               {/* CTA */}
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <Link href={currentSlideData.cta.href}>
                   <Button 
-                    size="lg" 
+                    size="default" 
                     variant={currentSlideData.cta.variant || 'default'}
                     className="font-mono border-dashed hover:border-solid transition-all duration-200 group"
                   >
@@ -176,7 +176,7 @@ export function HeroCarousel() {
                 
                 <Button 
                   variant="outline" 
-                  size="lg"
+                  size="default"
                   className="font-mono border-dashed hover:border-solid transition-all duration-200"
                   onClick={() => setIsAutoPlaying(!isAutoPlaying)}
                 >
@@ -192,7 +192,7 @@ export function HeroCarousel() {
             {/* Visual Element */}
             <div className="flex items-center justify-center">
               <div className="relative">
-                <div className="text-[200px] md:text-[250px] lg:text-[300px] opacity-20 select-none">
+                <div className="text-[120px] md:text-[150px] lg:text-[180px] opacity-20 select-none">
                   {currentSlideData.image}
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-background/50 to-transparent" />

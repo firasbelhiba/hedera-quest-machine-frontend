@@ -90,14 +90,12 @@ export function Navbar({ className }: NavbarProps) {
               <Image 
                 src="/logo.png" 
                 alt="Hedera Quest" 
-                width={40} 
-                height={40} 
+                width={70} 
+                height={70} 
                 className="rounded-lg drop-shadow-sm" 
               />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-primary via-purple-500 to-cyan-500 bg-clip-text text-transparent">
-              HEDERA_QUEST
-            </span>
+
           </Link>
 
           {/* Desktop Navigation */}

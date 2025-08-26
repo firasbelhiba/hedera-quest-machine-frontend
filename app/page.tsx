@@ -9,7 +9,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Trophy, Target, Users, TrendingUp, Clock, Zap, Star, ArrowRight, Fire, Award, CheckCircle, XCircle, AlertCircle, Calendar, BookOpen, Sparkles } from 'lucide-react';
+import { Trophy, Target, Users, TrendingUp, Clock, Zap, Star, ArrowRight, Flame, Award, CheckCircle, XCircle, AlertCircle, Calendar, BookOpen, Sparkles } from 'lucide-react';
 import { QuestCard } from '@/components/quests/quest-card';
 import { HeroCarousel } from '@/components/landing/hero-carousel';
 import { FeatureHighlights } from '@/components/landing/feature-highlights';
@@ -36,11 +36,46 @@ export default function Dashboard() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [statsData, questsData, userData] = await Promise.all([
-          QuestService.getDashboardStats(),
-          QuestService.getQuests(),
-          QuestService.getCurrentUser()
-        ]);
+        // Check for any existing tokens first
+        let hasTokens = false;
+        if (typeof window !== 'undefined') {
+          const authToken = localStorage.getItem('auth_token');
+          const accessToken = localStorage.getItem('access_token');
+          const cookieToken = document.cookie.includes('hq_access_token') || document.cookie.includes('access_token');
+          hasTokens = !!(authToken || accessToken || cookieToken);
+          console.log('Has tokens:', hasTokens, 'Auth token:', !!authToken, 'Access token:', !!accessToken, 'Cookie token:', cookieToken);
+        }
+        
+        // First check if user is authenticated
+         let userData = null;
+         if (hasTokens) {
+           try {
+             const response = await QuestService.getCurrentUser();
+             // Only set userData if we get a valid response with required fields
+             if (response && response.id && response.email) {
+               userData = response;
+               console.log('Valid user data from API:', userData);
+             } else {
+               console.log('Invalid user data received:', response);
+               userData = null;
+             }
+           } catch (error) {
+             console.log('Authentication failed:', error);
+             userData = null;
+           }
+           
+           // If authentication failed but we have tokens, clear them
+           if (!userData && typeof window !== 'undefined') {
+             localStorage.removeItem('auth_token');
+             localStorage.removeItem('access_token');
+             localStorage.removeItem('refresh_token');
+             document.cookie = 'hq_access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+             document.cookie = 'hq_refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+             document.cookie = 'access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+             document.cookie = 'refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+             console.log('Cleared invalid cached tokens');
+           }
+         }
         
         // Redirect admin users to admin dashboard
         if (userData?.role === 'admin') {
@@ -48,11 +83,18 @@ export default function Dashboard() {
           return;
         }
         
+        // Load basic data for both authenticated and non-authenticated users
+        const [statsData, questsData] = await Promise.all([
+          QuestService.getDashboardStats().catch(() => null),
+          QuestService.getQuests().catch(() => [])
+        ]);
+        
         setStats(statsData);
         setFeaturedQuests(questsData.slice(0, 6));
         setQuests(questsData);
         setUser(userData);
         
+        // Only load user-specific data if user is authenticated
         if (userData) {
           try {
             const [badgesData, submissionsData] = await Promise.all([
@@ -69,6 +111,8 @@ export default function Dashboard() {
         }
       } catch (error) {
         console.error('Failed to load dashboard data:', error);
+        // Ensure user is set to null on error
+        setUser(null);
       } finally {
         setIsLoading(false);
       }
@@ -84,6 +128,15 @@ export default function Dashboard() {
       </div>
     );
   }
+
+  // Debug logging
+  console.log('Dashboard render - User state:', user);
+  console.log('Dashboard render - Is loading:', isLoading);
+  console.log('Dashboard render - Has tokens:', typeof window !== 'undefined' && (
+    localStorage.getItem('auth_token') || 
+    localStorage.getItem('access_token') || 
+    document.cookie.includes('access_token')
+  ));
 
   if (!user) {
     return (
@@ -119,6 +172,26 @@ export default function Dashboard() {
                   Sign In
                 </Button>
               </Link>
+              <Button 
+                variant="outline" 
+                size="lg" 
+                onClick={() => {
+                  // Clear any cached tokens
+                  if (typeof window !== 'undefined') {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('access_token');
+                    localStorage.removeItem('refresh_token');
+                    document.cookie = 'hq_access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                    document.cookie = 'hq_refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                    document.cookie = 'access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                    document.cookie = 'refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+                    window.location.reload();
+                  }
+                }}
+                className="font-mono border-dashed hover:border-solid transition-all duration-200"
+              >
+                Logout
+              </Button>
             </div>
           </div>
         </div>
@@ -149,6 +222,9 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
+      {/* Hero Carousel for All Users */}
+      <HeroCarousel />
+      
       {/* Personalized Welcome Section */}
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-cyan-500/10 to-blue-500/10 rounded-lg" />
@@ -195,7 +271,7 @@ export default function Dashboard() {
           <CardContent className="p-6">
             <div className="flex items-center">
               <div className="p-2 bg-red-500/10 rounded-lg border border-dashed border-red-500/30">
-                <Fire className="h-6 w-6 text-red-500" />
+                <Flame className="h-6 w-6 text-red-500" />
               </div>
               <div className="ml-4">
                 <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">STREAK</p>

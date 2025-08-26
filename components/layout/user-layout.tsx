@@ -25,9 +25,7 @@ export function UserLayout({ children, className }: UserLayoutProps) {
         <div className="container mx-auto px-4 py-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="space-y-3">
-              <h3 className="font-bold text-lg bg-gradient-to-r from-primary via-purple-500 to-cyan-500 bg-clip-text text-transparent">
-                HEDERA_QUEST
-              </h3>
+
               <p className="text-sm text-muted-foreground">
                 Gamified learning platform for Hedera blockchain development.
               </p>
