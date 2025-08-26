@@ -72,136 +72,178 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="relative">
-        <div className="absolute inset-0 bg-gradient-to-r from-red-500/10 via-orange-500/10 to-yellow-500/10 rounded-lg" />
-        <div className="relative bg-background/80 backdrop-blur-sm border-2 border-dashed border-primary/20 rounded-lg p-8">
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 to-orange-500/20 rounded-lg border-2 border-dashed border-primary/30" />
-              <div className="relative p-3 bg-gradient-to-r from-red-600 to-orange-500 rounded-lg">
-                <Shield className="w-8 h-8 text-white" />
-              </div>
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-red-500 to-orange-500 bg-clip-text text-transparent font-mono">
-                Admin Dashboard
-              </h1>
-              <p className="text-muted-foreground font-mono text-sm mt-2">
-                {'>'} PLATFORM_MANAGEMENT_AND_ANALYTICS
-              </p>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
+      {/* Breadcrumb Navigation */}
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/50">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground font-mono">
+            <Shield className="w-4 h-4" />
+            <span>ADMIN</span>
+            <span>/</span>
+            <span className="text-foreground">DASHBOARD</span>
           </div>
         </div>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="border-2 border-dashed border-blue-500/20 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 hover:border-solid transition-all duration-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground font-mono uppercase tracking-wider">TOTAL_USERS</p>
-                <p className="text-2xl font-bold font-mono bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
-                  {stats?.totalUsers.toLocaleString()}
-                </p>
-              </div>
-              <div className="p-2 bg-blue-500/10 rounded-lg border border-dashed border-blue-500/30">
-                <Users className="h-6 w-6 text-blue-500" />
-              </div>
-            </div>
-            <div className="mt-4">
-              <div className="text-xs text-muted-foreground font-mono">+12% FROM_LAST_MONTH</div>
-              <div className="relative mt-2">
-                <div className="h-2 bg-muted rounded-lg border border-dashed border-blue-500/20" />
-                <div className="absolute top-0 left-0 h-2 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg transition-all duration-500" style={{width: '75%'}} />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 sm:space-y-8">
 
-        <Card className="border-2 border-dashed border-green-500/20 bg-gradient-to-br from-green-500/5 to-emerald-500/5 hover:border-solid transition-all duration-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground font-mono uppercase tracking-wider">ACTIVE_QUESTS</p>
-                <p className="text-2xl font-bold font-mono bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">
-                  {stats?.activeQuests}
-                </p>
-              </div>
-              <div className="p-2 bg-green-500/10 rounded-lg border border-dashed border-green-500/30">
-                <Target className="h-6 w-6 text-green-500" />
-              </div>
-            </div>
-            <div className="mt-4">
-              <div className="text-xs text-muted-foreground font-mono">+3 NEW_THIS_WEEK</div>
-              <div className="relative mt-2">
-                <div className="h-2 bg-muted rounded-lg border border-dashed border-green-500/20" />
-                <div className="absolute top-0 left-0 h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg transition-all duration-500" style={{width: '65%'}} />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
 
-        <Card className="border-2 border-dashed border-purple-500/20 bg-gradient-to-br from-purple-500/5 to-indigo-500/5 hover:border-solid transition-all duration-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground font-mono uppercase tracking-wider">SUBMISSIONS</p>
-                <p className="text-2xl font-bold font-mono bg-gradient-to-r from-purple-500 to-indigo-500 bg-clip-text text-transparent">
-                  {stats?.totalSubmissions}
-                </p>
+        {/* Key Metrics */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <Card className="group relative overflow-hidden border-0 bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-950/50 dark:to-blue-900/30 hover:shadow-lg transition-all duration-300">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-indigo-500/5" />
+            <CardHeader className="relative pb-3">
+              <div className="flex items-center justify-between">
+                <div className="p-2 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                  <Users className="h-5 w-5 text-blue-600" />
+                </div>
+                <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-500/20 font-mono text-xs">
+                  +12%
+                </Badge>
               </div>
-              <div className="p-2 bg-purple-500/10 rounded-lg border border-dashed border-purple-500/30">
-                <FileText className="h-6 w-6 text-purple-500" />
+            </CardHeader>
+            <CardContent className="relative">
+              <div className="space-y-2">
+                <h3 className="text-sm font-medium text-blue-600/80 font-mono uppercase tracking-wide">Total Users</h3>
+                <div className="text-3xl font-bold text-blue-700 dark:text-blue-300 font-mono">{stats?.totalUsers?.toLocaleString() || 0}</div>
+                <p className="text-xs text-blue-600/60 font-mono">from last month</p>
               </div>
-            </div>
-            <div className="mt-4">
-              <div className="text-xs text-muted-foreground font-mono">87 PENDING_REVIEW</div>
-              <div className="relative mt-2">
-                <div className="h-2 bg-muted rounded-lg border border-dashed border-purple-500/20" />
-                <div className="absolute top-0 left-0 h-2 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-lg transition-all duration-500" style={{width: '90%'}} />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        <Card className="border-2 border-dashed border-yellow-500/20 bg-gradient-to-br from-yellow-500/5 to-orange-500/5 hover:border-solid transition-all duration-200">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground font-mono uppercase tracking-wider">APPROVAL_RATE</p>
-                <p className="text-2xl font-bold font-mono bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
-                  {stats?.approvalRate}%
-                </p>
+          <Card className="group relative overflow-hidden border-0 bg-gradient-to-br from-green-50 to-green-100/50 dark:from-green-950/50 dark:to-green-900/30 hover:shadow-lg transition-all duration-300">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 to-emerald-500/5" />
+            <CardHeader className="relative pb-3">
+              <div className="flex items-center justify-between">
+                <div className="p-2 bg-green-500/10 rounded-lg border border-green-500/20">
+                  <Target className="h-5 w-5 text-green-600" />
+                </div>
+                <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/20 font-mono text-xs">
+                  +3 NEW
+                </Badge>
               </div>
-              <div className="p-2 bg-yellow-500/10 rounded-lg border border-dashed border-yellow-500/30">
-                <TrendingUp className="h-6 w-6 text-yellow-500" />
+            </CardHeader>
+            <CardContent className="relative">
+              <div className="space-y-2">
+                <h3 className="text-sm font-medium text-green-600/80 font-mono uppercase tracking-wide">Active Quests</h3>
+                <div className="text-3xl font-bold text-green-700 dark:text-green-300 font-mono">{stats?.activeQuests || 0}</div>
+                <p className="text-xs text-green-600/60 font-mono">this week</p>
               </div>
-            </div>
-            <div className="mt-4">
-              <div className="text-xs text-muted-foreground font-mono">+2.5% THIS_WEEK</div>
-              <div className="relative mt-2">
-                <div className="h-2 bg-muted rounded-lg border border-dashed border-yellow-500/20" />
-                <div className="absolute top-0 left-0 h-2 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-lg transition-all duration-500" style={{width: '87%'}} />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
 
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6 bg-background/50 border-2 border-dashed border-primary/20 p-1">
-          <TabsTrigger value="overview" className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-primary/30">OVERVIEW</TabsTrigger>
-          <TabsTrigger value="users" className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-primary/30">USERS</TabsTrigger>
-          <TabsTrigger value="quests" className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-primary/30">QUESTS</TabsTrigger>
-          <TabsTrigger value="submissions" className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-primary/30">SUBMISSIONS</TabsTrigger>
-          <TabsTrigger value="analytics" className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-primary/30">ANALYTICS</TabsTrigger>
-          <TabsTrigger value="reports" className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-primary/30">REPORTS</TabsTrigger>
-        </TabsList>
+          <Card className="group relative overflow-hidden border-0 bg-gradient-to-br from-purple-50 to-purple-100/50 dark:from-purple-950/50 dark:to-purple-900/30 hover:shadow-lg transition-all duration-300">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/5" />
+            <CardHeader className="relative pb-3">
+              <div className="flex items-center justify-between">
+                <div className="p-2 bg-purple-500/10 rounded-lg border border-purple-500/20">
+                  <FileText className="h-5 w-5 text-purple-600" />
+                </div>
+                <Badge variant="outline" className="bg-yellow-500/10 text-yellow-600 border-yellow-500/20 font-mono text-xs">
+                  87 PENDING
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="relative">
+              <div className="space-y-2">
+                <h3 className="text-sm font-medium text-purple-600/80 font-mono uppercase tracking-wide">Submissions</h3>
+                <div className="text-3xl font-bold text-purple-700 dark:text-purple-300 font-mono">{stats?.totalSubmissions || 0}</div>
+                <p className="text-xs text-purple-600/60 font-mono">awaiting review</p>
+              </div>
+            </CardContent>
+          </Card>
 
-        <TabsContent value="overview" className="space-y-6">
+          <Card className="group relative overflow-hidden border-0 bg-gradient-to-br from-orange-50 to-orange-100/50 dark:from-orange-950/50 dark:to-orange-900/30 hover:shadow-lg transition-all duration-300">
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-red-500/5" />
+            <CardHeader className="relative pb-3">
+              <div className="flex items-center justify-between">
+                <div className="p-2 bg-orange-500/10 rounded-lg border border-orange-500/20">
+                  <TrendingUp className="h-5 w-5 text-orange-600" />
+                </div>
+                <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500/20 font-mono text-xs">
+                  +2.5%
+                </Badge>
+              </div>
+            </CardHeader>
+            <CardContent className="relative">
+              <div className="space-y-2">
+                <h3 className="text-sm font-medium text-orange-600/80 font-mono uppercase tracking-wide">Approval Rate</h3>
+                <div className="text-3xl font-bold text-orange-700 dark:text-orange-300 font-mono">{stats?.approvalRate || 0}%</div>
+                <p className="text-xs text-orange-600/60 font-mono">this week</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Tabs defaultValue="overview" className="space-y-8">
+          {/* Enhanced Tab Navigation */}
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-muted/30 via-muted/20 to-muted/30 rounded-xl" />
+            <div className="relative p-2 bg-background/80 backdrop-blur-sm border border-border/50 rounded-xl">
+              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1 sm:gap-2 bg-transparent p-0 h-auto">
+                <TabsTrigger 
+                  value="overview" 
+                  className="relative font-mono text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-200 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:scale-105 hover:bg-muted/50"
+                >
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <div className="w-2 h-2 rounded-full bg-current opacity-60" />
+                    <span className="hidden sm:inline">Overview</span>
+                    <span className="sm:hidden">Over</span>
+                  </div>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="users" 
+                  className="relative font-mono text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-200 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:scale-105 hover:bg-muted/50"
+                >
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <Users className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span>Users</span>
+                  </div>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="quests" 
+                  className="relative font-mono text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-200 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:scale-105 hover:bg-muted/50"
+                >
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <Target className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span>Quests</span>
+                  </div>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="submissions" 
+                  className="relative font-mono text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-200 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:scale-105 hover:bg-muted/50"
+                >
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <FileText className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="hidden sm:inline">Submissions</span>
+                    <span className="sm:hidden">Subs</span>
+                  </div>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="analytics" 
+                  className="relative font-mono text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-200 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:scale-105 hover:bg-muted/50"
+                >
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="hidden sm:inline">Analytics</span>
+                    <span className="sm:hidden">Stats</span>
+                  </div>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="reports" 
+                  className="relative font-mono text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-200 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:scale-105 hover:bg-muted/50"
+                >
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <div className="w-2 h-2 rounded-full bg-current opacity-60" />
+                    <span className="hidden sm:inline">Reports</span>
+                    <span className="sm:hidden">Rep</span>
+                  </div>
+                </TabsTrigger>
+              </TabsList>
+            </div>
+          </div>
+
+        <TabsContent value="overview" className="space-y-4 sm:space-y-6">
           {/* Recent Activity */}
           <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-blue-500/5">
             <CardHeader>
@@ -235,75 +277,157 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
-          {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card className="border-2 border-dashed border-yellow-500/20 bg-gradient-to-br from-yellow-500/5 to-orange-500/5">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 font-mono">
-                  <div className="p-1 bg-yellow-500/10 rounded border border-dashed border-yellow-500/30">
-                    <AlertCircle className="w-5 h-5 text-yellow-500" />
+          {/* Enhanced Quick Actions */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+            <Card className="group relative overflow-hidden border-0 bg-gradient-to-br from-amber-50 to-orange-100/50 dark:from-amber-950/30 dark:to-orange-900/20 hover:shadow-xl transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 to-orange-500/5" />
+              <CardHeader className="relative pb-4">
+                <CardTitle className="flex items-center gap-3 font-mono text-lg">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-amber-500/20 rounded-lg blur-sm" />
+                    <div className="relative p-2 bg-amber-500/10 rounded-lg border border-amber-500/20">
+                      <AlertCircle className="w-6 h-6 text-amber-600" />
+                    </div>
                   </div>
-                  <span className="bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
-                    PENDING_ACTIONS
-                  </span>
+                  <div className="min-w-0">
+                    <span className="bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+                      Priority Actions
+                    </span>
+                    <p className="text-sm text-muted-foreground font-normal mt-1">Items requiring immediate attention</p>
+                  </div>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4 border-t-2 border-dashed border-yellow-500/10">
-                <div className="flex items-center justify-between p-2 rounded border border-dashed border-yellow-500/20 bg-yellow-500/5">
-                  <span className="text-sm font-mono">SUBMISSIONS_TO_REVIEW</span>
-                  <Badge variant="outline" className="border-dashed border-yellow-500/30 bg-yellow-500/10 text-yellow-600 font-mono">67</Badge>
+              <CardContent className="relative space-y-2 sm:space-y-3">
+                <div className="group/item flex items-center justify-between p-3 sm:p-4 rounded-xl border border-amber-200/50 bg-gradient-to-r from-amber-50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/10 hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer">
+                  <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                    <div className="p-2 bg-amber-500/10 rounded-lg border border-amber-500/20">
+                      <FileText className="w-4 h-4 text-amber-600" />
+                    </div>
+                    <div>
+                      <span className="font-medium text-amber-800 dark:text-amber-200 text-sm sm:text-base">Submissions to Review</span>
+                      <p className="text-xs text-amber-600/70 mt-0.5 hidden sm:block">Awaiting approval</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                    <Badge className="bg-amber-500/15 text-amber-700 border-amber-500/30 font-mono px-2 sm:px-3 py-1 hover:bg-amber-500/25 transition-colors text-xs sm:text-sm">
+                      67
+                    </Badge>
+                    <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
+                  </div>
                 </div>
-                <div className="flex items-center justify-between p-2 rounded border border-dashed border-blue-500/20 bg-blue-500/5">
-                  <span className="text-sm font-mono">NEW_QUEST_PROPOSALS</span>
-                  <Badge variant="outline" className="border-dashed border-blue-500/30 bg-blue-500/10 text-blue-600 font-mono">3</Badge>
+                
+                <div className="group/item flex items-center justify-between p-3 sm:p-4 rounded-xl border border-blue-200/50 bg-gradient-to-r from-blue-50 to-indigo-50/50 dark:from-blue-950/20 dark:to-indigo-950/10 hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer">
+                  <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                    <div className="p-2 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                      <Target className="w-4 h-4 text-blue-600" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="font-medium text-blue-800 dark:text-blue-200 text-sm sm:text-base">Quest Proposals</span>
+                      <p className="text-xs text-blue-600/70 mt-0.5 hidden sm:block">New submissions</p>
+                    </div>
+                  </div>
+                  <Badge className="bg-blue-500/15 text-blue-700 border-blue-500/30 font-mono px-2 sm:px-3 py-1 hover:bg-blue-500/25 transition-colors text-xs sm:text-sm flex-shrink-0">
+                    3
+                  </Badge>
                 </div>
-                <div className="flex items-center justify-between p-2 rounded border border-dashed border-red-500/20 bg-red-500/5">
-                  <span className="text-sm font-mono">USER_REPORTS</span>
-                  <Badge variant="outline" className="border-dashed border-red-500/30 bg-red-500/10 text-red-600 font-mono">2</Badge>
+                
+                <div className="group/item flex items-center justify-between p-3 sm:p-4 rounded-xl border border-red-200/50 bg-gradient-to-r from-red-50 to-pink-50/50 dark:from-red-950/20 dark:to-pink-950/10 hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer">
+                  <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                    <div className="p-2 bg-red-500/10 rounded-lg border border-red-500/20">
+                      <AlertCircle className="w-4 h-4 text-red-600" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="font-medium text-red-800 dark:text-red-200 text-sm sm:text-base">User Reports</span>
+                      <p className="text-xs text-red-600/70 mt-0.5 hidden sm:block">Requires investigation</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                    <Badge className="bg-red-500/15 text-red-700 border-red-500/30 font-mono px-2 sm:px-3 py-1 hover:bg-red-500/25 transition-colors text-xs sm:text-sm">
+                      2
+                    </Badge>
+                    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                  </div>
                 </div>
-                <div className="flex items-center justify-between p-2 rounded border border-dashed border-purple-500/20 bg-purple-500/5">
-                  <span className="text-sm font-mono">SYSTEM_ALERTS</span>
-                  <Badge variant="outline" className="border-dashed border-purple-500/30 bg-purple-500/10 text-purple-600 font-mono">1</Badge>
+                
+                <div className="group/item flex items-center justify-between p-3 sm:p-4 rounded-xl border border-purple-200/50 bg-gradient-to-r from-purple-50 to-violet-50/50 dark:from-purple-950/20 dark:to-violet-950/10 hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer">
+                  <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                    <div className="p-2 bg-purple-500/10 rounded-lg border border-purple-500/20">
+                      <Shield className="w-4 h-4 text-purple-600" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="font-medium text-purple-800 dark:text-purple-200 text-sm sm:text-base">System Alerts</span>
+                      <p className="text-xs text-purple-600/70 mt-0.5 hidden sm:block">Security & performance</p>
+                    </div>
+                  </div>
+                  <Badge className="bg-purple-500/15 text-purple-700 border-purple-500/30 font-mono px-2 sm:px-3 py-1 hover:bg-purple-500/25 transition-colors text-xs sm:text-sm flex-shrink-0">
+                    1
+                  </Badge>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="border-2 border-dashed border-green-500/20 bg-gradient-to-br from-green-500/5 to-emerald-500/5">
-              <CardHeader>
-                <CardTitle className="font-mono bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">
-                  SYSTEM_HEALTH
+            <Card className="group relative overflow-hidden border-0 bg-gradient-to-br from-emerald-50 to-green-100/50 dark:from-emerald-950/30 dark:to-green-900/20 hover:shadow-xl transition-all duration-300">
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-green-500/5" />
+              <CardHeader className="relative pb-4">
+                <CardTitle className="flex items-center gap-3 font-mono text-lg">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-emerald-500/20 rounded-lg blur-sm" />
+                    <div className="relative p-2 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+                      <CheckCircle className="w-6 h-6 text-emerald-600" />
+                    </div>
+                  </div>
+                  <div>
+                    <span className="bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">
+                      System Health
+                    </span>
+                    <p className="text-sm text-muted-foreground font-normal mt-1">Real-time performance metrics</p>
+                  </div>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4 border-t-2 border-dashed border-green-500/10">
-                <div className="space-y-2 p-3 rounded border border-dashed border-green-500/20 bg-green-500/5">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-mono">API_RESPONSE_TIME</span>
-                    <span className="text-green-600 font-mono font-bold">245ms</span>
+              <CardContent className="relative space-y-3 sm:space-y-4">
+                <div className="group/metric p-3 sm:p-4 rounded-xl border border-emerald-200/50 bg-gradient-to-r from-emerald-50 to-green-50/50 dark:from-emerald-950/20 dark:to-green-950/10 hover:shadow-md transition-all duration-200">
+                  <div className="flex items-center justify-between mb-2 sm:mb-3">
+                    <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                      <span className="font-medium text-emerald-800 dark:text-emerald-200 text-sm sm:text-base truncate">API Response Time</span>
+                    </div>
+                    <span className="text-emerald-700 dark:text-emerald-300 font-mono font-bold text-base sm:text-lg flex-shrink-0">245ms</span>
                   </div>
-                  <div className="relative">
-                    <div className="h-2 bg-muted rounded-lg border border-dashed border-green-500/20" />
-                    <div className="absolute top-0 left-0 h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg transition-all duration-500" style={{width: '85%'}} />
+                  <div className="relative h-3 bg-emerald-100 dark:bg-emerald-950/50 rounded-full overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full transition-all duration-1000 ease-out" style={{width: '85%'}} />
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
                   </div>
+                  <p className="text-xs text-emerald-600/70 mt-1.5 sm:mt-2 hidden sm:block">Excellent performance</p>
                 </div>
-                <div className="space-y-2 p-3 rounded border border-dashed border-green-500/20 bg-green-500/5">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-mono">DATABASE_PERFORMANCE</span>
-                    <span className="text-green-600 font-mono font-bold">GOOD</span>
+                
+                <div className="group/metric p-3 sm:p-4 rounded-xl border border-emerald-200/50 bg-gradient-to-r from-emerald-50 to-green-50/50 dark:from-emerald-950/20 dark:to-green-950/10 hover:shadow-md transition-all duration-200">
+                  <div className="flex items-center justify-between mb-2 sm:mb-3">
+                    <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                      <span className="font-medium text-emerald-800 dark:text-emerald-200 text-sm sm:text-base truncate">Database Performance</span>
+                    </div>
+                    <span className="text-emerald-700 dark:text-emerald-300 font-mono font-bold text-base sm:text-lg flex-shrink-0">Optimal</span>
                   </div>
-                  <div className="relative">
-                    <div className="h-2 bg-muted rounded-lg border border-dashed border-green-500/20" />
-                    <div className="absolute top-0 left-0 h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg transition-all duration-500" style={{width: '92%'}} />
+                  <div className="relative h-3 bg-emerald-100 dark:bg-emerald-950/50 rounded-full overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full transition-all duration-1000 ease-out" style={{width: '92%'}} />
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
                   </div>
+                  <p className="text-xs text-emerald-600/70 mt-1.5 sm:mt-2 hidden sm:block">All queries optimized</p>
                 </div>
-                <div className="space-y-2 p-3 rounded border border-dashed border-green-500/20 bg-green-500/5">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-mono">SERVER_UPTIME</span>
-                    <span className="text-green-600 font-mono font-bold">99.9%</span>
+                
+                <div className="group/metric p-3 sm:p-4 rounded-xl border border-emerald-200/50 bg-gradient-to-r from-emerald-50 to-green-50/50 dark:from-emerald-950/20 dark:to-green-950/10 hover:shadow-md transition-all duration-200">
+                  <div className="flex items-center justify-between mb-2 sm:mb-3">
+                    <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+                      <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                      <span className="font-medium text-emerald-800 dark:text-emerald-200 text-sm sm:text-base truncate">Server Uptime</span>
+                    </div>
+                    <span className="text-emerald-700 dark:text-emerald-300 font-mono font-bold text-base sm:text-lg flex-shrink-0">99.9%</span>
                   </div>
-                  <div className="relative">
-                    <div className="h-2 bg-muted rounded-lg border border-dashed border-green-500/20" />
-                    <div className="absolute top-0 left-0 h-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg transition-all duration-500" style={{width: '99%'}} />
+                  <div className="relative h-3 bg-emerald-100 dark:bg-emerald-950/50 rounded-full overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full transition-all duration-1000 ease-out" style={{width: '99%'}} />
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-pulse" />
                   </div>
+                  <p className="text-xs text-emerald-600/70 mt-1.5 sm:mt-2 hidden sm:block">Rock solid reliability</p>
                 </div>
               </CardContent>
             </Card>
@@ -496,6 +620,7 @@ export default function AdminDashboard() {
           </div>
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 }

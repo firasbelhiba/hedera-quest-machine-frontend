@@ -251,61 +251,74 @@ export function UserManagement({ className }: UserManagementProps) {
           </div>
 
           {/* Users Table */}
-          <div className="border-2 border-dashed border-purple-500/20 rounded-lg overflow-hidden">
+          <div className="border-2 border-dashed border-purple-500/20 rounded-lg overflow-hidden bg-gradient-to-br from-white/50 to-purple-50/30 dark:from-gray-900/50 dark:to-purple-900/10">
             <Table>
               <TableHeader>
-                <TableRow className="bg-gradient-to-r from-purple-500/5 to-cyan-500/5 border-b border-dashed border-purple-500/20">
-                  <TableHead className="font-mono">[USER]</TableHead>
-                  <TableHead className="font-mono">[ROLE]</TableHead>
-                  <TableHead className="font-mono">[STATUS]</TableHead>
-                  <TableHead className="font-mono">[STATS]</TableHead>
-                  <TableHead className="font-mono">[JOINED]</TableHead>
-                  <TableHead className="font-mono">[ACTIONS]</TableHead>
+                <TableRow className="bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border-b-2 border-dashed border-purple-500/30">
+                  <TableHead className="font-mono font-semibold text-purple-700 dark:text-purple-300 py-4">[USER]</TableHead>
+                  <TableHead className="font-mono font-semibold text-purple-700 dark:text-purple-300 py-4">[ROLE]</TableHead>
+                  <TableHead className="font-mono font-semibold text-purple-700 dark:text-purple-300 py-4">[STATUS]</TableHead>
+                  <TableHead className="font-mono font-semibold text-purple-700 dark:text-purple-300 py-4">[STATS]</TableHead>
+                  <TableHead className="font-mono font-semibold text-purple-700 dark:text-purple-300 py-4">[JOINED]</TableHead>
+                  <TableHead className="font-mono font-semibold text-purple-700 dark:text-purple-300 py-4 text-center">[ACTIONS]</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredUsers.map((user) => (
-                  <TableRow key={user.id} className="border-b border-dashed border-purple-500/10 hover:bg-gradient-to-r hover:from-purple-500/5 hover:to-cyan-500/5">
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-8 w-8 border border-dashed border-purple-500/30">
+                  <TableRow key={user.id} className="border-b border-dashed border-purple-500/10 hover:bg-gradient-to-r hover:from-purple-500/8 hover:to-cyan-500/8 transition-all duration-200 group">
+                    <TableCell className="py-4">
+                      <div className="flex items-center gap-4">
+                        <Avatar className="h-10 w-10 border-2 border-dashed border-purple-500/30 group-hover:border-solid transition-all duration-200">
                           <AvatarImage src={user.avatar} alt={user.name} />
-                          <AvatarFallback className="bg-gradient-to-r from-purple-500 to-cyan-500 text-white font-mono text-xs">
+                          <AvatarFallback className="bg-gradient-to-r from-purple-500 to-cyan-500 text-white font-mono text-sm font-semibold">
                             {getInitials(user.name)}
                           </AvatarFallback>
                         </Avatar>
-                        <div>
-                          <div className="font-medium font-mono">{user.name}</div>
-                          <div className="text-sm text-muted-foreground font-mono">{user.email}</div>
+                        <div className="min-w-0 flex-1">
+                          <div className="font-semibold font-mono text-gray-900 dark:text-gray-100 truncate">{user.name}</div>
+                          <div className="text-sm text-muted-foreground font-mono truncate">{user.email}</div>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>{getRoleBadge(user.role)}</TableCell>
-                    <TableCell>{getStatusBadge(user.status)}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-4 text-xs font-mono">
-                        <div className="flex items-center gap-1">
-                          <Trophy className="w-3 h-3 text-yellow-500" />
-                          <span>{user.level}</span>
+                    <TableCell className="py-4">{getRoleBadge(user.role)}</TableCell>
+                    <TableCell className="py-4">{getStatusBadge(user.status)}</TableCell>
+                    <TableCell className="py-4">
+                      <div className="flex items-center gap-3 text-sm font-mono">
+                        <div className="flex items-center gap-1.5 bg-yellow-50 dark:bg-yellow-900/20 px-2 py-1 rounded border border-dashed border-yellow-300/50">
+                          <Trophy className="w-3.5 h-3.5 text-yellow-600" />
+                          <span className="font-semibold">{user.level}</span>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Star className="w-3 h-3 text-purple-500" />
-                          <span>{user.points?.toLocaleString()}</span>
+                        <div className="flex items-center gap-1.5 bg-purple-50 dark:bg-purple-900/20 px-2 py-1 rounded border border-dashed border-purple-300/50">
+                          <Star className="w-3.5 h-3.5 text-purple-600" />
+                          <span className="font-semibold">{user.points?.toLocaleString()}</span>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Zap className="w-3 h-3 text-orange-500" />
-                          <span>{user.streak}d</span>
+                        <div className="flex items-center gap-1.5 bg-orange-50 dark:bg-orange-900/20 px-2 py-1 rounded border border-dashed border-orange-300/50">
+                          <Zap className="w-3.5 h-3.5 text-orange-600" />
+                          <span className="font-semibold">{user.streak}d</span>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="font-mono text-sm">{user.joinedAt}</TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0 border border-dashed border-purple-500/30 hover:border-solid">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
+                    <TableCell className="font-mono text-sm py-4 text-muted-foreground">{user.joinedAt}</TableCell>
+                    <TableCell className="py-4">
+                      <div className="flex items-center justify-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setIsEditDialogOpen(true);
+                          }}
+                          className="h-8 px-3 border border-dashed border-blue-500/30 hover:border-solid hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 hover:text-blue-700 transition-all duration-200"
+                        >
+                          <Edit className="w-3.5 h-3.5 mr-1" />
+                          Edit
+                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0 border border-dashed border-purple-500/30 hover:border-solid hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all duration-200">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="font-mono border-2 border-dashed border-purple-500/30">
                           <DropdownMenuLabel>[ACTIONS]</DropdownMenuLabel>
                           <DropdownMenuSeparator className="border-dashed border-purple-500/20" />
@@ -345,7 +358,8 @@ export function UserManagement({ className }: UserManagementProps) {
                             [DELETE]
                           </DropdownMenuItem>
                         </DropdownMenuContent>
-                      </DropdownMenu>
+                        </DropdownMenu>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -441,3 +455,5 @@ export function UserManagement({ className }: UserManagementProps) {
     </div>
   );
 }
+
+export default UserManagement;

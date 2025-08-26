@@ -560,3 +560,5 @@ export function SubmissionReview({ className }: SubmissionReviewProps) {
     </div>
   );
 }
+
+export default SubmissionReview;

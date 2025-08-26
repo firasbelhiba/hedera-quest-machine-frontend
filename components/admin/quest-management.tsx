@@ -297,98 +297,112 @@ export function QuestManagement({ className }: QuestManagementProps) {
           </div>
 
           {/* Quests Table */}
-          <div className="border-2 border-dashed border-cyan-500/20 rounded-lg overflow-hidden">
+          <div className="border-2 border-dashed border-cyan-500/20 rounded-lg overflow-hidden bg-gradient-to-br from-white/50 to-cyan-50/30 dark:from-gray-900/50 dark:to-cyan-900/10">
             <Table>
               <TableHeader>
-                <TableRow className="bg-gradient-to-r from-cyan-500/5 to-blue-500/5 border-b border-dashed border-cyan-500/20">
-                  <TableHead className="font-mono">[QUEST]</TableHead>
-                  <TableHead className="font-mono">[CATEGORY]</TableHead>
-                  <TableHead className="font-mono">[DIFFICULTY]</TableHead>
-                  <TableHead className="font-mono">[STATUS]</TableHead>
-                  <TableHead className="font-mono">[STATS]</TableHead>
-                  <TableHead className="font-mono">[UPDATED]</TableHead>
-                  <TableHead className="font-mono">[ACTIONS]</TableHead>
+                <TableRow className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border-b-2 border-dashed border-cyan-500/30">
+                  <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4">[QUEST]</TableHead>
+                  <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4">[CATEGORY]</TableHead>
+                  <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4">[DIFFICULTY]</TableHead>
+                  <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4">[STATUS]</TableHead>
+                  <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4">[STATS]</TableHead>
+                  <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4">[UPDATED]</TableHead>
+                  <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4 text-center">[ACTIONS]</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredQuests.map((quest) => (
-                  <TableRow key={quest.id} className="border-b border-dashed border-cyan-500/10 hover:bg-gradient-to-r hover:from-cyan-500/5 hover:to-blue-500/5">
-                    <TableCell>
-                      <div>
-                        <div className="font-medium font-mono">{quest.title}</div>
-                        <div className="text-sm text-muted-foreground font-mono truncate max-w-xs">
+                  <TableRow key={quest.id} className="border-b border-dashed border-cyan-500/10 hover:bg-gradient-to-r hover:from-cyan-500/8 hover:to-blue-500/8 transition-all duration-200 group">
+                    <TableCell className="py-4">
+                      <div className="min-w-0">
+                        <div className="font-semibold font-mono text-gray-900 dark:text-gray-100 mb-1">{quest.title}</div>
+                        <div className="text-sm text-muted-foreground font-mono line-clamp-2 max-w-sm">
                           {quest.description}
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>{getCategoryBadge(quest.category)}</TableCell>
-                    <TableCell>{getDifficultyBadge(quest.difficulty)}</TableCell>
-                    <TableCell>{getStatusBadge(quest.status)}</TableCell>
-                    <TableCell>
-                      <div className="space-y-1 text-xs font-mono">
-                        <div className="flex items-center gap-2">
-                          <Trophy className="w-3 h-3 text-yellow-500" />
-                          <span>{quest.points} pts</span>
+                    <TableCell className="py-4">{getCategoryBadge(quest.category)}</TableCell>
+                    <TableCell className="py-4">{getDifficultyBadge(quest.difficulty)}</TableCell>
+                    <TableCell className="py-4">{getStatusBadge(quest.status)}</TableCell>
+                    <TableCell className="py-4">
+                      <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                        <div className="flex items-center gap-1.5 bg-yellow-50 dark:bg-yellow-900/20 px-2 py-1 rounded border border-dashed border-yellow-300/50">
+                          <Trophy className="w-3 h-3 text-yellow-600" />
+                          <span className="font-semibold">{quest.points}</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Users className="w-3 h-3 text-blue-500" />
-                          <span>{quest.completions} users</span>
+                        <div className="flex items-center gap-1.5 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded border border-dashed border-blue-300/50">
+                          <Users className="w-3 h-3 text-blue-600" />
+                          <span className="font-semibold">{quest.completions}</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Star className="w-3 h-3 text-purple-500" />
-                          <span>{quest.rating}/5.0</span>
+                        <div className="flex items-center gap-1.5 bg-purple-50 dark:bg-purple-900/20 px-2 py-1 rounded border border-dashed border-purple-300/50">
+                          <Star className="w-3 h-3 text-purple-600" />
+                          <span className="font-semibold">{quest.rating}</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Clock className="w-3 h-3 text-green-500" />
-                          <span>{quest.estimatedTime}min</span>
+                        <div className="flex items-center gap-1.5 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded border border-dashed border-green-300/50">
+                          <Clock className="w-3 h-3 text-green-600" />
+                          <span className="font-semibold">{quest.estimatedTime}m</span>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="font-mono text-sm">{quest.updatedAt}</TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0 border border-dashed border-cyan-500/30 hover:border-solid">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="font-mono border-2 border-dashed border-cyan-500/30">
-                          <DropdownMenuLabel>[ACTIONS]</DropdownMenuLabel>
-                          <DropdownMenuSeparator className="border-dashed border-cyan-500/20" />
-                          <DropdownMenuItem>
-                            <Eye className="mr-2 h-4 w-4" />
-                            [VIEW]
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => {
+                    <TableCell className="font-mono text-sm py-4 text-muted-foreground">{quest.updatedAt}</TableCell>
+                    <TableCell className="py-4">
+                      <div className="flex items-center justify-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
                             setSelectedQuest(quest);
                             setIsEditDialogOpen(true);
-                          }}>
-                            <Edit className="mr-2 h-4 w-4" />
-                            [EDIT]
-                          </DropdownMenuItem>
-                          {quest.status === 'draft' && (
-                            <DropdownMenuItem onClick={() => handleQuestAction(quest.id, 'publish')} className="text-green-600">
-                              <Play className="mr-2 h-4 w-4" />
-                              [PUBLISH]
+                          }}
+                          className="h-8 px-3 border border-dashed border-blue-500/30 hover:border-solid hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 hover:text-blue-700 transition-all duration-200"
+                        >
+                          <Edit className="w-3.5 h-3.5 mr-1" />
+                          Edit
+                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0 border border-dashed border-cyan-500/30 hover:border-solid hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-all duration-200">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="font-mono border-2 border-dashed border-cyan-500/30">
+                            <DropdownMenuLabel>[ACTIONS]</DropdownMenuLabel>
+                            <DropdownMenuSeparator className="border-dashed border-cyan-500/20" />
+                            <DropdownMenuItem>
+                              <Eye className="mr-2 h-4 w-4" />
+                              [VIEW]
                             </DropdownMenuItem>
-                          )}
-                          {quest.status === 'published' && (
-                            <DropdownMenuItem onClick={() => handleQuestAction(quest.id, 'draft')} className="text-yellow-600">
-                              <Pause className="mr-2 h-4 w-4" />
-                              [UNPUBLISH]
+                            <DropdownMenuItem onClick={() => {
+                              setSelectedQuest(quest);
+                              setIsEditDialogOpen(true);
+                            }}>
+                              <Edit className="mr-2 h-4 w-4" />
+                              [EDIT]
                             </DropdownMenuItem>
-                          )}
-                          <DropdownMenuItem onClick={() => handleQuestAction(quest.id, 'archive')} className="text-orange-600">
-                            <XCircle className="mr-2 h-4 w-4" />
-                            [ARCHIVE]
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator className="border-dashed border-cyan-500/20" />
-                          <DropdownMenuItem onClick={() => handleDeleteQuest(quest.id)} className="text-red-600">
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            [DELETE]
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                            {quest.status === 'draft' && (
+                              <DropdownMenuItem onClick={() => handleQuestAction(quest.id, 'publish')} className="text-green-600">
+                                <Play className="mr-2 h-4 w-4" />
+                                [PUBLISH]
+                              </DropdownMenuItem>
+                            )}
+                            {quest.status === 'published' && (
+                              <DropdownMenuItem onClick={() => handleQuestAction(quest.id, 'draft')} className="text-yellow-600">
+                                <Pause className="mr-2 h-4 w-4" />
+                                [UNPUBLISH]
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem onClick={() => handleQuestAction(quest.id, 'archive')} className="text-orange-600">
+                              <XCircle className="mr-2 h-4 w-4" />
+                              [ARCHIVE]
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator className="border-dashed border-cyan-500/20" />
+                            <DropdownMenuItem onClick={() => handleDeleteQuest(quest.id)} className="text-red-600">
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              [DELETE]
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -568,3 +582,5 @@ export function QuestManagement({ className }: QuestManagementProps) {
     </div>
   );
 }
+
+export default QuestManagement;

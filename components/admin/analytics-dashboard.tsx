@@ -401,3 +401,5 @@ export function AnalyticsDashboard({ className }: AnalyticsDashboardProps) {
     </div>
   );
 }
+
+export default AnalyticsDashboard;
