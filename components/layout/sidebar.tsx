@@ -73,7 +73,7 @@ export function Sidebar({ isCollapsed, onToggle, userRole = 'user' }: SidebarPro
             'transition-all duration-300 ease-in-out',
             isCollapsed ? 'scale-75' : 'scale-100'
           )}>
-            <Image src="/logo.png" alt="Hedera Quest" width={140} height={140} className="rounded-lg drop-shadow-sm" />
+            <Image src="/logo.png" alt="Hedera Quest" width={200} height={200} className="rounded-lg drop-shadow-sm" />
           </div>
         </div>
         <button

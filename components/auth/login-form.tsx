@@ -61,8 +61,8 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
       }>
         <Card className="w-full max-w-md">
           <CardHeader className="text-center p-4">
-            <div className="mx-auto mb-6 w-16 h-16 relative">
-              <Image src="/logo.png" alt="Hedera Quest" fill className="object-contain scale-[3]" />
+            <div className="mx-auto mb-6 w-24 h-24 relative">
+              <Image src="/logo.png" alt="Hedera Quest" fill className="object-contain scale-[2.5]" />
             </div>
             <CardTitle className="text-2xl">Welcome Back</CardTitle>
             <p className="text-muted-foreground">Sign in to continue your Hedera journey</p>

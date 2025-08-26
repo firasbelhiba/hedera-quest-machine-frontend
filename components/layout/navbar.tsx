@@ -90,8 +90,8 @@ export function Navbar({ className }: NavbarProps) {
               <Image 
                 src="/logo.png" 
                 alt="Hedera Quest" 
-                width={70} 
-                height={70} 
+                width={100} 
+                height={100} 
                 className="rounded-lg drop-shadow-sm" 
               />
             </div>
