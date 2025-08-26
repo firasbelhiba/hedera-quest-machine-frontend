@@ -19,6 +19,10 @@ import {
   XCircle,
   Shield
 } from 'lucide-react';
+import UserManagement from '@/components/admin/user-management';
+import QuestManagement from '@/components/admin/quest-management';
+import SubmissionReview from '@/components/admin/submission-review';
+import AnalyticsDashboard from '@/components/admin/analytics-dashboard';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 
 const RC: any = ResponsiveContainer as any;
@@ -82,7 +86,7 @@ export default function AdminDashboard() {
             </div>
             <div>
               <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-red-500 to-orange-500 bg-clip-text text-transparent font-mono">
-                🛡️ Admin Dashboard
+                Admin Dashboard
               </h1>
               <p className="text-muted-foreground font-mono text-sm mt-2">
                 {'>'} PLATFORM_MANAGEMENT_AND_ANALYTICS
@@ -188,10 +192,13 @@ export default function AdminDashboard() {
       </div>
 
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="bg-background/50 border-2 border-dashed border-primary/20 p-1">
-          <TabsTrigger value="overview" className="font-mono data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-white/30">OVERVIEW</TabsTrigger>
-          <TabsTrigger value="submissions" className="font-mono data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-white/30">SUBMISSIONS</TabsTrigger>
-          <TabsTrigger value="analytics" className="font-mono data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-blue-500 data-[state=active]:text-white data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-white/30">ANALYTICS</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-6 bg-background/50 border-2 border-dashed border-primary/20 p-1">
+          <TabsTrigger value="overview" className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-primary/30">📊 OVERVIEW</TabsTrigger>
+          <TabsTrigger value="users" className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-primary/30">👥 USERS</TabsTrigger>
+          <TabsTrigger value="quests" className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-primary/30">🎯 QUESTS</TabsTrigger>
+          <TabsTrigger value="submissions" className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-primary/30">📝 SUBMISSIONS</TabsTrigger>
+          <TabsTrigger value="analytics" className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-primary/30">📈 ANALYTICS</TabsTrigger>
+          <TabsTrigger value="reports" className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-primary/30">📊 REPORTS</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -303,7 +310,23 @@ export default function AdminDashboard() {
           </div>
         </TabsContent>
 
+        <TabsContent value="users" className="space-y-6">
+          <UserManagement />
+        </TabsContent>
+
+        <TabsContent value="quests" className="space-y-6">
+          <QuestManagement />
+        </TabsContent>
+
         <TabsContent value="submissions" className="space-y-6">
+          <SubmissionReview />
+        </TabsContent>
+
+        <TabsContent value="reports" className="space-y-6">
+          <AnalyticsDashboard />
+        </TabsContent>
+
+        <TabsContent value="legacy-submissions" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Submission Status Distribution */}
             <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5">

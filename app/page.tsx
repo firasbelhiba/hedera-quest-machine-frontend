@@ -3,21 +3,34 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { QuestService } from '@/lib/services';
-import { DashboardStats, Quest, User } from '@/lib/types';
+import { DashboardStats, Quest, User, Badge as BadgeType, Submission } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Trophy, Target, Users, TrendingUp, Clock, Zap, Star, ArrowRight, Siren as Fire } from 'lucide-react';
+import { BadgeCollection } from '@/components/badges/badge-display';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Trophy, Target, Users, TrendingUp, Clock, Zap, Star, ArrowRight, Siren as Fire, Award, CheckCircle, XCircle, AlertCircle, FileText, Search, Filter, Grid, List, MapPin, BookOpen, Calendar } from 'lucide-react';
 import { QuestCard } from '@/components/quests/quest-card';
 import Link from 'next/link';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 
 export default function Dashboard() {
   const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [featuredQuests, setFeaturedQuests] = useState<Quest[]>([]);
+  const [quests, setQuests] = useState<Quest[]>([]);
+  const [badges, setBadges] = useState<BadgeType[]>([]);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [activeTab, setActiveTab] = useState('available');
 
   useEffect(() => {
     const loadData = async () => {
@@ -36,7 +49,23 @@ export default function Dashboard() {
         
         setStats(statsData);
         setFeaturedQuests(questsData.slice(0, 4));
+        setQuests(questsData);
         setUser(userData);
+        
+        if (userData) {
+          try {
+            const [badgesData, submissionsData] = await Promise.all([
+              QuestService.getUserBadges(String(userData.id)).catch(() => []),
+              QuestService.getSubmissions(undefined, String(userData.id)).catch(() => [])
+            ]);
+            setBadges(badgesData || []);
+            setSubmissions(submissionsData || []);
+          } catch (error) {
+            console.error('Failed to load user data:', error);
+            setBadges([]);
+            setSubmissions([]);
+          }
+        }
       } catch (error) {
         console.error('Failed to load dashboard data:', error);
       } finally {
@@ -55,6 +84,50 @@ export default function Dashboard() {
     );
   }
 
+  if (!user) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-muted-foreground">Please log in to view your dashboard.</p>
+      </div>
+    );
+  }
+
+  // Quest filtering logic
+  const completedQuestIds = submissions
+    .filter(s => s.status === 'approved')
+    .map(s => s.questId);
+
+  const filteredQuests = quests.filter(quest => {
+    const matchesSearch = quest.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         quest.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || quest.category === selectedCategory;
+    const matchesDifficulty = selectedDifficulty === 'all' || quest.difficulty === selectedDifficulty;
+    
+    let matchesTab = true;
+    if (activeTab === 'available') {
+      matchesTab = !completedQuestIds.includes(quest.id);
+    } else if (activeTab === 'completed') {
+      matchesTab = completedQuestIds.includes(quest.id);
+    }
+    
+    return matchesSearch && matchesCategory && matchesDifficulty && matchesTab;
+  });
+
+  const submissionStats = {
+    total: submissions.length,
+    approved: submissions.filter(s => s.status === 'approved').length,
+    pending: submissions.filter(s => s.status === 'pending').length,
+    needsRevision: submissions.filter(s => s.status === 'needs-revision').length,
+    rejected: submissions.filter(s => s.status === 'rejected').length
+  };
+
+  const recentActivity = submissions
+    .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())
+    .slice(0, 5);
+
+  const categories = Array.from(new Set(quests.map(q => q.category).filter(Boolean)));
+  const difficulties = ['beginner', 'intermediate', 'advanced', 'expert'];
+
   return (
     <div className="space-y-8">
       {/* Welcome Header */}
@@ -64,10 +137,10 @@ export default function Dashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-purple-500 to-cyan-500 bg-clip-text text-transparent font-mono">
-                🚀 Welcome back!
+                🚀 Welcome back, {user?.name}!
               </h1>
               <p className="text-muted-foreground font-mono text-sm mt-2">
-                {'>'} Ready to continue your Hedera journey? Streak: {user?.streak || 0} days
+                {'>'} Your complete quest journey in one place • Streak: {user?.streak || 0} days
               </p>
             </div>
             {user?.role !== 'admin' && (
@@ -141,137 +214,552 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      {/* Progress to Next Level */}
-      <Card className="border-2 border-dashed border-yellow-500/20 bg-gradient-to-br from-yellow-500/5 to-orange-500/5 hover:border-solid transition-all duration-200">
-        <CardHeader className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10">
-          <CardTitle className="flex items-center gap-2 font-mono">
-            <div className="p-1 bg-yellow-500/20 rounded border border-dashed border-yellow-500/40">
-              <Zap className="w-4 h-4 text-yellow-500" />
-            </div>
-            ⚡ LEVEL_PROGRESS
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4 mt-2">
-          <div className="space-y-3">
-            <div className="flex justify-between text-sm font-mono">
-              <span className="bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent font-bold">
-                LVL_{user?.userLevel?.level || user?.level || 1}
-              </span>
-              <span className="bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent font-bold">
-                LVL_{(user?.userLevel?.level || user?.level || 1) + 1}
-              </span>
-            </div>
-            <div className="relative">
-              <Progress 
-                value={user?.userLevel ? (user.userLevel.progress / user.userLevel.max_progress) * 100 : 0} 
-                className="h-4 border border-dashed border-primary/20" 
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent rounded-full" />
-            </div>
-            <div className="flex justify-between text-xs font-mono text-muted-foreground">
-              <span>{user?.userLevel?.progress || 0} XP</span>
-              <span>{user?.userLevel?.max_progress || 100} XP</span>
-            </div>
-            <p className="text-sm text-muted-foreground font-mono">
-              {'>'} Earn {(user?.userLevel?.max_progress || 100) - (user?.userLevel?.progress || 0)} more XP to reach the next level
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Main Content Tabs */}
+      <Tabs defaultValue="overview" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4 bg-muted/50 rounded-lg p-1">
+          <TabsTrigger 
+            value="overview" 
+            className="text-sm data-[state=active]:bg-background data-[state=active]:text-primary"
+          >
+            📊 OVERVIEW
+          </TabsTrigger>
+          <TabsTrigger 
+            value="quests" 
+            className="text-sm data-[state=active]:bg-background data-[state=active]:text-primary"
+          >
+            🎯 QUESTS ({filteredQuests.length})
+          </TabsTrigger>
+          <TabsTrigger 
+            value="progress" 
+            className="text-sm data-[state=active]:bg-background data-[state=active]:text-primary"
+          >
+            📈 PROGRESS
+          </TabsTrigger>
+          <TabsTrigger 
+            value="badges" 
+            className="text-sm data-[state=active]:bg-background data-[state=active]:text-primary"
+          >
+            🏆 BADGES ({badges.length})
+          </TabsTrigger>
+        </TabsList>
 
-
-
-      {/* Platform Stats */}
-      {stats && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card className="border-2 border-dashed border-blue-500/20 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 hover:border-solid transition-all duration-200">
-            <CardHeader className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10">
+        <TabsContent value="overview" className="space-y-6">
+          {/* Progress to Next Level */}
+          <Card className="border-2 border-dashed border-yellow-500/20 bg-gradient-to-br from-yellow-500/5 to-orange-500/5 hover:border-solid transition-all duration-200">
+            <CardHeader className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10">
               <CardTitle className="flex items-center gap-2 font-mono">
-                <div className="p-1 bg-blue-500/20 rounded border border-dashed border-blue-500/40">
-                  <Users className="w-4 h-4 text-blue-500" />
+                <div className="p-1 bg-yellow-500/20 rounded border border-dashed border-yellow-500/40">
+                  <Zap className="w-4 h-4 text-yellow-500" />
                 </div>
-                👥 COMMUNITY
+                ⚡ LEVEL_PROGRESS
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="text-2xl font-bold font-mono bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
-                  {stats.totalUsers.toLocaleString()}
+            <CardContent className="space-y-4 mt-2">
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm font-mono">
+                  <span className="bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent font-bold">
+                    LVL_{user?.userLevel?.level || user?.level || 1}
+                  </span>
+                  <span className="bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent font-bold">
+                    LVL_{(user?.userLevel?.level || user?.level || 1) + 1}
+                  </span>
                 </div>
-                <p className="text-sm text-muted-foreground font-mono">Active learners</p>
+                <div className="relative">
+                  <Progress 
+                    value={user?.userLevel ? (user.userLevel.progress / user.userLevel.max_progress) * 100 : 0} 
+                    className="h-4 border border-dashed border-primary/20" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent rounded-full" />
+                </div>
+                <div className="flex justify-between text-xs font-mono text-muted-foreground">
+                  <span>{user?.userLevel?.progress || 0} XP</span>
+                  <span>{user?.userLevel?.max_progress || 100} XP</span>
+                </div>
+                <p className="text-sm text-muted-foreground font-mono">
+                  {'>'} Earn {(user?.userLevel?.max_progress || 100) - (user?.userLevel?.progress || 0)} more XP to reach the next level
+                </p>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-2 border-dashed border-green-500/20 bg-gradient-to-br from-green-500/5 to-emerald-500/5 hover:border-solid transition-all duration-200">
-            <CardHeader className="bg-gradient-to-r from-green-500/10 to-emerald-500/10">
-              <CardTitle className="flex items-center gap-2 font-mono">
-                <div className="p-1 bg-green-500/20 rounded border border-dashed border-green-500/40">
-                  <TrendingUp className="w-4 h-4 text-green-500" />
+          {/* Recent Activity */}
+          <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5 hover:border-solid transition-all duration-200">
+            <CardHeader className="border-b border-dashed border-primary/20">
+              <CardTitle className="flex items-center gap-2 font-mono text-lg">
+                <div className="p-1 bg-primary/10 rounded border border-dashed border-primary/30">
+                  <Clock className="w-4 h-4 text-primary" />
                 </div>
-                📈 SUCCESS_RATE
+                {'>'} RECENT_ACTIVITY
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="text-2xl font-bold font-mono bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">
-                  {stats.approvalRate}%
+            <CardContent className="p-6">
+              {recentActivity.length > 0 ? (
+                <div className="space-y-4">
+                  {recentActivity.map((submission) => (
+                    <div key={submission.id} className="flex items-center gap-4 p-3 border-2 border-dashed border-primary/10 rounded-lg bg-gradient-to-r from-background/50 to-muted/20 hover:border-solid transition-all duration-200">
+                      <div className={cn(
+                        'w-8 h-8 rounded-lg border-2 border-dashed flex items-center justify-center',
+                        submission.status === 'approved' && 'bg-green-500/10 border-green-500/30',
+                        submission.status === 'pending' && 'bg-yellow-500/10 border-yellow-500/30',
+                        submission.status === 'needs-revision' && 'bg-orange-500/10 border-orange-500/30',
+                        submission.status === 'rejected' && 'bg-red-500/10 border-red-500/30'
+                      )}>
+                        {submission.status === 'approved' && <CheckCircle className="w-4 h-4 text-green-600" />}
+                        {submission.status === 'pending' && <Clock className="w-4 h-4 text-yellow-600" />}
+                        {submission.status === 'needs-revision' && <AlertCircle className="w-4 h-4 text-orange-600" />}
+                        {submission.status === 'rejected' && <XCircle className="w-4 h-4 text-red-600" />}
+                      </div>
+                      
+                      <div className="flex-1">
+                        <div className="font-medium font-mono text-primary">
+                          {submission.status === 'approved' && '✅ QUEST_COMPLETED'}
+                          {submission.status === 'pending' && '⏳ QUEST_SUBMITTED'}
+                          {submission.status === 'needs-revision' && '🔄 REVISION_REQUESTED'}
+                          {submission.status === 'rejected' && '❌ SUBMISSION_REJECTED'}
+                        </div>
+                        <div className="text-sm text-muted-foreground font-mono">
+                          {'>'} QUEST_#{submission.questId} • {new Date(submission.submittedAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                      
+                      {submission.points && (
+                        <div className="text-sm font-medium font-mono bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">
+                          +{submission.points} PTS
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
-                <p className="text-sm text-muted-foreground font-mono">Quest completion rate</p>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="relative mx-auto w-16 h-16 mb-4">
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-lg border-2 border-dashed border-primary/30" />
+                    <div className="relative w-full h-full bg-gradient-to-r from-primary/10 to-purple-500/10 rounded-lg flex items-center justify-center">
+                      <Calendar className="w-8 h-8 text-primary" />
+                    </div>
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2 font-mono text-primary">NO_RECENT_ACTIVITY</h3>
+                  <p className="text-muted-foreground font-mono text-sm">
+                    {'>'} Your quest submissions and achievements will appear here.
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Platform Stats */}
+          {stats && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <Card className="border-2 border-dashed border-blue-500/20 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 hover:border-solid transition-all duration-200">
+                <CardHeader className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10">
+                  <CardTitle className="flex items-center gap-2 font-mono">
+                    <div className="p-1 bg-blue-500/20 rounded border border-dashed border-blue-500/40">
+                      <Users className="w-4 h-4 text-blue-500" />
+                    </div>
+                    👥 COMMUNITY
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="text-2xl font-bold font-mono bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
+                      {stats.totalUsers.toLocaleString()}
+                    </div>
+                    <p className="text-sm text-muted-foreground font-mono">Active learners</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 border-dashed border-green-500/20 bg-gradient-to-br from-green-500/5 to-emerald-500/5 hover:border-solid transition-all duration-200">
+                <CardHeader className="bg-gradient-to-r from-green-500/10 to-emerald-500/10">
+                  <CardTitle className="flex items-center gap-2 font-mono">
+                    <div className="p-1 bg-green-500/20 rounded border border-dashed border-green-500/40">
+                      <TrendingUp className="w-4 h-4 text-green-500" />
+                    </div>
+                    📈 SUCCESS_RATE
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="text-2xl font-bold font-mono bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">
+                      {stats.approvalRate}%
+                    </div>
+                    <p className="text-sm text-muted-foreground font-mono">Quest completion rate</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 border-dashed border-purple-500/20 bg-gradient-to-br from-purple-500/5 to-indigo-500/5 hover:border-solid transition-all duration-200">
+                <CardHeader className="bg-gradient-to-r from-purple-500/10 to-indigo-500/10">
+                  <CardTitle className="flex items-center gap-2 font-mono">
+                    <div className="p-1 bg-purple-500/20 rounded border border-dashed border-purple-500/40">
+                      <Clock className="w-4 h-4 text-purple-500" />
+                    </div>
+                    ⏱️ AVG_TIME
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    <div className="text-2xl font-bold font-mono bg-gradient-to-r from-purple-500 to-indigo-500 bg-clip-text text-transparent">
+                      {stats.avgCompletionTime}h
+                    </div>
+                    <p className="text-sm text-muted-foreground font-mono">Per quest completion</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Featured Quests */}
+          <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-blue-500/5 hover:border-solid transition-all duration-200">
+            <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-500/10">
+              <div className="flex items-center justify-between">
+                <CardTitle className="font-mono bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
+                  🎯 FEATURED_QUESTS
+                </CardTitle>
+                <Link href="/quests">
+                  <Button variant="outline" size="sm" className="font-mono border-dashed hover:border-solid transition-all duration-200">
+                    View All <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {featuredQuests.map((quest) => (
+                  <QuestCard key={quest.id} quest={quest} isCompleted={completedQuestIds.includes(quest.id)} />
+                ))}
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-2 border-dashed border-purple-500/20 bg-gradient-to-br from-purple-500/5 to-indigo-500/5 hover:border-solid transition-all duration-200">
-            <CardHeader className="bg-gradient-to-r from-purple-500/10 to-indigo-500/10">
-              <CardTitle className="flex items-center gap-2 font-mono">
-                <div className="p-1 bg-purple-500/20 rounded border border-dashed border-purple-500/40">
-                  <Clock className="w-4 h-4 text-purple-500" />
+          {/* Popular Categories */}
+          {stats && (
+            <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-blue-500/5 hover:border-solid transition-all duration-200">
+              <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-500/10">
+                <CardTitle className="font-mono bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
+                  📊 POPULAR_CATEGORIES
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {stats.popularCategories.map((category) => (
+                    <div key={category.category} className="flex items-center justify-between p-3 bg-gradient-to-r from-background/50 to-muted/20 rounded-lg border border-dashed border-primary/10 hover:border-solid transition-all duration-200">
+                      <div className="flex items-center gap-3">
+                        <Badge 
+                          variant="outline" 
+                          className="capitalize font-mono border-dashed bg-gradient-to-r from-primary/10 to-blue-500/10 hover:border-solid transition-all duration-200"
+                        >
+                          {category.category.replace('-', ' ')}
+                        </Badge>
+                      </div>
+                      <div className="text-sm text-muted-foreground font-mono">
+                        {category.count} quests
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                ⏱️ AVG_TIME
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="quests" className="space-y-6">
+          {/* Quest Filters */}
+          <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-blue-500/5 hover:border-solid transition-all duration-200">
+            <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-500/10">
+              <CardTitle className="flex items-center gap-2 font-mono">
+                <div className="p-1 bg-primary/20 rounded border border-dashed border-primary/40">
+                  <Search className="w-4 h-4 text-primary" />
+                </div>
+                🔍 QUEST_FILTERS
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="text-2xl font-bold font-mono bg-gradient-to-r from-purple-500 to-indigo-500 bg-clip-text text-transparent">
-                  {stats.avgCompletionTime}h
+            <CardContent className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-mono text-muted-foreground uppercase tracking-wider">SEARCH</label>
+                  <Input
+                    placeholder="Search quests..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="font-mono border-dashed"
+                  />
                 </div>
-                <p className="text-sm text-muted-foreground font-mono">Per quest completion</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {/* Popular Categories */}
-      {stats && (
-        <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-blue-500/5 hover:border-solid transition-all duration-200">
-          <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-500/10">
-            <CardTitle className="font-mono bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
-              📊 POPULAR_CATEGORIES
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {stats.popularCategories.map((category) => (
-                <div key={category.category} className="flex items-center justify-between p-3 bg-gradient-to-r from-background/50 to-muted/20 rounded-lg border border-dashed border-primary/10 hover:border-solid transition-all duration-200">
-                  <div className="flex items-center gap-3">
-                    <Badge 
-                      variant="outline" 
-                      className="capitalize font-mono border-dashed bg-gradient-to-r from-primary/10 to-blue-500/10 hover:border-solid transition-all duration-200"
+                <div className="space-y-2">
+                  <label className="text-sm font-mono text-muted-foreground uppercase tracking-wider">CATEGORY</label>
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger className="font-mono border-dashed">
+                      <SelectValue placeholder="All categories" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Categories</SelectItem>
+                      {categories.map((category) => (
+                        <SelectItem key={category} value={category} className="capitalize">
+                          {category?.replace('-', ' ') || category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-mono text-muted-foreground uppercase tracking-wider">DIFFICULTY</label>
+                  <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
+                    <SelectTrigger className="font-mono border-dashed">
+                      <SelectValue placeholder="All difficulties" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Difficulties</SelectItem>
+                      {difficulties.map((difficulty) => (
+                        <SelectItem key={difficulty} value={difficulty} className="capitalize">
+                          {difficulty}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-mono text-muted-foreground uppercase tracking-wider">VIEW</label>
+                  <div className="flex gap-2">
+                    <Button
+                      variant={viewMode === 'grid' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setViewMode('grid')}
+                      className="flex-1 font-mono border-dashed"
                     >
-                      {category.category.replace('-', ' ')}
-                    </Badge>
-                  </div>
-                  <div className="text-sm text-muted-foreground font-mono">
-                    {category.count} quests
+                      <Grid className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant={viewMode === 'list' ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setViewMode('list')}
+                      className="flex-1 font-mono border-dashed"
+                    >
+                      <List className="w-4 h-4" />
+                    </Button>
                   </div>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Quest Tabs */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+            <TabsList className="grid w-full grid-cols-3 bg-muted/50 rounded-lg p-1">
+              <TabsTrigger value="available" className="text-sm font-mono">
+                🎯 AVAILABLE ({quests.filter(q => !completedQuestIds.includes(q.id)).length})
+              </TabsTrigger>
+              <TabsTrigger value="completed" className="text-sm font-mono">
+                ✅ COMPLETED ({completedQuestIds.length})
+              </TabsTrigger>
+              <TabsTrigger value="all" className="text-sm font-mono">
+                📋 ALL ({quests.length})
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value={activeTab} className="space-y-4">
+              {filteredQuests.length > 0 ? (
+                <div className={cn(
+                  viewMode === 'grid' 
+                    ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+                    : 'space-y-4'
+                )}>
+                  {filteredQuests.map((quest) => (
+                    <QuestCard 
+                      key={quest.id} 
+                      quest={quest} 
+                      isCompleted={completedQuestIds.includes(quest.id)}
+                      viewMode={viewMode}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5">
+                  <CardContent className="p-12 text-center">
+                    <div className="relative mx-auto w-16 h-16 mb-4">
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-lg border-2 border-dashed border-primary/30" />
+                      <div className="relative w-full h-full bg-gradient-to-r from-primary/10 to-purple-500/10 rounded-lg flex items-center justify-center">
+                        <Target className="w-8 h-8 text-primary" />
+                      </div>
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2 font-mono text-primary">NO_QUESTS_FOUND</h3>
+                    <p className="text-muted-foreground font-mono text-sm">
+                      {'>'} Try adjusting your filters or check back later for new quests.
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+            </TabsContent>
+          </Tabs>
+        </TabsContent>
+
+        <TabsContent value="progress" className="space-y-6">
+          {/* Submission Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            <Card className="border-2 border-dashed border-blue-500/20 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 hover:border-solid transition-all duration-200">
+              <CardContent className="p-6">
+                <div className="flex items-center">
+                  <div className="p-2 bg-blue-500/10 rounded-lg border border-dashed border-blue-500/30">
+                    <FileText className="h-6 w-6 text-blue-500" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">TOTAL</p>
+                    <p className="text-2xl font-bold font-mono">{submissionStats.total}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-dashed border-green-500/20 bg-gradient-to-br from-green-500/5 to-emerald-500/5 hover:border-solid transition-all duration-200">
+              <CardContent className="p-6">
+                <div className="flex items-center">
+                  <div className="p-2 bg-green-500/10 rounded-lg border border-dashed border-green-500/30">
+                    <CheckCircle className="h-6 w-6 text-green-500" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">APPROVED</p>
+                    <p className="text-2xl font-bold font-mono">{submissionStats.approved}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-dashed border-yellow-500/20 bg-gradient-to-br from-yellow-500/5 to-orange-500/5 hover:border-solid transition-all duration-200">
+              <CardContent className="p-6">
+                <div className="flex items-center">
+                  <div className="p-2 bg-yellow-500/10 rounded-lg border border-dashed border-yellow-500/30">
+                    <Clock className="h-6 w-6 text-yellow-500" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">PENDING</p>
+                    <p className="text-2xl font-bold font-mono">{submissionStats.pending}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-dashed border-orange-500/20 bg-gradient-to-br from-orange-500/5 to-red-500/5 hover:border-solid transition-all duration-200">
+              <CardContent className="p-6">
+                <div className="flex items-center">
+                  <div className="p-2 bg-orange-500/10 rounded-lg border border-dashed border-orange-500/30">
+                    <AlertCircle className="h-6 w-6 text-orange-500" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">REVISION</p>
+                    <p className="text-2xl font-bold font-mono">{submissionStats.needsRevision}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-dashed border-red-500/20 bg-gradient-to-br from-red-500/5 to-pink-500/5 hover:border-solid transition-all duration-200">
+              <CardContent className="p-6">
+                <div className="flex items-center">
+                  <div className="p-2 bg-red-500/10 rounded-lg border border-dashed border-red-500/30">
+                    <XCircle className="h-6 w-6 text-red-500" />
+                  </div>
+                  <div className="ml-4">
+                    <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">REJECTED</p>
+                    <p className="text-2xl font-bold font-mono">{submissionStats.rejected}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Detailed Progress */}
+          <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5 hover:border-solid transition-all duration-200">
+            <CardHeader className="border-b border-dashed border-primary/20">
+              <CardTitle className="flex items-center gap-2 font-mono text-lg">
+                <div className="p-1 bg-primary/10 rounded border border-dashed border-primary/30">
+                  <TrendingUp className="w-4 h-4 text-primary" />
+                </div>
+                {'>'} SUBMISSION_HISTORY
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              {submissions.length > 0 ? (
+                <div className="space-y-4">
+                  {submissions
+                    .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())
+                    .map((submission) => (
+                    <div key={submission.id} className="flex items-center gap-4 p-4 border-2 border-dashed border-primary/10 rounded-lg bg-gradient-to-r from-background/50 to-muted/20 hover:border-solid transition-all duration-200">
+                      <div className={cn(
+                        'w-10 h-10 rounded-lg border-2 border-dashed flex items-center justify-center',
+                        submission.status === 'approved' && 'bg-green-500/10 border-green-500/30',
+                        submission.status === 'pending' && 'bg-yellow-500/10 border-yellow-500/30',
+                        submission.status === 'needs-revision' && 'bg-orange-500/10 border-orange-500/30',
+                        submission.status === 'rejected' && 'bg-red-500/10 border-red-500/30'
+                      )}>
+                        {submission.status === 'approved' && <CheckCircle className="w-5 h-5 text-green-600" />}
+                        {submission.status === 'pending' && <Clock className="w-5 h-5 text-yellow-600" />}
+                        {submission.status === 'needs-revision' && <AlertCircle className="w-5 h-5 text-orange-600" />}
+                        {submission.status === 'rejected' && <XCircle className="w-5 h-5 text-red-600" />}
+                      </div>
+                      
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <div className="font-medium font-mono text-primary">
+                            QUEST_#{submission.questId}
+                          </div>
+                          <Badge 
+                            variant="outline" 
+                            className={cn(
+                              'font-mono text-xs border-dashed',
+                              submission.status === 'approved' && 'bg-green-500/10 border-green-500/30 text-green-700',
+                              submission.status === 'pending' && 'bg-yellow-500/10 border-yellow-500/30 text-yellow-700',
+                              submission.status === 'needs-revision' && 'bg-orange-500/10 border-orange-500/30 text-orange-700',
+                              submission.status === 'rejected' && 'bg-red-500/10 border-red-500/30 text-red-700'
+                            )}
+                          >
+                            {submission.status.toUpperCase().replace('-', '_')}
+                          </Badge>
+                        </div>
+                        <div className="text-sm text-muted-foreground font-mono">
+                          {'>'} Submitted: {new Date(submission.submittedAt).toLocaleDateString()}
+                          {submission.reviewedAt && (
+                            <> • Reviewed: {new Date(submission.reviewedAt).toLocaleDateString()}</>
+                          )}
+                        </div>
+                        {submission.feedback && (
+                          <div className="text-sm text-muted-foreground mt-2 p-2 bg-muted/50 rounded border border-dashed border-primary/10">
+                            {'>'} {submission.feedback}
+                          </div>
+                        )}
+                      </div>
+                      
+                      {submission.points && (
+                        <div className="text-right">
+                          <div className="text-lg font-bold font-mono bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">
+                            +{submission.points}
+                          </div>
+                          <div className="text-xs text-muted-foreground font-mono">POINTS</div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <div className="relative mx-auto w-16 h-16 mb-4">
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-lg border-2 border-dashed border-primary/30" />
+                    <div className="relative w-full h-full bg-gradient-to-r from-primary/10 to-purple-500/10 rounded-lg flex items-center justify-center">
+                      <FileText className="w-8 h-8 text-primary" />
+                    </div>
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2 font-mono text-primary">NO_SUBMISSIONS_YET</h3>
+                  <p className="text-muted-foreground font-mono text-sm">
+                    {'>'} Start completing quests to track your progress here.
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="badges" className="space-y-6">
+          <BadgeCollection badges={badges} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

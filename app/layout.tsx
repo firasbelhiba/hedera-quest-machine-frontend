@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { ThemeProvider } from '@/components/ui/theme-provider';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
+import { ConditionalLayout } from '@/components/layout/conditional-layout';
 import { AuthPage } from '@/components/auth/auth-page';
 import { User } from '@/lib/types';
 import useStore from '@/lib/store';
@@ -57,7 +58,7 @@ export default function RootLayout({
                   </div>
                 ) : !isAuthenticated ? (
                   <AuthPage onAuthSuccess={handleAuthSuccess} />
-                ) : (
+                ) : user?.role === 'admin' ? (
                   <div className="flex h-screen bg-background">
                     <Sidebar
                       isCollapsed={sidebarCollapsed}
@@ -75,6 +76,10 @@ export default function RootLayout({
                       </main>
                     </div>
                   </div>
+                ) : (
+                  <ConditionalLayout>
+                    {children}
+                  </ConditionalLayout>
                 )}
               </Suspense>
             </ClientProvider>

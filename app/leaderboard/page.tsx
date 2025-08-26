@@ -146,6 +146,13 @@ export default function LeaderboardPage() {
 
       {/* Period Selection */}
       <Tabs value={selectedPeriod} onValueChange={setSelectedPeriod} className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4">
+          {LEADERBOARD_PERIODS.map((period) => (
+            <TabsTrigger key={period.value} value={period.value}>
+              {period.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
 
         {LEADERBOARD_PERIODS.map((period) => (
           <TabsContent key={period.value} value={period.value} className="space-y-6">

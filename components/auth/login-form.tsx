@@ -135,13 +135,7 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
           </p>
         </div>
 
-        <div className="mt-4 p-3 bg-muted rounded-lg">
-          <p className="text-xs text-muted-foreground mb-2">Demo Accounts:</p>
-          <div className="space-y-1 text-xs">
-            <div>User: alice@example.com / password123</div>
-            <div>Admin: admin@hederaquest.com / admin123</div>
-          </div>
-        </div>
+
           </CardContent>
         </Card>
       </HydrationSafe>

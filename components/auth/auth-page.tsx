@@ -78,35 +78,8 @@ export function AuthPage({ onAuthSuccess }: { onAuthSuccess: (user: User, isAdmi
 
 
 
-          <div className="bg-white/5 backdrop-blur-sm rounded-lg p-6">
-            <h3 className="font-semibold mb-3">What you&apos;ll learn:</h3>
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-cyan-400 rounded-full"></div>
-                <span>Smart Contracts</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                <span>Token Service</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                <span>NFT Creation</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                <span>DeFi Protocols</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-pink-400 rounded-full"></div>
-                <span>Consensus Service</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                <span>File Service</span>
-              </div>
-            </div>
-          </div>
+
+
         </div>
 
         {/* Right Side - Auth Forms */}
