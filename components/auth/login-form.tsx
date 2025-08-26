@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AuthService } from '@/lib/api/auth';
+import useStore from '@/lib/store';
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
 import { HydrationSafe } from '@/components/hydration-safe';
 import ErrorBoundary from '@/components/error-boundary';
@@ -37,14 +37,19 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
     resolver: zodResolver(loginSchema)
   });
 
+  const { login } = useStore();
+
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const authResult = await AuthService.login({ email: data.email, password: data.password });
-      // AuthService.login already returns user data and admin status
-      onSuccess(authResult.user, authResult.isAdmin);
+      await login(data.email, data.password);
+      // Get the user data from store after successful login
+      const { user } = useStore.getState();
+      if (user) {
+        onSuccess(user, user.role === 'admin');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
     } finally {

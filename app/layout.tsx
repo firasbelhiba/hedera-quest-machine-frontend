@@ -28,10 +28,8 @@ export default function RootLayout({
   const router = useRouter();
 
   const handleAuthSuccess = async (authenticatedUser: User, isAdmin: boolean) => {
-    // Update store with the authenticated user
-    setUser(authenticatedUser);
-    
-    // Redirect based on admin status
+    // User data is already set in store by login method
+    // Just handle the redirect
     if (isAdmin) {
       router.push('/admin');
     } else {

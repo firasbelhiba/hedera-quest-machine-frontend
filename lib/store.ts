@@ -60,12 +60,9 @@ const useStore = create<AppState>((set, get) => ({
   login: async (email: string, password: string) => {
     set({ isLoading: true });
     try {
-      await AuthService.login({ email, password });
-      const user = await QuestService.getCurrentUser();
-      if (!user) {
-        throw new Error('Failed to fetch user data after login');
-      }
-      set({ user, isAuthenticated: true, isLoading: false });
+      const authResult = await AuthService.login({ email, password });
+      // AuthService.login already returns complete user data
+      set({ user: authResult.user, isAuthenticated: true, isLoading: false });
     } catch (error) {
       set({ isLoading: false });
       throw error;
