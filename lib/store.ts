@@ -40,11 +40,9 @@ interface AppState {
 type Theme = 'light' | 'dark';
 
 const useStore = create<AppState>((set, get) => ({
-  // Initial state - check for token on initialization to prevent login page flash
+  // Initial state - don't set authenticated until user data is loaded
   user: null,
-  isAuthenticated: typeof window !== 'undefined' && 
-    (!!localStorage.getItem('auth_token') || 
-     !!document.cookie.includes('hq_access_token')),
+  isAuthenticated: false,
   isLoading: false,
   quests: [],
   selectedQuest: null,
@@ -103,13 +101,14 @@ const useStore = create<AppState>((set, get) => ({
 
   loadCurrentUser: async () => {
     // Only load if we don't already have a user
-    const { user, isAuthenticated, isLoading } = get();
+    const { user } = get();
     if (user) {
       console.log('User already loaded, skipping API call');
       return;
     }
 
     // Prevent multiple concurrent calls
+    const { isLoading } = get();
     if (isLoading) {
       console.log('Already loading user, skipping API call');
       return;
@@ -126,11 +125,7 @@ const useStore = create<AppState>((set, get) => ({
       return;
     }
 
-    // We have a token, so we're authenticated until proven otherwise
-    if (!isAuthenticated) {
-      set({ isAuthenticated: true });
-    }
-
+    // Don't set authenticated until we have user data
     set({ isLoading: true });
     
     // Add timeout to prevent infinite loading
