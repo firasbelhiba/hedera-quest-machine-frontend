@@ -4,6 +4,7 @@ import { Badge as BadgeType } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { formatDistanceToNow } from 'date-fns';
 
 interface BadgeDisplayProps {
   badge: BadgeType;
@@ -108,7 +109,7 @@ export function BadgeDisplay({
           </div>
           {badge.earnedAt && (
             <p className="text-sm text-muted-foreground">
-              Earned: {new Date(badge.earnedAt).toLocaleDateString()}
+              Earned: {formatDistanceToNow(new Date(badge.earnedAt), { addSuffix: true })}
             </p>
           )}
         </CardContent>

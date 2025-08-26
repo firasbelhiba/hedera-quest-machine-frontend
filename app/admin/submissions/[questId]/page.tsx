@@ -28,6 +28,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatDistanceToNow } from 'date-fns';
 import {
   Dialog,
   DialogContent,
@@ -294,7 +295,7 @@ export default function QuestSubmissionsPage() {
                       <TableCell>
                         <div className="flex items-center gap-1 text-sm text-gray-400">
                           <Calendar className="w-3 h-3" />
-                          {new Date(submission.submittedAt || submission.created_at || Date.now()).toLocaleDateString()}
+                          {formatDistanceToNow(new Date(submission.submittedAt || submission.created_at || Date.now()), { addSuffix: true })}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -452,13 +453,7 @@ export default function QuestSubmissionsPage() {
                                   <h3 className="text-sm font-medium text-gray-400 mb-2">SUBMITTED</h3>
                                   <div className="flex items-center gap-2 text-sm text-white">
                                     <Calendar className="w-4 h-4 text-gray-400" />
-                                    {new Date(submission.submittedAt || submission.created_at || Date.now()).toLocaleDateString('en-US', {
-                                      year: 'numeric',
-                                      month: 'long',
-                                      day: 'numeric',
-                                      hour: '2-digit',
-                                      minute: '2-digit'
-                                    })}
+                                    {formatDistanceToNow(new Date(submission.submittedAt || submission.created_at || Date.now()), { addSuffix: true })}
                                   </div>
                                 </div>
                               </div>

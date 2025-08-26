@@ -34,6 +34,7 @@ import {
   Search
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatDistanceToNow } from 'date-fns';
 
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
@@ -112,10 +113,10 @@ export default function EventsPage() {
     const end = new Date(endDate);
     
     if (start.toDateString() === end.toDateString()) {
-      return start.toLocaleDateString();
+      return formatDistanceToNow(start, { addSuffix: true });
     }
     
-    return `${start.toLocaleDateString()} - ${end.toLocaleDateString()}`;
+    return `${formatDistanceToNow(start, { addSuffix: true })} - ${formatDistanceToNow(end, { addSuffix: true })}`;
   };
 
   if (isLoading) {
@@ -449,8 +450,8 @@ export default function EventsPage() {
                 <div>
                   <h4 className="font-semibold mb-2">Event Details</h4>
                   <div className="space-y-2 text-sm">
-                    <div>Start: {new Date(selectedEvent.startDate).toLocaleDateString()}</div>
-                    <div>End: {new Date(selectedEvent.endDate).toLocaleDateString()}</div>
+                    <div>Start: {formatDistanceToNow(new Date(selectedEvent.startDate), { addSuffix: true })}</div>
+                <div>End: {formatDistanceToNow(new Date(selectedEvent.endDate), { addSuffix: true })}</div>
                     <div>Participants: {selectedEvent.participants}</div>
                     {selectedEvent.maxParticipants && (
                       <div>Max Participants: {selectedEvent.maxParticipants}</div>

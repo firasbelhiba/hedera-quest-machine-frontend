@@ -14,6 +14,7 @@ import {
   BookOpen 
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatDistanceToNow } from 'date-fns';
 
 interface Stat {
   id: string;
@@ -254,7 +255,7 @@ export function StatsOverview() {
       {/* Additional Info */}
       <div className="text-center pt-4">
         <p className="text-sm text-muted-foreground font-mono">
-          {'>'} Statistics updated in real-time • Last updated: {new Date().toLocaleDateString()}
+          {'>'} Statistics updated in real-time • Last updated: {formatDistanceToNow(new Date(), { addSuffix: true })}
         </p>
       </div>
     </section>

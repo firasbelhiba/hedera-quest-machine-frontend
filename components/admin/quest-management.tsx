@@ -8,13 +8,14 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
+import { format, formatDistanceToNow } from 'date-fns';
 import { Search, Plus, MoreHorizontal, Eye, Edit, Play, Pause, XCircle, Trash2, Filter, Users, Calendar, Clock, Award, User, MapPin, Target, FileText, CheckCircle, AlertCircle, Compass, Trophy } from 'lucide-react';
 import { QuestService } from '@/lib/services';
 import { CreateQuestForm } from '@/components/admin/create-quest-form';
@@ -27,7 +28,7 @@ function QuestManagement() {
   const [filteredQuests, setFilteredQuests] = useState<Quest[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+
   const [selectedDifficulty, setSelectedDifficulty] = useState('all');
   const [selectedQuest, setSelectedQuest] = useState<Quest | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -42,7 +43,7 @@ function QuestManagement() {
 
   useEffect(() => {
     filterQuests();
-  }, [quests, searchTerm, selectedCategory, selectedDifficulty]);
+  }, [quests, searchTerm, selectedDifficulty]);
 
   const loadQuests = async () => {
     try {
@@ -69,10 +70,6 @@ function QuestManagement() {
         quest.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         quest.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
-    }
-
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(quest => quest.category === selectedCategory);
     }
 
     if (selectedDifficulty !== 'all') {
@@ -146,17 +143,7 @@ function QuestManagement() {
     }
   };
 
-  const getCategoryColor = (category: string) => {
-     const colors = {
-       'smart-contracts': 'text-purple-600 bg-purple-50 border-purple-200',
-       'tokens': 'text-blue-600 bg-blue-50 border-blue-200',
-       'nfts': 'text-pink-600 bg-pink-50 border-pink-200',
-       'defi': 'text-indigo-600 bg-indigo-50 border-indigo-200',
-       'consensus': 'text-orange-600 bg-orange-50 border-orange-200',
-       'mirror-node': 'text-teal-600 bg-teal-50 border-teal-200',
-     };
-     return colors[category as keyof typeof colors] || 'text-gray-600 bg-gray-50 border-gray-200';
-   };
+
 
    const getStatusBadge = (status: string | undefined) => {
     if (!status) {
@@ -188,30 +175,7 @@ function QuestManagement() {
     }
   };
 
-  const getCategoryBadge = (category: string | undefined) => {
-    if (!category) {
-      return <Badge variant="outline" className="font-mono">UNCATEGORIZED</Badge>;
-    }
-    
-    const categoryColors: Record<string, string> = {
-      'smart-contracts': 'purple',
-      'token-service': 'blue',
-      'nfts': 'pink',
-      'defi': 'cyan',
-      'consensus': 'orange',
-      'file-service': 'indigo',
-      'getting-started': 'green',
-      'development': 'yellow',
-      'community': 'red'
-    };
-    
-    const color = categoryColors[category] || 'gray';
-    return (
-      <Badge className={`bg-${color}-500/10 text-${color}-500 border-${color}-500/20 font-mono`}>
-        {category.replace('-', ' ').toUpperCase()}
-      </Badge>
-    );
-  };
+
 
   const handleQuestAction = async (questId: string | number, action: string) => {
     try {
@@ -277,20 +241,7 @@ function QuestManagement() {
                 <SelectItem value="archived">[ARCHIVED]</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-48 font-mono border-dashed border-cyan-500/30">
-                <SelectValue placeholder="[CATEGORY]" />
-              </SelectTrigger>
-              <SelectContent className="font-mono">
-                <SelectItem value="all">[ALL_CATEGORIES]</SelectItem>
-                <SelectItem value="smart-contracts">[SMART_CONTRACTS]</SelectItem>
-                <SelectItem value="tokens">[TOKENS]</SelectItem>
-                <SelectItem value="nfts">[NFTS]</SelectItem>
-                <SelectItem value="defi">[DEFI]</SelectItem>
-                <SelectItem value="consensus">[CONSENSUS]</SelectItem>
-                <SelectItem value="mirror-node">[MIRROR_NODE]</SelectItem>
-              </SelectContent>
-            </Select>
+
             <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
               <SelectTrigger className="w-44 font-mono border-dashed border-cyan-500/30">
                 <SelectValue placeholder="[DIFFICULTY]" />
@@ -317,7 +268,6 @@ function QuestManagement() {
               <TableHeader>
                 <TableRow className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border-b-2 border-dashed border-cyan-500/30">
                   <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4">[QUEST]</TableHead>
-                  <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4">[CATEGORY]</TableHead>
                   <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4">[DIFFICULTY]</TableHead>
                   <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4">[STATUS]</TableHead>
                   <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4">[STATS]</TableHead>
@@ -336,7 +286,6 @@ function QuestManagement() {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="py-4">{getCategoryBadge(quest.category)}</TableCell>
                     <TableCell className="py-4">{getDifficultyBadge(quest.difficulty)}</TableCell>
                     <TableCell className="py-4">{getStatusBadge(quest.status)}</TableCell>
                     <TableCell className="py-4">
@@ -355,11 +304,11 @@ function QuestManagement() {
                         </div>
                         <div className="flex items-center gap-1.5 bg-purple-50 dark:bg-purple-900/20 px-2 py-1 rounded border border-dashed border-purple-300/50">
                           <Calendar className="w-3 h-3 text-purple-600" />
-                          <span className="font-semibold">{quest.updatedAt}</span>
+                          <span className="font-semibold">{quest.updatedAt ? formatDistanceToNow(new Date(quest.updatedAt), { addSuffix: true }) : 'N/A'}</span>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="font-mono text-sm py-4 text-muted-foreground">{quest.updatedAt}</TableCell>
+                    <TableCell className="font-mono text-sm py-4 text-muted-foreground">{quest.updatedAt ? formatDistanceToNow(new Date(quest.updatedAt), { addSuffix: true }) : 'N/A'}</TableCell>
                     <TableCell className="py-4">
                       <div className="flex items-center justify-center gap-2">
                         <Button
@@ -523,16 +472,13 @@ function QuestManagement() {
                     <div className="text-center p-3 bg-gray-50 rounded-lg">
                       <Calendar className="w-6 h-6 mx-auto mb-1 text-purple-600" />
                       <div className="text-sm text-gray-600">Updated</div>
-                      <div className="font-semibold text-xs">{selectedQuest.updatedAt}</div>
+                      <div className="font-semibold text-xs">{selectedQuest.updatedAt ? formatDistanceToNow(new Date(selectedQuest.updatedAt), { addSuffix: true }) : 'N/A'}</div>
                     </div>
                   </div>
 
                   <div className="flex flex-wrap gap-2 mb-4">
                     <Badge className={getDifficultyColor(selectedQuest.difficulty)}>
                       {selectedQuest.difficulty}
-                    </Badge>
-                    <Badge className={getCategoryColor(selectedQuest.category || '')}>
-                      {selectedQuest.category?.replace('-', ' ')}
                     </Badge>
                     {getStatusBadge(selectedQuest.status)}
                   </div>

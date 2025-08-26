@@ -27,6 +27,7 @@ import {
   MessageCircle,
   Facebook
 } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
 
 export default function SettingsPage() {
   const [adminProfile, setAdminProfile] = useState<any>(null);
@@ -763,13 +764,13 @@ export default function SettingsPage() {
                       <div>
                         <Label className="text-sm">Connected At</Label>
                         <p className="text-sm text-muted-foreground">
-                          {new Date(adminProfile.twitterProfile.created_at).toLocaleDateString()}
+                          {formatDistanceToNow(new Date(adminProfile.twitterProfile.created_at), { addSuffix: true })}
                         </p>
                       </div>
                       <div>
                         <Label className="text-sm">Token Expires</Label>
                         <p className="text-sm text-muted-foreground">
-                          {new Date(adminProfile.twitterProfile.expires_at).toLocaleDateString()}
+                          {formatDistanceToNow(new Date(adminProfile.twitterProfile.expires_at), { addSuffix: true })}
                         </p>
                       </div>
                     </div>
@@ -820,13 +821,13 @@ export default function SettingsPage() {
                       <div>
                         <Label className="text-sm">Connected At</Label>
                         <p className="text-sm text-muted-foreground">
-                          {new Date(adminProfile.discordProfile.created_at).toLocaleDateString()}
+                          {formatDistanceToNow(new Date(adminProfile.discordProfile.created_at), { addSuffix: true })}
                         </p>
                       </div>
                       <div>
                         <Label className="text-sm">Token Expires</Label>
                         <p className="text-sm text-muted-foreground">
-                          {adminProfile.discordProfile.expires_at ? new Date(adminProfile.discordProfile.expires_at).toLocaleDateString() : 'Never'}
+                          {adminProfile.discordProfile.expires_at ? formatDistanceToNow(new Date(adminProfile.discordProfile.expires_at), { addSuffix: true }) : 'Never'}
                         </p>
                       </div>
                     </div>
@@ -877,13 +878,13 @@ export default function SettingsPage() {
                       <div>
                         <Label className="text-sm">Connected At</Label>
                         <p className="text-sm text-muted-foreground">
-                          {new Date(adminProfile.facebookProfile.created_at).toLocaleDateString()}
+                          {formatDistanceToNow(new Date(adminProfile.facebookProfile.created_at), { addSuffix: true })}
                         </p>
                       </div>
                       <div>
                         <Label className="text-sm">Token Expires</Label>
                         <p className="text-sm text-muted-foreground">
-                          {adminProfile.facebookProfile.expires_at ? new Date(adminProfile.facebookProfile.expires_at).toLocaleDateString() : 'Never'}
+                          {adminProfile.facebookProfile.expires_at ? formatDistanceToNow(new Date(adminProfile.facebookProfile.expires_at), { addSuffix: true }) : 'Never'}
                         </p>
                       </div>
                     </div>

@@ -28,6 +28,7 @@ import {
   MessageSquare
 } from 'lucide-react';
 import { SiDiscord } from 'react-icons/si';
+import { formatDistanceToNow } from 'date-fns';
 
 const profileSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -444,7 +445,7 @@ export default function ProfilePage() {
             </div>
             <div>
               <h1 className="text-3xl font-bold font-mono bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">{profileData?.user?.firstName && profileData?.user?.lastName ? `${profileData.user.firstName} ${profileData.user.lastName}` : profileData?.user?.username || 'User'}</h1>
-              <p className="text-muted-foreground font-mono text-sm">{'>'} Member since {profileData?.user?.created_at ? new Date(profileData.user.created_at).toLocaleDateString() : 'Unknown'}</p>
+              <p className="text-muted-foreground font-mono text-sm">{'>'} Member since {profileData?.user?.created_at ? formatDistanceToNow(new Date(profileData.user.created_at), { addSuffix: true }) : 'Unknown'}</p>
             </div>
           </div>
         </CardContent>

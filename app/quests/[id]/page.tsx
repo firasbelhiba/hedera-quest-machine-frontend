@@ -45,6 +45,7 @@ import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 import { api } from '@/lib/api/client';
+import { formatDistanceToNow } from 'date-fns';
 
 export default function QuestDetailPage() {
   const params = useParams();
@@ -254,8 +255,8 @@ export default function QuestDetailPage() {
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">START</div>
                     <div>
-                      <div className="font-mono font-semibold text-gray-900 dark:text-white">{new Date(quest.startDate || Date.now()).toLocaleDateString()}</div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">START_DATE</div>
+                      <div className="font-mono font-semibold text-gray-900 dark:text-white">{formatDistanceToNow(new Date(quest.startDate || Date.now()), { addSuffix: true })}</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">START_DATE</div>
                     </div>
                   </div>
                 </div>
@@ -263,8 +264,8 @@ export default function QuestDetailPage() {
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">END</div>
                     <div>
-                      <div className="font-mono font-semibold text-gray-900 dark:text-white">{new Date(quest.endDate || Date.now()).toLocaleDateString()}</div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">END_DATE</div>
+                      <div className="font-mono font-semibold text-gray-900 dark:text-white">{formatDistanceToNow(new Date(quest.endDate || Date.now()), { addSuffix: true })}</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">END_DATE</div>
                     </div>
                   </div>
                 </div>

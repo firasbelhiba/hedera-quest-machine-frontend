@@ -55,6 +55,7 @@ import {
   Code,
   Link
 } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
 
 interface Submission {
   id: string;
@@ -248,13 +249,7 @@ export function SubmissionReview({ className }: SubmissionReviewProps) {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    return formatDistanceToNow(new Date(dateString), { addSuffix: true });
   };
 
   return (

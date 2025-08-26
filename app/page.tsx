@@ -18,6 +18,7 @@ import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { formatDistanceToNow } from 'date-fns';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -436,7 +437,7 @@ export default function Dashboard() {
                           {submission.status === 'rejected' && 'SUBMISSION_REJECTED'}
                         </div>
                         <div className="text-sm text-muted-foreground font-mono">
-                          {'>'} QUEST_#{submission.questId} • {new Date(submission.submittedAt).toLocaleDateString()}
+                          {'>'} QUEST_#{submission.questId} • {formatDistanceToNow(new Date(submission.submittedAt), { addSuffix: true })}
                         </div>
                       </div>
                       

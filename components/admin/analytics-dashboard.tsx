@@ -44,6 +44,7 @@ import {
   LineChart as LineChartIcon,
   AreaChart as AreaChartIcon
 } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
 
 interface AnalyticsDashboardProps {
   className?: string;
@@ -352,7 +353,7 @@ export function AnalyticsDashboard({ className }: AnalyticsDashboardProps) {
                     <XAxis 
                       dataKey="date" 
                       className="font-mono" 
-                      tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      tickFormatter={(value) => formatDistanceToNow(new Date(value), { addSuffix: true })}
                     />
                     <YAxis className="font-mono" />
                     <Tooltip 
@@ -361,7 +362,7 @@ export function AnalyticsDashboard({ className }: AnalyticsDashboardProps) {
                         border: '2px dashed hsl(var(--border))',
                         fontFamily: 'monospace'
                       }}
-                      labelFormatter={(value) => new Date(value).toLocaleDateString()}
+                      labelFormatter={(value) => formatDistanceToNow(new Date(value), { addSuffix: true })}
                     />
                     <Area type="monotone" dataKey="submissions" stackId="1" stroke="#F59E0B" fill="#F59E0B" fillOpacity={0.6} name="Submissions" />
                     <Area type="monotone" dataKey="completions" stackId="1" stroke="#10B981" fill="#10B981" fillOpacity={0.6} name="Completions" />

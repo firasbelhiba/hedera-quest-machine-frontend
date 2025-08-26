@@ -11,6 +11,7 @@ import { BadgeCollection } from '@/components/badges/badge-display';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Trophy, Target, Calendar, TrendingUp, Star, Siren as Fire, Award, Clock, CheckCircle, XCircle, AlertCircle, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatDistanceToNow } from 'date-fns';
 
 export default function ProgressPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -326,9 +327,9 @@ export default function ProgressPage() {
                       </div>
                       
                       <div className="text-sm text-muted-foreground mb-2 font-mono">
-                        {'>'} SUBMITTED: {new Date(submission.submittedAt).toLocaleDateString()}
+                        {'>'} SUBMITTED: {formatDistanceToNow(new Date(submission.submittedAt), { addSuffix: true })}
                         {submission.reviewedAt && (
-                          <> • REVIEWED: {new Date(submission.reviewedAt).toLocaleDateString()}</>
+                          <> • REVIEWED: {formatDistanceToNow(new Date(submission.reviewedAt), { addSuffix: true })}</>)
                         )}
                       </div>
                       
@@ -401,7 +402,7 @@ export default function ProgressPage() {
                           {submission.status === 'rejected' && '❌ SUBMISSION_REJECTED'}
                         </div>
                         <div className="text-sm text-muted-foreground font-mono">
-                          {'>'} QUEST_#{submission.questId} • {new Date(submission.submittedAt).toLocaleDateString()}
+                          {'>'} QUEST_#{submission.questId} • {formatDistanceToNow(new Date(submission.submittedAt), { addSuffix: true })}
                         </div>
                       </div>
                       

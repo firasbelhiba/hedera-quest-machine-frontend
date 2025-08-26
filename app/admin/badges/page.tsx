@@ -15,6 +15,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Plus, Edit, Trash2, Eye, Filter, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { formatDistanceToNow } from 'date-fns';
 
 const rarityColors = {
   common: 'bg-gray-800 border border-gray-600 text-gray-400',
@@ -281,7 +282,7 @@ function AdminBadgesPageContent() {
                       </span>
                       {badge.created_at && (
                         <span className="text-gray-400">
-                          Created: {new Date(badge.created_at).toLocaleDateString()}
+                          Created: {formatDistanceToNow(new Date(badge.created_at), { addSuffix: true })}
                         </span>
                       )}
                     </div>
