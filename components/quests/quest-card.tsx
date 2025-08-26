@@ -29,13 +29,14 @@ const categoryColors = {
 };
 
 const difficultyConfig = {
-  beginner: { color: 'text-green-600', stars: 1 },
-  easy: { color: 'text-green-600', stars: 1 },
-  intermediate: { color: 'text-yellow-600', stars: 2 },
-  medium: { color: 'text-yellow-600', stars: 2 },
-  advanced: { color: 'text-orange-600', stars: 3 },
-  hard: { color: 'text-orange-600', stars: 3 },
-  expert: { color: 'text-red-600', stars: 4 },
+  beginner: { color: 'text-emerald-600', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-200', stars: 1 },
+  easy: { color: 'text-emerald-600', bgColor: 'bg-emerald-50', borderColor: 'border-emerald-200', stars: 1 },
+  intermediate: { color: 'text-amber-600', bgColor: 'bg-amber-50', borderColor: 'border-amber-200', stars: 2 },
+  medium: { color: 'text-amber-600', bgColor: 'bg-amber-50', borderColor: 'border-amber-200', stars: 2 },
+  advanced: { color: 'text-rose-600', bgColor: 'bg-rose-50', borderColor: 'border-rose-200', stars: 3 },
+  hard: { color: 'text-rose-600', bgColor: 'bg-rose-50', borderColor: 'border-rose-200', stars: 3 },
+  expert: { color: 'text-purple-600', bgColor: 'bg-purple-50', borderColor: 'border-purple-200', stars: 4 },
+  master: { color: 'text-indigo-600', bgColor: 'bg-indigo-50', borderColor: 'border-indigo-200', stars: 5 },
 };
 
 export function QuestCard({ quest, isCompleted = false, progress = 0, onSelect }: QuestCardProps) {
@@ -88,19 +89,21 @@ export function QuestCard({ quest, isCompleted = false, progress = 0, onSelect }
             </div>
           </div>
           
-          <div className="flex items-center space-x-1 bg-background/50 px-2 py-1 rounded border border-dashed">
-            {Array.from({ length: 4 }, (_, i) => (
-              <Star
-                key={i}
-                className={cn(
-                  'w-3 h-3 transition-all duration-200',
-                  i < difficultyInfo.stars 
-                    ? `${difficultyInfo.color} fill-current drop-shadow-sm` 
-                    : 'text-muted-foreground'
-                )}
-              />
-            ))}
-          </div>
+          <Badge className={cn(
+            'font-mono font-semibold shadow-sm border',
+            difficultyInfo.bgColor,
+            difficultyInfo.color,
+            difficultyInfo.borderColor,
+            'dark:bg-opacity-20 dark:border-opacity-50'
+          )}>
+            <div className="flex items-center gap-1.5">
+              <div className={cn(
+                'w-2 h-2 rounded-full animate-pulse',
+                difficultyInfo.color.replace('text-', 'bg-')
+              )}></div>
+              {quest.difficulty.toUpperCase()}
+            </div>
+          </Badge>
         </div>
 
         {progress > 0 && (

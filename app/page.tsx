@@ -223,7 +223,7 @@ export default function Dashboard() {
     .slice(0, 5);
 
   const categories = Array.from(new Set(quests.map(q => q.category).filter(Boolean))) as string[];
-  const difficulties = ['beginner', 'intermediate', 'advanced', 'expert'];
+  const difficulties = ['beginner', 'intermediate', 'advanced', 'expert', 'master'];
 
   return (
     <div className="space-y-8">

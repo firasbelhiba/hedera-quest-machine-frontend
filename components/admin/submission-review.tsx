@@ -211,13 +211,59 @@ export function SubmissionReview({ className }: SubmissionReviewProps) {
   const getDifficultyBadge = (difficulty: string) => {
     switch (difficulty) {
       case 'beginner':
-        return <Badge className="bg-green-500/10 text-green-500 border-green-500/20 font-mono">BEGINNER</Badge>;
+        return (
+          <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 font-mono font-semibold shadow-sm dark:bg-emerald-900/20 dark:text-emerald-300 dark:border-emerald-700/50">
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+              BEGINNER
+            </div>
+          </Badge>
+        );
       case 'intermediate':
-        return <Badge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20 font-mono">INTERMEDIATE</Badge>;
+        return (
+          <Badge className="bg-amber-50 text-amber-700 border-amber-200 font-mono font-semibold shadow-sm dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-700/50">
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
+              INTERMEDIATE
+            </div>
+          </Badge>
+        );
       case 'advanced':
-        return <Badge className="bg-red-500/10 text-red-500 border-red-500/20 font-mono">ADVANCED</Badge>;
+        return (
+          <Badge className="bg-rose-50 text-rose-700 border-rose-200 font-mono font-semibold shadow-sm dark:bg-rose-900/20 dark:text-rose-300 dark:border-rose-700/50">
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></div>
+              ADVANCED
+            </div>
+          </Badge>
+        );
+      case 'expert':
+        return (
+          <Badge className="bg-purple-50 text-purple-700 border-purple-200 font-mono font-semibold shadow-sm dark:bg-purple-900/20 dark:text-purple-300 dark:border-purple-700/50">
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></div>
+              EXPERT
+            </div>
+          </Badge>
+        );
+      case 'master':
+        return (
+          <Badge className="bg-indigo-50 text-indigo-700 border-indigo-200 font-mono font-semibold shadow-sm dark:bg-indigo-900/20 dark:text-indigo-300 dark:border-indigo-700/50">
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
+              MASTER
+            </div>
+          </Badge>
+        );
       default:
-        return <Badge variant="outline" className="font-mono">{difficulty.toUpperCase()}</Badge>;
+        return (
+          <Badge variant="outline" className="font-mono font-semibold">
+            <div className="flex items-center gap-1.5">
+              <div className="w-2 h-2 rounded-full bg-gray-400"></div>
+              {difficulty.toUpperCase()}
+            </div>
+          </Badge>
+        );
     }
   };
 

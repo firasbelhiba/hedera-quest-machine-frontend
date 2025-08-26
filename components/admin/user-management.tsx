@@ -54,95 +54,108 @@ import {
   Clock,
   Trophy,
   Star,
-  Zap
+  Zap,
+  Loader2,
+  AlertCircle
 } from 'lucide-react';
-import { User } from '@/lib/types';
+import { api } from '@/lib/api/client';
+
+interface User {
+  firstName: string;
+  lastName: string;
+  username: string;
+  email: string;
+  email_verified: boolean;
+  total_points: number;
+  role?: 'user' | 'moderator' | 'admin';
+  avatar?: string;
+  level?: number;
+  streak?: number;
+  joinedAt?: string;
+}
+
+interface ApiResponse {
+  succes: boolean;
+  users: User[];
+}
 
 interface UserManagementProps {
   className?: string;
 }
 
-// Mock data - replace with actual API calls
-const mockUsers: User[] = [
-  {
-    id: '1',
-    name: 'Alice Johnson',
-    email: 'alice@example.com',
-    role: 'user',
-    avatar: '',
-    level: 15,
-    points: 12500,
-    streak: 7,
-    joinedAt: '2024-01-15',
-    hederaAccountId: null,
-    badges: [],
-    completedQuests: []
-  },
-  {
-    id: '2',
-    name: 'Bob Smith',
-    email: 'bob@example.com',
-    role: 'user',
-    avatar: '',
-    level: 8,
-    points: 4200,
-    streak: 3,
-    joinedAt: '2024-02-01',
-    hederaAccountId: null,
-    badges: [],
-    completedQuests: []
-  },
-  {
-    id: '3',
-    name: 'Carol Davis',
-    email: 'carol@example.com',
-    role: 'moderator',
-    avatar: '',
-    level: 22,
-    points: 28900,
-    streak: 15,
-    joinedAt: '2023-11-10',
-    hederaAccountId: null,
-    badges: [],
-    completedQuests: []
-  },
-  {
-    id: '4',
-    name: 'David Wilson',
-    email: 'david@example.com',
-    role: 'user',
-    avatar: '',
-    level: 3,
-    points: 850,
-    streak: 0,
-    joinedAt: '2024-01-18',
-    hederaAccountId: null,
-    badges: [],
-    completedQuests: []
-  }
-];
+// Helper function to transform API user data
+const transformUser = (apiUser: User): User & { id: string; name: string; points: number } => ({
+  ...apiUser,
+  id: apiUser.username,
+  name: `${apiUser.firstName} ${apiUser.lastName}`,
+  points: apiUser.total_points,
+  role: apiUser.role || 'user',
+  level: apiUser.level || 1,
+  streak: apiUser.streak || 0,
+  joinedAt: apiUser.joinedAt || new Date().toISOString().split('T')[0]
+});
 
 export function UserManagement({ className }: UserManagementProps) {
-  const [users, setUsers] = useState<User[]>(mockUsers);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>(mockUsers);
+  const [users, setUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [roleFilter, setRoleFilter] = useState('all');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch users from API
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await api.get('/user/admin/all');
+      
+      const data: ApiResponse = response.data;
+      
+      if (data.succes) {
+        const transformedUsers = data.users.map(transformUser);
+        setUsers(transformedUsers);
+      } else {
+        throw new Error('Failed to fetch users');
+      }
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message || 'An error occurred';
+      setError(errorMessage);
+      console.error('Error fetching users:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch users on component mount
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   useEffect(() => {
     let filtered = users;
 
     // Search filter
     if (searchTerm) {
-      filtered = filtered.filter(user => 
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      filtered = filtered.filter(user => {
+        const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
+        return fullName.includes(searchTerm.toLowerCase()) ||
+               user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+               user.username.toLowerCase().includes(searchTerm.toLowerCase());
+      });
     }
 
-    // Status filter removed - User interface doesn't have status property
+    // Status filter based on email verification
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(user => {
+        if (statusFilter === 'active') return user.email_verified;
+        if (statusFilter === 'pending') return !user.email_verified;
+        return true;
+      });
+    }
 
     // Role filter
     if (roleFilter !== 'all') {
@@ -180,24 +193,42 @@ export function UserManagement({ className }: UserManagementProps) {
     }
   };
 
-  const handleUserAction = (userId: string | number, action: string) => {
-    setUsers(prev => prev.map(user => {
-      if (user.id === userId) {
-        switch (action) {
-          case 'suspend':
-            return user; // Status not supported in User interface
-          case 'activate':
-            return user; // Status not supported in User interface
-          case 'promote':
-            return { ...user, role: user.role === 'user' ? 'moderator' : 'admin' };
-          case 'demote':
-            return { ...user, role: user.role === 'admin' ? 'moderator' : 'user' };
-          default:
-            return user;
+  const handleUserAction = async (userId: string | number, action: string) => {
+    try {
+      // Optimistically update UI
+      setUsers(prev => prev.map(user => {
+        if (user.id === userId) {
+          switch (action) {
+            case 'suspend':
+              return user; // Status not supported in User interface
+            case 'activate':
+              return user; // Status not supported in User interface
+            case 'promote':
+              return { ...user, role: user.role === 'user' ? 'moderator' : 'admin' };
+            case 'demote':
+              return { ...user, role: user.role === 'admin' ? 'moderator' : 'user' };
+            default:
+              return user;
+          }
         }
-      }
-      return user;
-    }));
+        return user;
+      }));
+
+      // TODO: Make API call to update user on server
+      // const response = await fetch(`/api/admin/users/${userId}`, {
+      //   method: 'PATCH',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ action })
+      // });
+      // 
+      // if (!response.ok) {
+      //   throw new Error('Failed to update user');
+      // }
+    } catch (err) {
+      console.error('Error updating user:', err);
+      // Revert optimistic update on error
+      fetchUsers();
+    }
   };
 
   return (
@@ -253,6 +284,24 @@ export function UserManagement({ className }: UserManagementProps) {
 
           {/* Users Table */}
           <div className="border-2 border-dashed border-purple-500/20 rounded-lg overflow-hidden bg-gradient-to-br from-white/50 to-purple-50/30 dark:from-gray-900/50 dark:to-purple-900/10">
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+                <span className="ml-2 font-mono text-purple-500">LOADING_USERS...</span>
+              </div>
+            ) : error ? (
+              <div className="flex items-center justify-center py-12 text-red-500">
+                <AlertCircle className="w-8 h-8" />
+                <span className="ml-2 font-mono">ERROR: {error}</span>
+                <Button 
+                  onClick={fetchUsers} 
+                  className="ml-4 font-mono bg-red-500/10 border border-red-500/30 hover:bg-red-500/20"
+                  size="sm"
+                >
+                  RETRY
+                </Button>
+              </div>
+            ) : (
             <Table>
               <TableHeader>
                 <TableRow className="bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border-b-2 border-dashed border-purple-500/30">
@@ -272,17 +321,30 @@ export function UserManagement({ className }: UserManagementProps) {
                         <Avatar className="h-10 w-10 border-2 border-dashed border-purple-500/30 group-hover:border-solid transition-all duration-200">
                           <AvatarImage src={user.avatar} alt={user.name} />
                           <AvatarFallback className="bg-gradient-to-r from-purple-500 to-cyan-500 text-white font-mono text-sm font-semibold">
-                            {getInitials(user.name)}
+                            {getInitials(`${user.firstName} ${user.lastName}`)}
                           </AvatarFallback>
                         </Avatar>
                         <div className="min-w-0 flex-1">
-                          <div className="font-semibold font-mono text-gray-900 dark:text-gray-100 truncate">{user.name}</div>
-                          <div className="text-sm text-muted-foreground font-mono truncate">{user.email}</div>
+                          <div className="font-semibold font-mono text-gray-900 dark:text-gray-100 truncate">{user.firstName} {user.lastName}</div>
+                          <div className="text-sm text-muted-foreground font-mono truncate">@{user.username}</div>
+                          <div className="text-xs text-muted-foreground font-mono truncate">{user.email}</div>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell className="py-4">{getRoleBadge(user.role)}</TableCell>
-                    <TableCell className="py-4">{getRoleBadge('active')}</TableCell>
+                    <TableCell className="py-4">
+                      <div className="flex items-center gap-2">
+                        {user.email_verified ? (
+                          <Badge className="bg-green-100 text-green-800 border-green-200 font-mono text-xs">
+                            VERIFIED
+                          </Badge>
+                        ) : (
+                          <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200 font-mono text-xs">
+                            UNVERIFIED
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell className="py-4">
                       <div className="flex items-center gap-3 text-sm font-mono">
                         <div className="flex items-center gap-1.5 bg-yellow-50 dark:bg-yellow-900/20 px-2 py-1 rounded border border-dashed border-yellow-300/50">
@@ -291,7 +353,7 @@ export function UserManagement({ className }: UserManagementProps) {
                         </div>
                         <div className="flex items-center gap-1.5 bg-purple-50 dark:bg-purple-900/20 px-2 py-1 rounded border border-dashed border-purple-300/50">
                           <Star className="w-3.5 h-3.5 text-purple-600" />
-                          <span className="font-semibold">{user.points?.toLocaleString()}</span>
+                          <span className="font-semibold">{user.total_points?.toLocaleString()}</span>
                         </div>
                         <div className="flex items-center gap-1.5 bg-orange-50 dark:bg-orange-900/20 px-2 py-1 rounded border border-dashed border-orange-300/50">
                           <Zap className="w-3.5 h-3.5 text-orange-600" />
@@ -363,6 +425,7 @@ export function UserManagement({ className }: UserManagementProps) {
                 ))}
               </TableBody>
             </Table>
+            )}
           </div>
 
           {/* Stats Summary */}
@@ -372,16 +435,16 @@ export function UserManagement({ className }: UserManagementProps) {
               <div className="text-sm text-muted-foreground font-mono">TOTAL_USERS</div>
             </div>
             <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 p-4 rounded-lg border border-dashed border-green-500/20">
-              <div className="text-2xl font-bold font-mono text-green-500">{users.length}</div>
-              <div className="text-sm text-muted-foreground font-mono">ACTIVE_USERS</div>
+              <div className="text-2xl font-bold font-mono text-green-500">{users.filter(u => u.email_verified).length}</div>
+              <div className="text-sm text-muted-foreground font-mono">VERIFIED_USERS</div>
             </div>
             <div className="bg-gradient-to-r from-purple-500/10 to-indigo-500/10 p-4 rounded-lg border border-dashed border-purple-500/20">
               <div className="text-2xl font-bold font-mono text-purple-500">{users.filter(u => u.role === 'admin' || u.role === 'moderator').length}</div>
               <div className="text-sm text-muted-foreground font-mono">STAFF_MEMBERS</div>
             </div>
-            <div className="bg-gradient-to-r from-red-500/10 to-pink-500/10 p-4 rounded-lg border border-dashed border-red-500/20">
-              <div className="text-2xl font-bold font-mono text-red-500">0</div>
-              <div className="text-sm text-muted-foreground font-mono">SUSPENDED</div>
+            <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 p-4 rounded-lg border border-dashed border-yellow-500/20">
+              <div className="text-2xl font-bold font-mono text-yellow-500">{users.filter(u => !u.email_verified).length}</div>
+              <div className="text-sm text-muted-foreground font-mono">UNVERIFIED</div>
             </div>
           </div>
         </CardContent>
@@ -402,8 +465,18 @@ export function UserManagement({ className }: UserManagementProps) {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium font-mono">[NAME]</label>
-                  <Input defaultValue={selectedUser.name} className="font-mono border-dashed" />
+                  <label className="text-sm font-medium font-mono">[FIRST_NAME]</label>
+                  <Input defaultValue={selectedUser.firstName} className="font-mono border-dashed" />
+                </div>
+                <div>
+                  <label className="text-sm font-medium font-mono">[LAST_NAME]</label>
+                  <Input defaultValue={selectedUser.lastName} className="font-mono border-dashed" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium font-mono">[USERNAME]</label>
+                  <Input defaultValue={selectedUser.username} className="font-mono border-dashed" />
                 </div>
                 <div>
                   <label className="text-sm font-medium font-mono">[EMAIL]</label>

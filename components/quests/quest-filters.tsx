@@ -29,10 +29,11 @@ const categories: { value: QuestCategory; label: string }[] = [
 ];
 
 const difficulties: { value: Difficulty; label: string; color: string }[] = [
-  { value: 'beginner', label: 'Beginner', color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' },
-  { value: 'intermediate', label: 'Intermediate', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' },
-  { value: 'advanced', label: 'Advanced', color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300' },
-  { value: 'expert', label: 'Expert', color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300' },
+  { value: 'beginner', label: 'Beginner', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300 border-emerald-200' },
+  { value: 'intermediate', label: 'Intermediate', color: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300 border-amber-200' },
+  { value: 'advanced', label: 'Advanced', color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300 border-orange-200' },
+  { value: 'expert', label: 'Expert', color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 border-red-200' },
+  { value: 'master', label: 'Master', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300 border-purple-200' },
 ];
 
 export function QuestFilters({ filters, onFiltersChange, className }: QuestFiltersProps) {

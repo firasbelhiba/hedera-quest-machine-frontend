@@ -126,7 +126,7 @@ export type QuestCategory =
   | 'file-service'
   | 'community';
 
-export type Difficulty = 'beginner' | 'intermediate' | 'advanced' | 'expert';
+export type Difficulty = 'beginner' | 'intermediate' | 'advanced' | 'expert' | 'master';
 
 export type SubmissionType = 'url' | 'text' | 'file' | 'transaction-id' | 'account-id';
 
