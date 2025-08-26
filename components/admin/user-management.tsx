@@ -207,7 +207,7 @@ export function UserManagement({ className }: UserManagementProps) {
             <div className="p-1 bg-purple-500/20 rounded border border-dashed border-purple-500/40">
               <Users className="w-4 h-4 text-purple-500" />
             </div>
-            👥 USER_MANAGEMENT
+            USER_MANAGEMENT
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">

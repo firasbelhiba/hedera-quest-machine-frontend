@@ -153,7 +153,7 @@ export default function Dashboard() {
         {/* Call to Action */}
         <div className="text-center py-12 bg-gradient-to-br from-primary/5 to-purple-500/5 rounded-2xl border-2 border-dashed border-primary/20">
           <div className="space-y-6">
-            <div className="text-6xl mb-4">🚀</div>
+            <div className="text-6xl mb-4">ROCKET</div>
             <h2 className="text-3xl font-bold font-mono bg-gradient-to-r from-primary via-purple-500 to-cyan-500 bg-clip-text text-transparent">
               Ready to Start Your Journey?
             </h2>
@@ -235,10 +235,9 @@ export default function Dashboard() {
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-purple-500 to-cyan-500 bg-clip-text text-transparent font-mono">
                   Welcome back, {user?.name}!
                 </h1>
-                <Sparkles className="w-6 h-6 text-yellow-500 animate-pulse" />
               </div>
               <p className="text-muted-foreground font-mono text-sm">
-                {'>'} Continue your quest journey • Streak: {user?.streak || 0} days 🔥
+                {'>'} Continue your quest journey • Streak: {user?.streak || 0} days
               </p>
             </div>
             <div className="text-right bg-gradient-to-br from-primary/5 to-cyan-500/5 p-4 rounded-lg border border-dashed border-primary/20">
@@ -317,19 +316,19 @@ export default function Dashboard() {
             value="overview" 
             className="text-sm font-mono data-[state=active]:bg-background data-[state=active]:text-primary"
           >
-            📊 OVERVIEW
+            OVERVIEW
           </TabsTrigger>
           <TabsTrigger 
             value="quests" 
             className="text-sm font-mono data-[state=active]:bg-background data-[state=active]:text-primary"
           >
-            🎯 QUESTS ({filteredQuests.length})
+            QUESTS ({filteredQuests.length})
           </TabsTrigger>
           <TabsTrigger 
             value="progress" 
             className="text-sm font-mono data-[state=active]:bg-background data-[state=active]:text-primary"
           >
-            📈 PROGRESS
+            PROGRESS
           </TabsTrigger>
         </TabsList>
 
@@ -341,7 +340,7 @@ export default function Dashboard() {
                 <div className="p-1 bg-yellow-500/20 rounded border border-dashed border-yellow-500/40">
                   <Zap className="w-4 h-4 text-yellow-500" />
                 </div>
-                ⚡ LEVEL_PROGRESS
+                LEVEL_PROGRESS
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 mt-2">
@@ -374,7 +373,7 @@ export default function Dashboard() {
             <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-500/10">
               <div className="flex items-center justify-between">
                 <CardTitle className="font-mono bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
-                  🎯 FEATURED_QUESTS
+                  FEATURED_QUESTS
                 </CardTitle>
                 <Link href="/quests">
                   <Button variant="outline" size="sm" className="font-mono border-dashed hover:border-solid transition-all duration-200">
@@ -422,10 +421,10 @@ export default function Dashboard() {
                       
                       <div className="flex-1">
                         <div className="font-medium font-mono text-primary">
-                          {submission.status === 'approved' && '✅ QUEST_COMPLETED'}
-                          {submission.status === 'pending' && '⏳ QUEST_SUBMITTED'}
-                          {submission.status === 'needs-revision' && '🔄 REVISION_REQUESTED'}
-                          {submission.status === 'rejected' && '❌ SUBMISSION_REJECTED'}
+                          {submission.status === 'approved' && 'QUEST_COMPLETED'}
+                          {submission.status === 'pending' && 'QUEST_SUBMITTED'}
+                          {submission.status === 'needs-revision' && 'REVISION_REQUESTED'}
+                          {submission.status === 'rejected' && 'SUBMISSION_REJECTED'}
                         </div>
                         <div className="text-sm text-muted-foreground font-mono">
                           {'>'} QUEST_#{submission.questId} • {new Date(submission.submittedAt).toLocaleDateString()}
@@ -464,7 +463,7 @@ export default function Dashboard() {
             <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-500/10">
               <CardTitle className="flex items-center gap-2 font-mono">
                 <BookOpen className="w-5 h-5 text-primary" />
-                🔍 QUEST_EXPLORER
+                QUEST_EXPLORER
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
@@ -528,7 +527,7 @@ export default function Dashboard() {
           ) : (
             <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5">
               <CardContent className="p-12 text-center">
-                <div className="text-6xl mb-4">🎯</div>
+                <div className="text-6xl mb-4">TARGET</div>
                 <h3 className="text-lg font-semibold mb-2 font-mono text-primary">NO_QUESTS_FOUND</h3>
                 <p className="text-muted-foreground font-mono text-sm">
                   {'>'} Try adjusting your filters or check back later for new quests.
@@ -540,7 +539,7 @@ export default function Dashboard() {
 
         <TabsContent value="progress" className="space-y-6">
           <div className="text-center py-12">
-            <div className="text-6xl mb-4">📈</div>
+            <div className="text-6xl mb-4">CHART</div>
             <h3 className="text-lg font-semibold mb-2 font-mono text-primary">PROGRESS_TRACKING</h3>
             <p className="text-muted-foreground font-mono text-sm">
               {'>'} Detailed progress analytics coming soon.

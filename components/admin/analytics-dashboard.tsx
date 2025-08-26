@@ -127,7 +127,7 @@ export function AnalyticsDashboard({ className }: AnalyticsDashboardProps) {
               <div className="p-1 bg-indigo-500/20 rounded border border-dashed border-indigo-500/40">
                 <BarChart3 className="w-4 h-4 text-indigo-500" />
               </div>
-              📊 ANALYTICS_DASHBOARD
+              ANALYTICS_DASHBOARD
             </div>
             <div className="flex items-center gap-2">
               <Select value={timeRange} onValueChange={setTimeRange}>

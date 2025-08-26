@@ -83,7 +83,7 @@ export default function QuestsPage() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-blue-500 to-cyan-500 bg-clip-text text-transparent">
-                🎮 Discover Quests
+                Discover Quests
               </h1>
               <p className="text-muted-foreground font-mono text-sm">
                 {'>'} Explore {quests.length} quests to master the Hedera ecosystem
@@ -164,19 +164,19 @@ export default function QuestsPage() {
                 value="all"
                 className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[inset_2px_2px_0px_0px_rgba(0,0,0,0.1)] transition-all duration-200"
               >
-                🎯 All Quests ({filteredQuests.length})
+                All Quests ({filteredQuests.length})
               </TabsTrigger>
               <TabsTrigger 
                 value="available"
                 className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[inset_2px_2px_0px_0px_rgba(0,0,0,0.1)] transition-all duration-200"
               >
-                ⚡ Available ({filteredQuests.filter(q => !user?.completedQuests?.includes(String(q.id))).length})
+                Available ({filteredQuests.filter(q => !user?.completedQuests?.includes(String(q.id))).length})
               </TabsTrigger>
               <TabsTrigger 
                 value="completed"
                 className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[inset_2px_2px_0px_0px_rgba(0,0,0,0.1)] transition-all duration-200"
               >
-                ✅ Completed ({filteredQuests.filter(q => user?.completedQuests?.includes(String(q.id))).length})
+                Completed ({filteredQuests.filter(q => user?.completedQuests?.includes(String(q.id))).length})
               </TabsTrigger>
             </TabsList>
 

@@ -199,7 +199,7 @@ export default function LeaderboardPage() {
                       </div>
                       <h3 className="font-bold text-xl font-mono tracking-wide bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">{leaderboard[0].user.name}</h3>
                       <p className="text-3xl font-bold font-mono bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">{leaderboard[0].totalPoints.toLocaleString()}</p>
-                      <p className="text-sm text-muted-foreground font-mono uppercase tracking-wider">👑 CHAMPION</p>
+                      <p className="text-sm text-muted-foreground font-mono uppercase tracking-wider">CHAMPION</p>
                       {leaderboard[0].recentPoints > 0 && (
                         <Badge className="mt-2 bg-gradient-to-r from-yellow-500 to-orange-500 border-2 border-dashed border-yellow-400 text-white font-mono">
                           +{leaderboard[0].recentPoints} recent

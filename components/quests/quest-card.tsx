@@ -124,7 +124,7 @@ export function QuestCard({ quest, isCompleted = false, progress = 0, onSelect }
           variant={isCompleted ? "outline" : "default"}
           onClick={onSelect}
         >
-          {isCompleted ? '🏆 View Details' : '🚀 Start Quest'}
+          {isCompleted ? 'View Details' : 'Start Quest'}
         </Button>
       </CardFooter>
     </Card>

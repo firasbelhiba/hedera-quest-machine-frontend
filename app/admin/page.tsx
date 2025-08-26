@@ -193,12 +193,12 @@ export default function AdminDashboard() {
 
       <Tabs defaultValue="overview" className="space-y-6">
         <TabsList className="grid w-full grid-cols-6 bg-background/50 border-2 border-dashed border-primary/20 p-1">
-          <TabsTrigger value="overview" className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-primary/30">📊 OVERVIEW</TabsTrigger>
-          <TabsTrigger value="users" className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-primary/30">👥 USERS</TabsTrigger>
-          <TabsTrigger value="quests" className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-primary/30">🎯 QUESTS</TabsTrigger>
-          <TabsTrigger value="submissions" className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-primary/30">📝 SUBMISSIONS</TabsTrigger>
-          <TabsTrigger value="analytics" className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-primary/30">📈 ANALYTICS</TabsTrigger>
-          <TabsTrigger value="reports" className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-primary/30">📊 REPORTS</TabsTrigger>
+          <TabsTrigger value="overview" className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-primary/30">OVERVIEW</TabsTrigger>
+          <TabsTrigger value="users" className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-primary/30">USERS</TabsTrigger>
+          <TabsTrigger value="quests" className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-primary/30">QUESTS</TabsTrigger>
+          <TabsTrigger value="submissions" className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-primary/30">SUBMISSIONS</TabsTrigger>
+          <TabsTrigger value="analytics" className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-primary/30">ANALYTICS</TabsTrigger>
+          <TabsTrigger value="reports" className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-primary/30">REPORTS</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -206,7 +206,7 @@ export default function AdminDashboard() {
           <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-blue-500/5">
             <CardHeader>
               <CardTitle className="font-mono text-xl bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
-                📊 RECENT_ACTIVITY
+                RECENT_ACTIVITY
               </CardTitle>
             </CardHeader>
             <CardContent className="border-t-2 border-dashed border-primary/10">
@@ -244,7 +244,7 @@ export default function AdminDashboard() {
                     <AlertCircle className="w-5 h-5 text-yellow-500" />
                   </div>
                   <span className="bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
-                    ⚠️ PENDING_ACTIONS
+                    PENDING_ACTIONS
                   </span>
                 </CardTitle>
               </CardHeader>
@@ -271,7 +271,7 @@ export default function AdminDashboard() {
             <Card className="border-2 border-dashed border-green-500/20 bg-gradient-to-br from-green-500/5 to-emerald-500/5">
               <CardHeader>
                 <CardTitle className="font-mono bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">
-                  💚 SYSTEM_HEALTH
+                  SYSTEM_HEALTH
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 border-t-2 border-dashed border-green-500/10">
@@ -332,7 +332,7 @@ export default function AdminDashboard() {
             <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5">
               <CardHeader>
                 <CardTitle className="font-mono bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">
-                  📊 SUBMISSION_STATUS
+                  SUBMISSION_STATUS
                 </CardTitle>
               </CardHeader>
               <CardContent className="border-t-2 border-dashed border-primary/10">
@@ -376,7 +376,7 @@ export default function AdminDashboard() {
             <Card className="border-2 border-dashed border-blue-500/20 bg-gradient-to-br from-blue-500/5 to-indigo-500/5">
               <CardHeader>
                 <CardTitle className="font-mono bg-gradient-to-r from-blue-500 to-indigo-500 bg-clip-text text-transparent">
-                  📈 REVIEW_STATISTICS
+                  REVIEW_STATISTICS
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 border-t-2 border-dashed border-blue-500/10">

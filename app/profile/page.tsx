@@ -456,19 +456,19 @@ export default function ProfilePage() {
             value="profile" 
             className="font-mono text-sm data-[state=active]:bg-primary/20 data-[state=active]:border data-[state=active]:border-dashed data-[state=active]:border-primary/30 data-[state=active]:text-primary transition-all duration-200"
           >
-            👤 PROFILE
+            PROFILE
           </TabsTrigger>
           <TabsTrigger 
             value="account" 
             className="font-mono text-sm data-[state=active]:bg-primary/20 data-[state=active]:border data-[state=active]:border-dashed data-[state=active]:border-primary/30 data-[state=active]:text-primary transition-all duration-200"
           >
-            ⚙️ ACCOUNT
+            ACCOUNT
           </TabsTrigger>
           <TabsTrigger 
             value="privacy" 
             className="font-mono text-sm data-[state=active]:bg-primary/20 data-[state=active]:border data-[state=active]:border-dashed data-[state=active]:border-primary/30 data-[state=active]:text-primary transition-all duration-200"
           >
-            🔒 PRIVACY
+            PRIVACY
           </TabsTrigger>
         </TabsList>
 

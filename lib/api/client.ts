@@ -103,9 +103,9 @@ export function createApiClient(baseURL: string): AxiosInstance {
     if (token) {
       config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
-      console.log('✅ Token found and added to request:', token.substring(0, 20) + '...');
+      console.log('Token found and added to request:', token.substring(0, 20) + '...');
     } else {
-      console.log('❌ No token found in storage');
+      console.log('No token found in storage');
     }
 
     // Set basic headers

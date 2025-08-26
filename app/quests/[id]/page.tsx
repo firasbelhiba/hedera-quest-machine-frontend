@@ -100,7 +100,7 @@ export default function QuestDetailPage() {
     
     try {
       const response = await api.post(`/quest-completions/quests/${quest.id}/verify`);
-      setVerifyMessage('Quest verification successful! 🎉');
+      setVerifyMessage('Quest verification successful!');
     } catch (error: any) {
       console.error('Verification failed:', error);
       setVerifyMessage(error.response?.data?.message || 'Verification failed. Please try again.');
@@ -172,7 +172,7 @@ export default function QuestDetailPage() {
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <Badge className="border-2 border-dashed border-gray-400 bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-200 font-mono text-xs px-3 py-1 capitalize">
-                      📂 {(quest.category || 'general').replace('-', ' ')}
+                      {(quest.category || 'general').replace('-', ' ')}
                     </Badge>
                     <div className="flex items-center border-2 border-dashed border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 px-3 py-1 rounded-lg">
                       {Array.from({ length: 4 }, (_, i) => (
@@ -182,7 +182,7 @@ export default function QuestDetailPage() {
                             ? 'text-yellow-500'
                             : 'text-gray-300 dark:text-gray-600'
                         )}>
-                          {i < difficultyStars[quest.difficulty] ? '⭐' : '☆'}
+                          {i < difficultyStars[quest.difficulty] ? '★' : '☆'}
                         </span>
                       ))}
                       <span className="ml-2 text-sm font-mono font-medium text-yellow-700 dark:text-yellow-300 capitalize">
@@ -197,7 +197,7 @@ export default function QuestDetailPage() {
                 <div className="text-right">
                   <div className="border-2 border-dashed border-green-400 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 px-4 py-3 rounded-lg shadow-sm hover:shadow-md transition-all">
                     <div className="flex items-center text-2xl font-mono font-bold">
-                      🎯 {quest.reward || quest.points} points
+                      {quest.reward || quest.points} points
                     </div>
                     <div className="text-xs font-mono font-medium">REWARD</div>
                   </div>
@@ -216,10 +216,10 @@ export default function QuestDetailPage() {
                 <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-950/20 p-4 rounded-lg shadow-sm hover:shadow-md transition-all">
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">
-                      {quest.platform_type === 'facebook' ? '📘' :
-                       quest.platform_type === 'twitter' ? '🐦' :
-                       quest.platform_type === 'instagram' ? '📷' :
-                       '🔗'}
+                      {quest.platform_type === 'facebook' ? 'FB' :
+                       quest.platform_type === 'twitter' ? 'TW' :
+                       quest.platform_type === 'instagram' ? 'IG' :
+                       'WEB'}
                     </div>
                     <div>
                       <div className="font-mono font-semibold text-gray-900 dark:text-white capitalize">{quest.platform_type}</div>
@@ -230,10 +230,10 @@ export default function QuestDetailPage() {
                 <div className="border-2 border-dashed border-pink-300 dark:border-pink-600 bg-pink-50 dark:bg-pink-950/20 p-4 rounded-lg shadow-sm hover:shadow-md transition-all">
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">
-                      {quest.platform_type === 'like' ? '❤️' :
-                       quest.platform_type === 'comment' ? '💬' :
-                       quest.platform_type === 'share' ? '🔄' :
-                       '👁️'}
+                      {quest.platform_type === 'like' ? 'LIKE' :
+                       quest.platform_type === 'comment' ? 'COMMENT' :
+                       quest.platform_type === 'share' ? 'SHARE' :
+                       'VIEW'}
                     </div>
                     <div>
                       <div className="font-mono font-semibold text-gray-900 dark:text-white capitalize">{quest.platform_type || 'Social'}</div>
@@ -243,7 +243,7 @@ export default function QuestDetailPage() {
                 </div>
                 <div className="border-2 border-dashed border-green-300 dark:border-green-600 bg-green-50 dark:bg-green-950/20 p-4 rounded-lg shadow-sm hover:shadow-md transition-all">
                   <div className="flex items-center gap-3">
-                    <div className="text-2xl">👥</div>
+                    <div className="text-2xl">USERS</div>
                     <div>
                       <div className="font-mono font-semibold text-gray-900 dark:text-white">{quest.currentParticipants}/{quest.maxParticipants}</div>
                       <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">PARTICIPANTS</div>
@@ -252,7 +252,7 @@ export default function QuestDetailPage() {
                 </div>
                 <div className="border-2 border-dashed border-orange-300 dark:border-orange-600 bg-orange-50 dark:bg-orange-950/20 p-4 rounded-lg shadow-sm hover:shadow-md transition-all">
                   <div className="flex items-center gap-3">
-                    <div className="text-2xl">📅</div>
+                    <div className="text-2xl">START</div>
                     <div>
                       <div className="font-mono font-semibold text-gray-900 dark:text-white">{new Date(quest.startDate || Date.now()).toLocaleDateString()}</div>
                       <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">START_DATE</div>
@@ -261,7 +261,7 @@ export default function QuestDetailPage() {
                 </div>
                 <div className="border-2 border-dashed border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-950/20 p-4 rounded-lg shadow-sm hover:shadow-md transition-all">
                   <div className="flex items-center gap-3">
-                    <div className="text-2xl">⏰</div>
+                    <div className="text-2xl">END</div>
                     <div>
                       <div className="font-mono font-semibold text-gray-900 dark:text-white">{new Date(quest.endDate || Date.now()).toLocaleDateString()}</div>
                       <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">END_DATE</div>
@@ -276,7 +276,7 @@ export default function QuestDetailPage() {
                 <div className="mt-6 p-4 border-4 border-dashed border-green-400 dark:border-green-600 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-lg">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="text-3xl">🔗</div>
+                      <div className="text-3xl">LINK</div>
                       <div>
                         <h3 className="font-mono font-semibold text-gray-900 dark:text-white">QUEST_LINK.exe</h3>
                         <p className="text-sm text-gray-600 dark:text-gray-300 font-mono">{'>>>'} Execute quest on external platform</p>
@@ -291,7 +291,7 @@ export default function QuestDetailPage() {
                             className="border-4 border-dashed border-yellow-400 bg-gradient-to-r from-yellow-200 to-orange-200 dark:from-yellow-600/80 dark:to-orange-600/80 hover:from-yellow-300 hover:to-orange-300 dark:hover:from-yellow-500/90 dark:hover:to-orange-500/90 text-yellow-900 dark:text-yellow-100 font-mono font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 animate-pulse hover:animate-none px-8 py-4 text-lg"
                           >
                             <a href={quest.quest_link} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
-                              <span className="text-2xl">🚀</span>
+                              <span className="text-2xl">START</span>
                               <span className="tracking-wide">START_QUEST</span>
                               <ExternalLink className="w-5 h-5" />
                             </a>
@@ -304,7 +304,7 @@ export default function QuestDetailPage() {
                                  size="lg"
                                  className="border-4 border-dashed border-purple-400 bg-gradient-to-r from-purple-200 to-violet-200 dark:from-purple-600/80 dark:to-violet-600/80 hover:from-purple-300 hover:to-violet-300 dark:hover:from-purple-500/90 dark:hover:to-violet-500/90 text-purple-900 dark:text-purple-100 font-mono font-bold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 px-8 py-4 text-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                                >
-                                 <span className="text-2xl">✅</span>
+                                 <span className="text-2xl">VERIFY</span>
                                  <span className="tracking-wide">{verifying ? 'VERIFYING...' : 'VERIFY'}</span>
                                  <CheckSquare className="w-5 h-5" />
                                </Button>
@@ -312,7 +312,7 @@ export default function QuestDetailPage() {
                          <AlertDialogContent className="border-4 border-dashed border-purple-400 bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-950/50 dark:to-violet-950/50">
                            <AlertDialogHeader>
                              <AlertDialogTitle className="font-mono text-xl text-purple-900 dark:text-purple-100 flex items-center gap-2">
-                               <span className="text-2xl">⚠️</span>
+                               <span className="text-2xl">WARNING</span>
                                VERIFY_QUEST.exe
                              </AlertDialogTitle>
                              <AlertDialogDescription className="font-mono text-purple-700 dark:text-purple-300">
@@ -361,13 +361,13 @@ export default function QuestDetailPage() {
           <Tabs defaultValue="requirements" className="space-y-6">
             <TabsList className="grid w-full grid-cols-3 bg-transparent">
               <TabsTrigger value="requirements" className="data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-green-400 data-[state=active]:bg-green-50 data-[state=active]:dark:bg-green-950/20 data-[state=active]:text-green-700 data-[state=active]:dark:text-green-300 font-mono font-medium rounded-lg transition-all">
-                🎯 REQUIREMENTS
+                REQUIREMENTS
               </TabsTrigger>
               <TabsTrigger value="resources" className="data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-purple-400 data-[state=active]:bg-purple-50 data-[state=active]:dark:bg-purple-950/20 data-[state=active]:text-purple-700 data-[state=active]:dark:text-purple-300 font-mono font-medium rounded-lg transition-all">
-                📚 RESOURCES
+                RESOURCES
               </TabsTrigger>
               <TabsTrigger value="badges" className="data-[state=active]:border-2 data-[state=active]:border-dashed data-[state=active]:border-yellow-400 data-[state=active]:bg-yellow-50 data-[state=active]:dark:bg-yellow-950/20 data-[state=active]:text-yellow-700 data-[state=active]:dark:text-yellow-300 font-mono font-medium rounded-lg transition-all">
-                🏆 BADGES
+                BADGES
               </TabsTrigger>
             </TabsList>
 
@@ -375,7 +375,7 @@ export default function QuestDetailPage() {
               <Card className="border-4 border-dashed border-green-400 dark:border-green-600 shadow-lg bg-gradient-to-br from-green-50 to-white dark:from-green-950/30 dark:to-gray-900">
                 <CardHeader className="border-b-2 border-dashed border-green-300 dark:border-green-600 bg-gradient-to-r from-green-100 to-green-50 dark:from-green-950/40 dark:to-green-950/20">
                   <CardTitle className="flex items-center gap-2 text-xl font-mono text-gray-900 dark:text-white">
-                    <span className="text-2xl">🎯</span>
+                    <span className="text-2xl">REQ</span>
                     REQUIREMENTS.txt
                   </CardTitle>
                 </CardHeader>
@@ -383,7 +383,7 @@ export default function QuestDetailPage() {
                   <div className="space-y-4">
                     {(quest.requirements || []).map((requirement, index) => (
                       <div key={index} className="flex items-start gap-4 p-4 border-2 border-dashed border-green-300 dark:border-green-600 bg-green-50 dark:bg-green-950/20 rounded-lg shadow-sm hover:shadow-md transition-all">
-                        <div className="text-green-600 dark:text-green-400 text-xl mt-0.5">✅</div>
+                        <div className="text-green-600 dark:text-green-400 text-xl mt-0.5">✓</div>
                         <span className="text-gray-700 dark:text-gray-300 leading-relaxed font-mono">{requirement}</span>
                       </div>
                     ))}
@@ -398,7 +398,7 @@ export default function QuestDetailPage() {
               <Card className="border-4 border-dashed border-purple-400 dark:border-purple-600 shadow-lg bg-gradient-to-br from-purple-50 to-white dark:from-purple-950/30 dark:to-gray-900">
                 <CardHeader className="border-b-2 border-dashed border-purple-300 dark:border-purple-600 bg-gradient-to-r from-purple-100 to-purple-50 dark:from-purple-950/40 dark:to-purple-950/20">
                   <CardTitle className="flex items-center gap-2 text-xl font-mono text-gray-900 dark:text-white">
-                    <span className="text-2xl">📚</span>
+                    <span className="text-2xl">RES</span>
                     RESOURCES.db
                   </CardTitle>
                 </CardHeader>
@@ -410,7 +410,7 @@ export default function QuestDetailPage() {
                       rel="noopener noreferrer"
                       className="group flex items-center gap-4 p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-950/20 rounded-lg shadow-sm hover:shadow-md hover:border-gray-400 dark:hover:border-gray-500 transition-all"
                     >
-                      <div className="text-2xl group-hover:scale-110 transition-transform">📖</div>
+                      <div className="text-2xl group-hover:scale-110 transition-transform">DOCS</div>
                       <div>
                         <div className="font-mono font-medium text-gray-900 dark:text-gray-100">HEDERA_DOCS.html</div>
                         <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">{'>>>'} Official development documentation</div>
@@ -422,7 +422,7 @@ export default function QuestDetailPage() {
                       rel="noopener noreferrer"
                       className="group flex items-center gap-4 p-4 border-2 border-dashed border-green-300 dark:border-green-600 bg-green-50 dark:bg-green-950/20 rounded-lg shadow-sm hover:shadow-md hover:border-green-400 dark:hover:border-green-500 transition-all"
                     >
-                      <div className="text-2xl group-hover:scale-110 transition-transform">🚪</div>
+                      <div className="text-2xl group-hover:scale-110 transition-transform">PORTAL</div>
                       <div>
                         <div className="font-mono font-medium text-gray-900 dark:text-gray-100">HEDERA_PORTAL.exe</div>
                         <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">{'>>>'} Developer portal and tools</div>
@@ -434,7 +434,7 @@ export default function QuestDetailPage() {
                       rel="noopener noreferrer"
                       className="group flex items-center gap-4 p-4 border-2 border-dashed border-orange-300 dark:border-orange-600 bg-orange-50 dark:bg-orange-950/20 rounded-lg shadow-sm hover:shadow-md hover:border-orange-400 dark:hover:border-orange-500 transition-all"
                     >
-                      <div className="text-2xl group-hover:scale-110 transition-transform">🔍</div>
+                      <div className="text-2xl group-hover:scale-110 transition-transform">SCAN</div>
                       <div>
                         <div className="font-mono font-medium text-gray-900 dark:text-gray-100">HASHSCAN_EXPLORER.app</div>
                         <div className="text-sm text-gray-500 dark:text-gray-400 font-mono">{'>>>'} Blockchain explorer for Hedera</div>
@@ -449,7 +449,7 @@ export default function QuestDetailPage() {
               <Card className="border-4 border-dashed border-yellow-400 dark:border-yellow-600 shadow-lg bg-gradient-to-br from-yellow-50 to-white dark:from-yellow-950/30 dark:to-gray-900">
                 <CardHeader className="border-b-2 border-dashed border-yellow-300 dark:border-yellow-600 bg-gradient-to-r from-yellow-100 to-yellow-50 dark:from-yellow-950/40 dark:to-yellow-950/20">
                   <CardTitle className="flex items-center gap-2 text-xl font-mono text-gray-900 dark:text-white">
-                    <span className="text-2xl">🏆</span>
+                    <span className="text-2xl">BADGE</span>
                     BADGES.json
                   </CardTitle>
                 </CardHeader>
@@ -470,9 +470,9 @@ export default function QuestDetailPage() {
                             ) : (
                               <div className="w-16 h-16 border-2 border-dashed border-yellow-400 bg-gradient-to-br from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 rounded-lg flex items-center justify-center">
                                 <span className="text-3xl">
-                                  {badge.rarity === 'legendary' ? '👑' :
-                                   badge.rarity === 'epic' ? '🛡️' :
-                                   '🏅'}
+                                  {badge.rarity === 'legendary' ? 'LEG' :
+                                   badge.rarity === 'epic' ? 'EPIC' :
+                                   'COMM'}
                                 </span>
                               </div>
                             )}
@@ -494,7 +494,7 @@ export default function QuestDetailPage() {
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
                                 <div className="flex items-center gap-1">
-                                  <span className="text-yellow-500 text-lg">⭐</span>
+                                  <span className="text-yellow-500 text-lg">★</span>
                                   <span className="text-sm font-mono font-medium text-gray-700 dark:text-gray-300">{badge.points} PTS</span>
                                 </div>
                               </div>
@@ -508,7 +508,7 @@ export default function QuestDetailPage() {
                     ))}
                     {(!quest.badges || quest.badges.length === 0) && (
                       <div className="col-span-full text-center py-8 text-gray-500 dark:text-gray-400">
-                        <span className="text-6xl mb-3 block">🏆</span>
+                        <span className="text-6xl mb-3 block">BADGE</span>
                         <p className="font-mono">{'>>>'} NO BADGES FOUND</p>
                       </div>
                     )}
@@ -525,7 +525,7 @@ export default function QuestDetailPage() {
           <Card className="border-4 border-dashed border-green-400 dark:border-green-600 shadow-lg bg-gradient-to-br from-green-50 to-white dark:from-green-950/30 dark:to-gray-900 overflow-hidden">
             <CardHeader className="border-b-2 border-dashed border-green-300 dark:border-green-600 bg-gradient-to-r from-green-100 to-green-50 dark:from-green-950/40 dark:to-green-950/20">
               <CardTitle className="flex items-center gap-2 font-mono text-gray-900 dark:text-white">
-                <span className="text-2xl">✅</span>
+                <span className="text-2xl">STATUS</span>
                 STATUS.log
               </CardTitle>
             </CardHeader>
@@ -534,10 +534,10 @@ export default function QuestDetailPage() {
                 <div className="text-center py-6">
                   <div className="relative">
                     <div className="w-20 h-20 border-4 border-dashed border-green-400 bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900/30 dark:to-green-800/30 rounded-lg flex items-center justify-center mx-auto mb-4 shadow-lg">
-                      <span className="text-4xl">🏆</span>
+                      <span className="text-4xl">DONE</span>
                     </div>
                     <div className="absolute -top-1 -right-1 w-8 h-8 border-2 border-dashed border-yellow-400 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
-                      <span className="text-lg">✨</span>
+                      <span className="text-lg">★</span>
                     </div>
                   </div>
                   <h3 className="font-mono font-bold text-lg text-green-600 dark:text-green-400 mb-2">
@@ -545,14 +545,14 @@ export default function QuestDetailPage() {
                   </h3>
                   <div className="border-2 border-dashed border-green-300 dark:border-green-600 bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
                     <p className="text-sm font-mono font-medium text-green-700 dark:text-green-300">
-                      🎉 EARNED: {quest.points} POINTS
+                      EARNED: {quest.points} POINTS
                     </p>
                   </div>
                 </div>
               ) : (
                 <div className="text-center py-6">
                   <div className="w-16 h-16 border-4 border-dashed border-blue-400 bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-lg flex items-center justify-center mx-auto mb-4">
-                    <span className="text-3xl">⚡</span>
+                    <span className="text-3xl">READY</span>
                   </div>
                   <h3 className="font-mono font-semibold text-gray-900 dark:text-gray-100 mb-2">
                     {'>>>'} READY_TO_START?
@@ -572,7 +572,7 @@ export default function QuestDetailPage() {
             <Card className="border-4 border-dashed border-orange-400 dark:border-orange-600 shadow-lg bg-gradient-to-br from-orange-50 to-white dark:from-orange-950/30 dark:to-gray-900">
               <CardHeader className="border-b-2 border-dashed border-orange-300 dark:border-orange-600 bg-gradient-to-r from-orange-100 to-orange-50 dark:from-orange-950/40 dark:to-orange-950/20">
                 <CardTitle className="flex items-center gap-2 font-mono text-gray-900 dark:text-white">
-                  <span className="text-2xl">⚠️</span>
+                  <span className="text-2xl">PREREQ</span>
                   PREREQUISITES.txt
                 </CardTitle>
               </CardHeader>
@@ -581,7 +581,7 @@ export default function QuestDetailPage() {
                   {(quest.prerequisites || []).map((prereqId) => (
                     <div key={prereqId} className="flex items-center gap-3 p-3 border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50 rounded-lg shadow-sm">
                       <div className="p-1 border-2 border-dashed border-green-400 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                        <span className="text-green-600 dark:text-green-400 text-lg">✅</span>
+                        <span className="text-green-600 dark:text-green-400 text-lg">✓</span>
                       </div>
                       <span className="text-sm font-mono font-medium text-gray-700 dark:text-gray-300">QUEST_#{prereqId}</span>
                     </div>
@@ -595,7 +595,7 @@ export default function QuestDetailPage() {
           <Card className="border-4 border-dashed border-indigo-400 dark:border-indigo-600 shadow-lg bg-gradient-to-br from-indigo-50 to-white dark:from-indigo-950/30 dark:to-gray-900">
             <CardHeader className="border-b-2 border-dashed border-indigo-300 dark:border-indigo-600 bg-gradient-to-r from-indigo-100 to-indigo-50 dark:from-indigo-950/40 dark:to-indigo-950/20">
               <CardTitle className="flex items-center gap-2 font-mono text-gray-900 dark:text-white">
-                <span className="text-2xl">🎯</span>
+                <span className="text-2xl">STATS</span>
                 STATS.json
               </CardTitle>
             </CardHeader>
