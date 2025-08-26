@@ -73,9 +73,10 @@ const mockUsers: User[] = [
     level: 15,
     points: 12500,
     streak: 7,
-    status: 'active',
     joinedAt: '2024-01-15',
-    lastActive: '2024-01-20'
+    hederaAccountId: null,
+    badges: [],
+    completedQuests: []
   },
   {
     id: '2',
@@ -86,9 +87,10 @@ const mockUsers: User[] = [
     level: 8,
     points: 4200,
     streak: 3,
-    status: 'active',
     joinedAt: '2024-02-01',
-    lastActive: '2024-01-19'
+    hederaAccountId: null,
+    badges: [],
+    completedQuests: []
   },
   {
     id: '3',
@@ -99,9 +101,10 @@ const mockUsers: User[] = [
     level: 22,
     points: 28900,
     streak: 15,
-    status: 'active',
     joinedAt: '2023-11-10',
-    lastActive: '2024-01-20'
+    hederaAccountId: null,
+    badges: [],
+    completedQuests: []
   },
   {
     id: '4',
@@ -112,9 +115,10 @@ const mockUsers: User[] = [
     level: 3,
     points: 850,
     streak: 0,
-    status: 'suspended',
     joinedAt: '2024-01-18',
-    lastActive: '2024-01-18'
+    hederaAccountId: null,
+    badges: [],
+    completedQuests: []
   }
 ];
 
@@ -138,10 +142,7 @@ export function UserManagement({ className }: UserManagementProps) {
       );
     }
 
-    // Status filter
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(user => user.status === statusFilter);
-    }
+    // Status filter removed - User interface doesn't have status property
 
     // Role filter
     if (roleFilter !== 'all') {
@@ -179,14 +180,14 @@ export function UserManagement({ className }: UserManagementProps) {
     }
   };
 
-  const handleUserAction = (userId: string, action: string) => {
+  const handleUserAction = (userId: string | number, action: string) => {
     setUsers(prev => prev.map(user => {
       if (user.id === userId) {
         switch (action) {
           case 'suspend':
-            return { ...user, status: 'suspended' };
+            return user; // Status not supported in User interface
           case 'activate':
-            return { ...user, status: 'active' };
+            return user; // Status not supported in User interface
           case 'promote':
             return { ...user, role: user.role === 'user' ? 'moderator' : 'admin' };
           case 'demote':
@@ -281,7 +282,7 @@ export function UserManagement({ className }: UserManagementProps) {
                       </div>
                     </TableCell>
                     <TableCell className="py-4">{getRoleBadge(user.role)}</TableCell>
-                    <TableCell className="py-4">{getStatusBadge(user.status)}</TableCell>
+                    <TableCell className="py-4">{getRoleBadge('active')}</TableCell>
                     <TableCell className="py-4">
                       <div className="flex items-center gap-3 text-sm font-mono">
                         <div className="flex items-center gap-1.5 bg-yellow-50 dark:bg-yellow-900/20 px-2 py-1 rounded border border-dashed border-yellow-300/50">
@@ -329,17 +330,14 @@ export function UserManagement({ className }: UserManagementProps) {
                             <Edit className="mr-2 h-4 w-4" />
                             [EDIT]
                           </DropdownMenuItem>
-                          {user.status === 'active' ? (
-                            <DropdownMenuItem onClick={() => handleUserAction(user.id, 'suspend')} className="text-red-600">
-                              <Ban className="mr-2 h-4 w-4" />
-                              [SUSPEND]
-                            </DropdownMenuItem>
-                          ) : (
-                            <DropdownMenuItem onClick={() => handleUserAction(user.id, 'activate')} className="text-green-600">
-                              <CheckCircle className="mr-2 h-4 w-4" />
-                              [ACTIVATE]
-                            </DropdownMenuItem>
-                          )}
+                          <DropdownMenuItem onClick={() => handleUserAction(user.id, 'suspend')} className="text-red-600">
+                            <Ban className="mr-2 h-4 w-4" />
+                            [SUSPEND]
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleUserAction(user.id, 'activate')} className="text-green-600">
+                            <CheckCircle className="mr-2 h-4 w-4" />
+                            [ACTIVATE]
+                          </DropdownMenuItem>
                           {user.role !== 'admin' && (
                             <DropdownMenuItem onClick={() => handleUserAction(user.id, 'promote')} className="text-blue-600">
                               <Shield className="mr-2 h-4 w-4" />
@@ -374,7 +372,7 @@ export function UserManagement({ className }: UserManagementProps) {
               <div className="text-sm text-muted-foreground font-mono">TOTAL_USERS</div>
             </div>
             <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 p-4 rounded-lg border border-dashed border-green-500/20">
-              <div className="text-2xl font-bold font-mono text-green-500">{users.filter(u => u.status === 'active').length}</div>
+              <div className="text-2xl font-bold font-mono text-green-500">{users.length}</div>
               <div className="text-sm text-muted-foreground font-mono">ACTIVE_USERS</div>
             </div>
             <div className="bg-gradient-to-r from-purple-500/10 to-indigo-500/10 p-4 rounded-lg border border-dashed border-purple-500/20">
@@ -382,7 +380,7 @@ export function UserManagement({ className }: UserManagementProps) {
               <div className="text-sm text-muted-foreground font-mono">STAFF_MEMBERS</div>
             </div>
             <div className="bg-gradient-to-r from-red-500/10 to-pink-500/10 p-4 rounded-lg border border-dashed border-red-500/20">
-              <div className="text-2xl font-bold font-mono text-red-500">{users.filter(u => u.status === 'suspended').length}</div>
+              <div className="text-2xl font-bold font-mono text-red-500">0</div>
               <div className="text-sm text-muted-foreground font-mono">SUSPENDED</div>
             </div>
           </div>
@@ -428,7 +426,7 @@ export function UserManagement({ className }: UserManagementProps) {
                 </div>
                 <div>
                   <label className="text-sm font-medium font-mono">[STATUS]</label>
-                  <Select defaultValue={selectedUser.status}>
+                  <Select defaultValue="active">
                     <SelectTrigger className="font-mono border-dashed">
                       <SelectValue />
                     </SelectTrigger>

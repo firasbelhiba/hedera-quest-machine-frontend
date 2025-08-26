@@ -33,6 +33,10 @@ export default function Dashboard() {
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
   const [activeTab, setActiveTab] = useState('overview');
 
+  const handleQuestSelect = (questId: string) => {
+    router.push(`/quests/${questId}`);
+  };
+
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -217,7 +221,7 @@ export default function Dashboard() {
     .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())
     .slice(0, 5);
 
-  const categories = Array.from(new Set(quests.map(q => q.category).filter(Boolean)));
+  const categories = Array.from(new Set(quests.map(q => q.category).filter(Boolean))) as string[];
   const difficulties = ['beginner', 'intermediate', 'advanced', 'expert'];
 
   return (
@@ -385,7 +389,12 @@ export default function Dashboard() {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {featuredQuests.map((quest) => (
-                  <QuestCard key={quest.id} quest={quest} isCompleted={completedQuestIds.includes(quest.id)} />
+                  <QuestCard 
+                    key={quest.id} 
+                    quest={quest} 
+                    isCompleted={completedQuestIds.includes(String(quest.id))} 
+                    onSelect={() => handleQuestSelect(String(quest.id))}
+                  />
                 ))}
               </div>
             </CardContent>
@@ -520,7 +529,8 @@ export default function Dashboard() {
                 <QuestCard 
                   key={quest.id} 
                   quest={quest} 
-                  isCompleted={completedQuestIds.includes(quest.id)}
+                  isCompleted={completedQuestIds.includes(String(quest.id))}
+                  onSelect={() => handleQuestSelect(String(quest.id))}
                 />
               ))}
             </div>

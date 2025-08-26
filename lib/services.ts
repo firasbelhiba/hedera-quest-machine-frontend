@@ -241,8 +241,8 @@ export class QuestService {
             text: 'I have completed the token creation quest and deployed my token successfully.'
           },
           submittedAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-          reviewedAt: null,
-          feedback: null
+          reviewedAt: undefined,
+          feedback: undefined
         }
       ];
     }

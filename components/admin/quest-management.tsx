@@ -54,7 +54,8 @@ import {
   Trophy,
   CheckCircle,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  Calendar
 } from 'lucide-react';
 import { Quest } from '@/lib/types';
 
@@ -71,10 +72,9 @@ const mockQuests: Quest[] = [
     category: 'smart-contracts',
     difficulty: 'beginner',
     points: 100,
-    estimatedTime: 30,
+    estimatedTime: '30',
     status: 'published',
     completions: 245,
-    rating: 4.8,
     createdAt: '2024-01-10',
     updatedAt: '2024-01-15'
   },
@@ -82,13 +82,12 @@ const mockQuests: Quest[] = [
     id: '2',
     title: 'Token Creation Workshop',
     description: 'Create and deploy your first HTS token',
-    category: 'tokens',
+    category: 'token-service',
     difficulty: 'intermediate',
     points: 250,
-    estimatedTime: 60,
+    estimatedTime: '60',
     status: 'published',
     completions: 128,
-    rating: 4.6,
     createdAt: '2024-01-05',
     updatedAt: '2024-01-12'
   },
@@ -99,10 +98,9 @@ const mockQuests: Quest[] = [
     category: 'defi',
     difficulty: 'advanced',
     points: 500,
-    estimatedTime: 120,
+    estimatedTime: '120',
     status: 'draft',
     completions: 0,
-    rating: 0,
     createdAt: '2024-01-18',
     updatedAt: '2024-01-19'
   },
@@ -113,10 +111,9 @@ const mockQuests: Quest[] = [
     category: 'nfts',
     difficulty: 'advanced',
     points: 400,
-    estimatedTime: 90,
+    estimatedTime: '90',
     status: 'archived',
     completions: 67,
-    rating: 4.2,
     createdAt: '2023-12-20',
     updatedAt: '2024-01-08'
   }
@@ -162,7 +159,11 @@ export function QuestManagement({ className }: QuestManagementProps) {
     setFilteredQuests(filtered);
   }, [quests, searchTerm, statusFilter, categoryFilter, difficultyFilter]);
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string | undefined) => {
+    if (!status) {
+      return <Badge variant="outline" className="font-mono">UNKNOWN</Badge>;
+    }
+    
     switch (status) {
       case 'published':
         return <Badge className="bg-green-500/10 text-green-500 border-green-500/20 font-mono"><CheckCircle className="w-3 h-3 mr-1" />PUBLISHED</Badge>;
@@ -188,14 +189,21 @@ export function QuestManagement({ className }: QuestManagementProps) {
     }
   };
 
-  const getCategoryBadge = (category: string) => {
+  const getCategoryBadge = (category: string | undefined) => {
+    if (!category) {
+      return <Badge variant="outline" className="font-mono">UNCATEGORIZED</Badge>;
+    }
+    
     const categoryColors: Record<string, string> = {
       'smart-contracts': 'purple',
-      'tokens': 'blue',
+      'token-service': 'blue',
       'nfts': 'pink',
       'defi': 'cyan',
       'consensus': 'orange',
-      'mirror-node': 'indigo'
+      'file-service': 'indigo',
+      'getting-started': 'green',
+      'development': 'yellow',
+      'community': 'red'
     };
     
     const color = categoryColors[category] || 'gray';
@@ -206,7 +214,7 @@ export function QuestManagement({ className }: QuestManagementProps) {
     );
   };
 
-  const handleQuestAction = (questId: string, action: string) => {
+  const handleQuestAction = (questId: string | number, action: string) => {
     setQuests(prev => prev.map(quest => {
       if (quest.id === questId) {
         switch (action) {
@@ -224,7 +232,7 @@ export function QuestManagement({ className }: QuestManagementProps) {
     }));
   };
 
-  const handleDeleteQuest = (questId: string) => {
+  const handleDeleteQuest = (questId: string | number) => {
     setQuests(prev => prev.filter(quest => quest.id !== questId));
   };
 
@@ -334,13 +342,13 @@ export function QuestManagement({ className }: QuestManagementProps) {
                           <Users className="w-3 h-3 text-blue-600" />
                           <span className="font-semibold">{quest.completions}</span>
                         </div>
-                        <div className="flex items-center gap-1.5 bg-purple-50 dark:bg-purple-900/20 px-2 py-1 rounded border border-dashed border-purple-300/50">
-                          <Star className="w-3 h-3 text-purple-600" />
-                          <span className="font-semibold">{quest.rating}</span>
-                        </div>
                         <div className="flex items-center gap-1.5 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded border border-dashed border-green-300/50">
                           <Clock className="w-3 h-3 text-green-600" />
                           <span className="font-semibold">{quest.estimatedTime}m</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 bg-purple-50 dark:bg-purple-900/20 px-2 py-1 rounded border border-dashed border-purple-300/50">
+                          <Calendar className="w-3 h-3 text-purple-600" />
+                          <span className="font-semibold">{quest.updatedAt}</span>
                         </div>
                       </div>
                     </TableCell>
@@ -425,7 +433,7 @@ export function QuestManagement({ className }: QuestManagementProps) {
               <div className="text-sm text-muted-foreground font-mono">DRAFTS</div>
             </div>
             <div className="bg-gradient-to-r from-purple-500/10 to-pink-500/10 p-4 rounded-lg border border-dashed border-purple-500/20">
-              <div className="text-2xl font-bold font-mono text-purple-500">{quests.reduce((sum, q) => sum + q.completions, 0)}</div>
+              <div className="text-2xl font-bold font-mono text-purple-500">{quests.reduce((sum, q) => sum + (q.completions || 0), 0)}</div>
               <div className="text-sm text-muted-foreground font-mono">COMPLETIONS</div>
             </div>
           </div>
