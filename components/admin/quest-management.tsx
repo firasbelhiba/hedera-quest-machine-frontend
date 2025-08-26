@@ -1,139 +1,69 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Compass,
-  Search,
-  Plus,
-  MoreHorizontal,
-  Edit,
-  Trash2,
-  Eye,
-  Play,
-  Pause,
-  Star,
-  Clock,
-  Users,
-  Trophy,
-  CheckCircle,
-  XCircle,
-  AlertCircle,
-  Calendar
-} from 'lucide-react';
-import { Quest } from '@/lib/types';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { useToast } from '@/hooks/use-toast';
+import { Search, Plus, MoreHorizontal, Eye, Edit, Play, Pause, XCircle, Trash2, Filter, Users, Calendar, Clock, Award, User, MapPin, Target, FileText, CheckCircle, AlertCircle, Compass, Trophy } from 'lucide-react';
+import { QuestService } from '@/lib/services';
+import { CreateQuestForm } from '@/components/admin/create-quest-form';
+import { EditQuestForm } from '@/components/admin/edit-quest-form';
+import type { Quest } from '@/types/quest';
 
-interface QuestManagementProps {
-  className?: string;
-}
-
-// Mock data - replace with actual API calls
-const mockQuests: Quest[] = [
-  {
-    id: '1',
-    title: 'Smart Contract Basics',
-    description: 'Learn the fundamentals of Hedera smart contracts',
-    category: 'smart-contracts',
-    difficulty: 'beginner',
-    points: 100,
-    estimatedTime: '30',
-    status: 'published',
-    completions: 245,
-    createdAt: '2024-01-10',
-    updatedAt: '2024-01-15'
-  },
-  {
-    id: '2',
-    title: 'Token Creation Workshop',
-    description: 'Create and deploy your first HTS token',
-    category: 'token-service',
-    difficulty: 'intermediate',
-    points: 250,
-    estimatedTime: '60',
-    status: 'published',
-    completions: 128,
-    createdAt: '2024-01-05',
-    updatedAt: '2024-01-12'
-  },
-  {
-    id: '3',
-    title: 'Advanced DeFi Protocols',
-    description: 'Build complex DeFi applications on Hedera',
-    category: 'defi',
-    difficulty: 'advanced',
-    points: 500,
-    estimatedTime: '120',
-    status: 'draft',
-    completions: 0,
-    createdAt: '2024-01-18',
-    updatedAt: '2024-01-19'
-  },
-  {
-    id: '4',
-    title: 'NFT Marketplace Development',
-    description: 'Create a full-featured NFT marketplace',
-    category: 'nfts',
-    difficulty: 'advanced',
-    points: 400,
-    estimatedTime: '90',
-    status: 'archived',
-    completions: 67,
-    createdAt: '2023-12-20',
-    updatedAt: '2024-01-08'
-  }
-];
-
-export function QuestManagement({ className }: QuestManagementProps) {
-  const [quests, setQuests] = useState<Quest[]>(mockQuests);
-  const [filteredQuests, setFilteredQuests] = useState<Quest[]>(mockQuests);
+function QuestManagement() {
+  const { toast } = useToast();
+  const [quests, setQuests] = useState<Quest[]>([]);
+  const [filteredQuests, setFilteredQuests] = useState<Quest[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [categoryFilter, setCategoryFilter] = useState('all');
-  const [difficultyFilter, setDifficultyFilter] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedDifficulty, setSelectedDifficulty] = useState('all');
   const [selectedQuest, setSelectedQuest] = useState<Quest | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [questToDelete, setQuestToDelete] = useState<string | null>(null);
 
   useEffect(() => {
+    loadQuests();
+  }, []);
+
+  useEffect(() => {
+    filterQuests();
+  }, [quests, searchTerm, selectedCategory, selectedDifficulty]);
+
+  const loadQuests = async () => {
+    try {
+      setLoading(true);
+      const data = await QuestService.getQuests();
+      setQuests(data);
+    } catch (error) {
+      console.error('Failed to load quests:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load quests. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filterQuests = () => {
     let filtered = quests;
 
-    // Search filter
     if (searchTerm) {
       filtered = filtered.filter(quest => 
         quest.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -141,25 +71,94 @@ export function QuestManagement({ className }: QuestManagementProps) {
       );
     }
 
-    // Status filter
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(quest => quest.status === statusFilter);
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(quest => quest.category === selectedCategory);
     }
 
-    // Category filter
-    if (categoryFilter !== 'all') {
-      filtered = filtered.filter(quest => quest.category === categoryFilter);
-    }
-
-    // Difficulty filter
-    if (difficultyFilter !== 'all') {
-      filtered = filtered.filter(quest => quest.difficulty === difficultyFilter);
+    if (selectedDifficulty !== 'all') {
+      filtered = filtered.filter(quest => quest.difficulty === selectedDifficulty);
     }
 
     setFilteredQuests(filtered);
-  }, [quests, searchTerm, statusFilter, categoryFilter, difficultyFilter]);
+  };
 
-  const getStatusBadge = (status: string | undefined) => {
+  const handleDeleteQuest = async (questId: string) => {
+    try {
+      await QuestService.deleteQuest(questId);
+      await loadQuests();
+      toast({
+        title: 'Success',
+        description: 'Quest deleted successfully.',
+      });
+    } catch (error) {
+      console.error('Failed to delete quest:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to delete quest. Please try again.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleActivateQuest = async (questId: string) => {
+    try {
+      await QuestService.activateQuest(questId);
+      await loadQuests();
+      toast({
+        title: 'Success',
+        description: 'Quest activated successfully.',
+      });
+    } catch (error) {
+      console.error('Failed to activate quest:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to activate quest. Please try again.',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleViewDetails = (quest: Quest) => {
+    setSelectedQuest(quest);
+    setIsDetailsDialogOpen(true);
+  };
+
+  const handleEditQuest = (quest: Quest) => {
+    setSelectedQuest(quest);
+    setIsEditDialogOpen(true);
+  };
+
+  const confirmDeleteQuest = (questId: string) => {
+    setQuestToDelete(questId);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'beginner':
+        return 'text-green-600 bg-green-50 border-green-200';
+      case 'intermediate':
+        return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+      case 'advanced':
+        return 'text-red-600 bg-red-50 border-red-200';
+      default:
+        return 'text-gray-600 bg-gray-50 border-gray-200';
+    }
+  };
+
+  const getCategoryColor = (category: string) => {
+     const colors = {
+       'smart-contracts': 'text-purple-600 bg-purple-50 border-purple-200',
+       'tokens': 'text-blue-600 bg-blue-50 border-blue-200',
+       'nfts': 'text-pink-600 bg-pink-50 border-pink-200',
+       'defi': 'text-indigo-600 bg-indigo-50 border-indigo-200',
+       'consensus': 'text-orange-600 bg-orange-50 border-orange-200',
+       'mirror-node': 'text-teal-600 bg-teal-50 border-teal-200',
+     };
+     return colors[category as keyof typeof colors] || 'text-gray-600 bg-gray-50 border-gray-200';
+   };
+
+   const getStatusBadge = (status: string | undefined) => {
     if (!status) {
       return <Badge variant="outline" className="font-mono">UNKNOWN</Badge>;
     }
@@ -214,30 +213,38 @@ export function QuestManagement({ className }: QuestManagementProps) {
     );
   };
 
-  const handleQuestAction = (questId: string | number, action: string) => {
-    setQuests(prev => prev.map(quest => {
-      if (quest.id === questId) {
-        switch (action) {
-          case 'publish':
-            return { ...quest, status: 'published' };
-          case 'draft':
-            return { ...quest, status: 'draft' };
-          case 'archive':
-            return { ...quest, status: 'archived' };
-          default:
-            return quest;
-        }
+  const handleQuestAction = async (questId: string | number, action: string) => {
+    try {
+      // Call appropriate API based on action
+      if (action === 'publish') {
+        await QuestService.activateQuest(questId.toString());
       }
-      return quest;
-    }));
+      // Reload quests to get updated data
+      await loadQuests();
+      toast({
+        title: 'Success',
+        description: `Quest ${action}ed successfully.`,
+      });
+    } catch (error) {
+      console.error(`Failed to ${action} quest:`, error);
+      toast({
+        title: 'Error',
+        description: `Failed to ${action} quest. Please try again.`,
+        variant: 'destructive',
+      });
+    }
   };
 
-  const handleDeleteQuest = (questId: string | number) => {
-    setQuests(prev => prev.filter(quest => quest.id !== questId));
-  };
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className={className}>
+    <div className="space-y-6">
       <Card className="border-2 border-dashed border-cyan-500/20 bg-gradient-to-br from-cyan-500/5 to-blue-500/5">
         <CardHeader className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10">
           <CardTitle className="flex items-center gap-2 font-mono">
@@ -259,7 +266,7 @@ export function QuestManagement({ className }: QuestManagementProps) {
                 className="pl-10 font-mono border-dashed border-cyan-500/30 focus:border-solid"
               />
             </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <Select value="all" onValueChange={() => {}}>
               <SelectTrigger className="w-40 font-mono border-dashed border-cyan-500/30">
                 <SelectValue placeholder="[STATUS]" />
               </SelectTrigger>
@@ -270,7 +277,7 @@ export function QuestManagement({ className }: QuestManagementProps) {
                 <SelectItem value="archived">[ARCHIVED]</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
               <SelectTrigger className="w-48 font-mono border-dashed border-cyan-500/30">
                 <SelectValue placeholder="[CATEGORY]" />
               </SelectTrigger>
@@ -284,7 +291,7 @@ export function QuestManagement({ className }: QuestManagementProps) {
                 <SelectItem value="mirror-node">[MIRROR_NODE]</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
+            <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
               <SelectTrigger className="w-44 font-mono border-dashed border-cyan-500/30">
                 <SelectValue placeholder="[DIFFICULTY]" />
               </SelectTrigger>
@@ -358,10 +365,16 @@ export function QuestManagement({ className }: QuestManagementProps) {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => {
-                            setSelectedQuest(quest);
-                            setIsEditDialogOpen(true);
-                          }}
+                          onClick={() => handleViewDetails(quest)}
+                          className="h-8 px-3 border border-dashed border-green-500/30 hover:border-solid hover:bg-green-50 dark:hover:bg-green-900/20 text-green-600 hover:text-green-700 transition-all duration-200"
+                        >
+                          <Eye className="w-3.5 h-3.5 mr-1" />
+                          View
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEditQuest(quest)}
                           className="h-8 px-3 border border-dashed border-blue-500/30 hover:border-solid hover:bg-blue-50 dark:hover:bg-blue-900/20 text-blue-600 hover:text-blue-700 transition-all duration-200"
                         >
                           <Edit className="w-3.5 h-3.5 mr-1" />
@@ -380,10 +393,7 @@ export function QuestManagement({ className }: QuestManagementProps) {
                               <Eye className="mr-2 h-4 w-4" />
                               [VIEW]
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => {
-                              setSelectedQuest(quest);
-                              setIsEditDialogOpen(true);
-                            }}>
+                            <DropdownMenuItem onClick={() => handleEditQuest(quest)}>
                               <Edit className="mr-2 h-4 w-4" />
                               [EDIT]
                             </DropdownMenuItem>
@@ -404,7 +414,7 @@ export function QuestManagement({ className }: QuestManagementProps) {
                               [ARCHIVE]
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="border-dashed border-cyan-500/20" />
-                            <DropdownMenuItem onClick={() => handleDeleteQuest(quest.id)} className="text-red-600">
+                            <DropdownMenuItem onClick={() => confirmDeleteQuest(quest.id)} className="text-red-600">
                               <Trash2 className="mr-2 h-4 w-4" />
                               [DELETE]
                             </DropdownMenuItem>
@@ -442,153 +452,166 @@ export function QuestManagement({ className }: QuestManagementProps) {
 
       {/* Create Quest Dialog */}
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="max-w-2xl font-mono border-2 border-dashed border-cyan-500/30">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">
-              [CREATE_NEW_QUEST]
-            </DialogTitle>
+            <DialogTitle>Create New Quest</DialogTitle>
             <DialogDescription>
-              Create a new quest for users to complete.
+              Create a new quest for users to complete and earn rewards.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium font-mono">[TITLE]</label>
-              <Input placeholder="Quest title" className="font-mono border-dashed" />
-            </div>
-            <div>
-              <label className="text-sm font-medium font-mono">[DESCRIPTION]</label>
-              <Textarea placeholder="Quest description" className="font-mono border-dashed" rows={3} />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium font-mono">[CATEGORY]</label>
-                <Select>
-                  <SelectTrigger className="font-mono border-dashed">
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent className="font-mono">
-                    <SelectItem value="smart-contracts">[SMART_CONTRACTS]</SelectItem>
-                    <SelectItem value="tokens">[TOKENS]</SelectItem>
-                    <SelectItem value="nfts">[NFTS]</SelectItem>
-                    <SelectItem value="defi">[DEFI]</SelectItem>
-                    <SelectItem value="consensus">[CONSENSUS]</SelectItem>
-                    <SelectItem value="mirror-node">[MIRROR_NODE]</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="text-sm font-medium font-mono">[DIFFICULTY]</label>
-                <Select>
-                  <SelectTrigger className="font-mono border-dashed">
-                    <SelectValue placeholder="Select difficulty" />
-                  </SelectTrigger>
-                  <SelectContent className="font-mono">
-                    <SelectItem value="beginner">[BEGINNER]</SelectItem>
-                    <SelectItem value="intermediate">[INTERMEDIATE]</SelectItem>
-                    <SelectItem value="advanced">[ADVANCED]</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium font-mono">[POINTS]</label>
-                <Input type="number" placeholder="100" className="font-mono border-dashed" />
-              </div>
-              <div>
-                <label className="text-sm font-medium font-mono">[ESTIMATED_TIME] (minutes)</label>
-                <Input type="number" placeholder="30" className="font-mono border-dashed" />
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)} className="font-mono border-dashed">
-              [CANCEL]
-            </Button>
-            <Button onClick={() => setIsCreateDialogOpen(false)} className="font-mono bg-gradient-to-r from-cyan-500 to-blue-500">
-              [CREATE_QUEST]
-            </Button>
-          </DialogFooter>
+          <CreateQuestForm
+            onSuccess={() => {
+              setIsCreateDialogOpen(false);
+              loadQuests();
+            }}
+            onCancel={() => setIsCreateDialogOpen(false)}
+          />
         </DialogContent>
       </Dialog>
 
       {/* Edit Quest Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-2xl font-mono border-2 border-dashed border-cyan-500/30">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">
-              [EDIT_QUEST]
-            </DialogTitle>
+            <DialogTitle>Edit Quest</DialogTitle>
             <DialogDescription>
               Modify quest details and settings.
             </DialogDescription>
           </DialogHeader>
           {selectedQuest && (
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium font-mono">[TITLE]</label>
-                <Input defaultValue={selectedQuest.title} className="font-mono border-dashed" />
-              </div>
-              <div>
-                <label className="text-sm font-medium font-mono">[DESCRIPTION]</label>
-                <Textarea defaultValue={selectedQuest.description} className="font-mono border-dashed" rows={3} />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
+            <EditQuestForm
+              quest={selectedQuest}
+              onSuccess={() => {
+                setIsEditDialogOpen(false);
+                loadQuests();
+              }}
+              onCancel={() => setIsEditDialogOpen(false)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Quest Details Dialog */}
+      <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Quest Details</DialogTitle>
+          </DialogHeader>
+          {selectedQuest && (
+            <ScrollArea className="max-h-[60vh]">
+              <div className="space-y-6">
                 <div>
-                  <label className="text-sm font-medium font-mono">[CATEGORY]</label>
-                  <Select defaultValue={selectedQuest.category}>
-                    <SelectTrigger className="font-mono border-dashed">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="font-mono">
-                      <SelectItem value="smart-contracts">[SMART_CONTRACTS]</SelectItem>
-                      <SelectItem value="tokens">[TOKENS]</SelectItem>
-                      <SelectItem value="nfts">[NFTS]</SelectItem>
-                      <SelectItem value="defi">[DEFI]</SelectItem>
-                      <SelectItem value="consensus">[CONSENSUS]</SelectItem>
-                      <SelectItem value="mirror-node">[MIRROR_NODE]</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="text-sm font-medium font-mono">[DIFFICULTY]</label>
-                  <Select defaultValue={selectedQuest.difficulty}>
-                    <SelectTrigger className="font-mono border-dashed">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="font-mono">
-                      <SelectItem value="beginner">[BEGINNER]</SelectItem>
-                      <SelectItem value="intermediate">[INTERMEDIATE]</SelectItem>
-                      <SelectItem value="advanced">[ADVANCED]</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <h3 className="text-lg font-semibold mb-2">{selectedQuest.title}</h3>
+                  <p className="text-gray-600 mb-4">{selectedQuest.description}</p>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                      <Award className="w-6 h-6 mx-auto mb-1 text-yellow-600" />
+                      <div className="text-sm text-gray-600">Points</div>
+                      <div className="font-semibold">{selectedQuest.points}</div>
+                    </div>
+                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                      <Clock className="w-6 h-6 mx-auto mb-1 text-blue-600" />
+                      <div className="text-sm text-gray-600">Duration</div>
+                      <div className="font-semibold">{selectedQuest.estimatedTime}m</div>
+                    </div>
+                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                      <Users className="w-6 h-6 mx-auto mb-1 text-green-600" />
+                      <div className="text-sm text-gray-600">Completions</div>
+                      <div className="font-semibold">{selectedQuest.completions || 0}</div>
+                    </div>
+                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                      <Calendar className="w-6 h-6 mx-auto mb-1 text-purple-600" />
+                      <div className="text-sm text-gray-600">Updated</div>
+                      <div className="font-semibold text-xs">{selectedQuest.updatedAt}</div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    <Badge className={getDifficultyColor(selectedQuest.difficulty)}>
+                      {selectedQuest.difficulty}
+                    </Badge>
+                    <Badge className={getCategoryColor(selectedQuest.category || '')}>
+                      {selectedQuest.category?.replace('-', ' ')}
+                    </Badge>
+                    {getStatusBadge(selectedQuest.status)}
+                  </div>
+
+                  {selectedQuest.requirements && selectedQuest.requirements.length > 0 && (
+                    <div>
+                      <h4 className="font-semibold mb-2">Requirements</h4>
+                      <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
+                        {selectedQuest.requirements.map((req, index) => (
+                          <li key={index}>{req}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {selectedQuest.steps && selectedQuest.steps.length > 0 && (
+                    <div>
+                      <h4 className="font-semibold mb-2">Steps</h4>
+                      <ol className="list-decimal list-inside space-y-2">
+                        {selectedQuest.steps.map((step, index) => (
+                          <li key={index} className="text-sm">
+                            <span className="font-medium">{step.title}</span>
+                            {step.description && (
+                              <p className="text-gray-600 ml-4 mt-1">{step.description}</p>
+                            )}
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  )}
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm font-medium font-mono">[POINTS]</label>
-                  <Input type="number" defaultValue={selectedQuest.points} className="font-mono border-dashed" />
-                </div>
-                <div>
-                  <label className="text-sm font-medium font-mono">[ESTIMATED_TIME] (minutes)</label>
-                  <Input type="number" defaultValue={selectedQuest.estimatedTime} className="font-mono border-dashed" />
-                </div>
-              </div>
-            </div>
+            </ScrollArea>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)} className="font-mono border-dashed">
-              [CANCEL]
+            <Button variant="outline" onClick={() => setIsDetailsDialogOpen(false)}>
+              Close
             </Button>
-            <Button onClick={() => setIsEditDialogOpen(false)} className="font-mono bg-gradient-to-r from-cyan-500 to-blue-500">
-              [SAVE_CHANGES]
+            <Button onClick={() => {
+              setIsDetailsDialogOpen(false);
+              handleEditQuest(selectedQuest!);
+            }}>
+              Edit Quest
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the quest
+              and remove all associated data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setQuestToDelete(null)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (questToDelete) {
+                  handleDeleteQuest(questToDelete);
+                  setQuestToDelete(null);
+                }
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
 
+export { QuestManagement };
 export default QuestManagement;
