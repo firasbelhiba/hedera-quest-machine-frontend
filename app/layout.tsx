@@ -44,7 +44,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider defaultTheme="dark" attribute="class">
+        <ThemeProvider defaultTheme="system" attribute="class" enableSystem disableTransitionOnChange>
           <ErrorBoundary>
             <ClientProvider>
               <Suspense fallback={

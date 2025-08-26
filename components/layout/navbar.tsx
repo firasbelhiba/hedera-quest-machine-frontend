@@ -79,7 +79,7 @@ export function Navbar({ className }: NavbarProps) {
 
   return (
     <nav className={cn(
-      'sticky top-0 z-50 w-full border-b-2 border-dashed border-purple-500/30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 font-mono',
+      'sticky top-0 z-50 w-full border-b-2 border-dashed border-purple-500/30 bg-slate-900/95 backdrop-blur supports-[backdrop-filter]:bg-slate-900/60 font-mono text-slate-100',
       className
     )}>
       <div className="container mx-auto px-4">
@@ -109,8 +109,8 @@ export function Navbar({ className }: NavbarProps) {
                       <Link href={item.href} legacyBehavior passHref>
                         <NavigationMenuLink
                           className={cn(
-                            'group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 border-2 border-dashed border-transparent hover:border-purple-500/50 font-mono',
-                            isActive && 'bg-gradient-to-r from-purple-500/20 to-cyan-500/20 border-purple-500 border-solid text-foreground'
+                            'group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-slate-800 hover:text-slate-100 focus:bg-slate-800 focus:text-slate-100 focus:outline-none disabled:pointer-events-none disabled:opacity-50 border-2 border-dashed border-transparent hover:border-purple-500/50 font-mono text-slate-300',
+                            isActive && 'bg-gradient-to-r from-purple-500/20 to-cyan-500/20 border-purple-500 border-solid text-slate-100'
                           )}
                         >
                           <item.icon className="w-4 h-4 mr-2" />
@@ -131,7 +131,7 @@ export function Navbar({ className }: NavbarProps) {
               variant="ghost"
               size="sm"
               onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-              className="border-2 border-dashed border-purple-500/50 hover:border-cyan-500/50 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-cyan-500/20 font-mono"
+              className="border-2 border-dashed border-purple-500/50 hover:border-cyan-500/50 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-cyan-500/20 font-mono text-slate-300 hover:text-slate-100"
               title={theme === 'light' ? '[DARK_MODE]' : '[LIGHT_MODE]'}
             >
               {theme === 'light' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
@@ -141,7 +141,7 @@ export function Navbar({ className }: NavbarProps) {
             <Button
               variant="ghost"
               size="sm"
-              className="relative border-2 border-dashed border-purple-500/50 hover:border-cyan-500/50 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-cyan-500/20 font-mono"
+              className="relative border-2 border-dashed border-purple-500/50 hover:border-cyan-500/50 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-cyan-500/20 font-mono text-slate-300 hover:text-slate-100"
               title="[NOTIFICATIONS]"
             >
               <Bell className="h-4 w-4" />
@@ -153,7 +153,7 @@ export function Navbar({ className }: NavbarProps) {
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full border-2 border-dashed border-purple-500/50 hover:border-cyan-500/50 p-0">
+                <Button variant="ghost" className="relative h-10 w-10 rounded-full border-2 border-dashed border-purple-500/50 hover:border-cyan-500/50 p-0 text-slate-300 hover:text-slate-100">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={user?.avatar} alt={user?.name} />
                     <AvatarFallback className="bg-gradient-to-r from-purple-500 to-cyan-500 text-white font-mono text-xs">
@@ -162,7 +162,7 @@ export function Navbar({ className }: NavbarProps) {
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 border-2 border-dashed border-purple-500/50 bg-gradient-to-br from-purple-500/5 to-cyan-500/5 font-mono" align="end" forceMount>
+              <DropdownMenuContent className="w-56 border-2 border-dashed border-purple-500/50 bg-slate-800 text-slate-100 font-mono" align="end" forceMount>
                 <DropdownMenuLabel className="font-mono">
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium leading-none">{user?.name}</p>
@@ -223,12 +223,12 @@ export function Navbar({ className }: NavbarProps) {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="md:hidden border-2 border-dashed border-purple-500/50 hover:border-cyan-500/50 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-cyan-500/20 font-mono"
+                  className="md:hidden border-2 border-dashed border-purple-500/50 hover:border-cyan-500/50 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-cyan-500/20 font-mono text-slate-300 hover:text-slate-100"
                 >
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-80 border-l-2 border-dashed border-purple-500/30 bg-gradient-to-br from-purple-500/5 to-cyan-500/5 font-mono">
+              <SheetContent side="right" className="w-80 border-l-2 border-dashed border-purple-500/30 bg-slate-800 text-slate-100 font-mono">
                 <SheetHeader>
                   <SheetTitle className="font-mono bg-gradient-to-r from-primary via-purple-500 to-cyan-500 bg-clip-text text-transparent">
                     [NAVIGATION]
@@ -245,14 +245,14 @@ export function Navbar({ className }: NavbarProps) {
                         className={cn(
                           'flex items-center space-x-3 px-3 py-3 rounded-lg border-2 border-dashed transition-all duration-200 font-mono',
                           isActive
-                            ? 'bg-gradient-to-r from-purple-500/20 to-cyan-500/20 border-purple-500 border-solid text-foreground'
-                            : 'border-transparent hover:border-purple-500/50 hover:bg-gradient-to-r hover:from-purple-500/10 hover:to-cyan-500/10 text-muted-foreground hover:text-foreground'
+                            ? 'bg-gradient-to-r from-purple-500/20 to-cyan-500/20 border-purple-500 border-solid text-slate-100'
+                            : 'border-transparent hover:border-purple-500/50 hover:bg-gradient-to-r hover:from-purple-500/10 hover:to-cyan-500/10 text-slate-300 hover:text-slate-100'
                         )}
                       >
                         <item.icon className="w-5 h-5" />
                         <div>
                           <div className="font-medium">{item.name.toUpperCase()}</div>
-                          <div className="text-xs text-muted-foreground">{item.description}</div>
+                          <div className="text-xs text-slate-400">{item.description}</div>
                         </div>
                       </Link>
                     );
