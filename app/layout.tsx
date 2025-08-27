@@ -15,6 +15,7 @@ import { Suspense } from 'react';
 import { ClientProvider } from '@/components/providers/client-provider';
 import ErrorBoundary from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/sonner';
+import { BalanceWidget } from '@/components/ui/balance-widget';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -78,6 +79,11 @@ export default function RootLayout({
                   <ConditionalLayout>
                     {children}
                   </ConditionalLayout>
+                )}
+                
+                {/* Balance Widget - Shows for all authenticated users except loading states */}
+                {isAuthenticated && user && !isLoading && (
+                  <BalanceWidget />
                 )}
               </Suspense>
             </ClientProvider>
