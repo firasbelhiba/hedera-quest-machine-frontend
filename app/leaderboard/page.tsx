@@ -65,12 +65,12 @@ export default function LeaderboardPage() {
             username: user.username,
             email: user.email,
             avatar: '', // API doesn't provide avatar
-            level: 1, // Default level since API doesn't provide it
-            completedQuests: [] // Default empty array since API doesn't provide it
+            level: 0, // Will be provided by API
+            completedQuests: [] // Will be provided by API
           },
           totalPoints: user.total_points,
-          recentPoints: 0, // API doesn't provide recent points
-          previousRank: null // API doesn't provide previous rank
+          recentPoints: 0, // Will be provided by API
+          previousRank: null // Will be provided by API
         }));
         setLeaderboard(transformedData);
         setUserRank(response.data.rank);

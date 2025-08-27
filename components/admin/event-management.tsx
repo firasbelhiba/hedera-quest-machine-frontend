@@ -264,7 +264,7 @@ export default function EventManagement() {
                   id="reward"
                   value={formData.reward}
                   onChange={(e) => handleInputChange('reward', e.target.value)}
-                  placeholder="e.g., 1000 XP, $100 USDC"
+                  placeholder="Enter reward description"
                   className="font-mono"
                 />
               </div>
@@ -462,7 +462,7 @@ export default function EventManagement() {
                 id="edit-reward"
                 value={formData.reward}
                 onChange={(e) => handleInputChange('reward', e.target.value)}
-                placeholder="e.g., 1000 XP, $100 USDC"
+                placeholder="Enter reward description"
                 className="font-mono"
               />
             </div>

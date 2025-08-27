@@ -95,7 +95,7 @@ const mockSubmissions: Submission[] = [
     submissionUrl: 'https://github.com/alice/smart-contract-basics',
     repositoryUrl: 'https://github.com/alice/smart-contract-basics',
     description: 'Implemented a basic smart contract with all required functions. Added comprehensive tests and documentation.',
-    questPoints: 100,
+    questPoints: 0, // Will be provided by API
     questDifficulty: 'beginner'
   },
   {
@@ -114,7 +114,7 @@ const mockSubmissions: Submission[] = [
     description: 'Created HTS token with custom properties and implemented transfer functionality.',
     feedback: 'Excellent implementation with clean code and good documentation.',
     score: 95,
-    questPoints: 250,
+    questPoints: 0, // Will be provided by API
     questDifficulty: 'intermediate'
   },
   {
@@ -133,7 +133,7 @@ const mockSubmissions: Submission[] = [
     description: 'Built NFT marketplace with minting and trading features.',
     feedback: 'Good start but needs better error handling and more comprehensive tests.',
     score: 70,
-    questPoints: 400,
+    questPoints: 0, // Will be provided by API
     questDifficulty: 'advanced'
   },
   {

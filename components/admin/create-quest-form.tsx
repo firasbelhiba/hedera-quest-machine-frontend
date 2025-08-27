@@ -190,7 +190,7 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
                 <Input
                   id="reward"
                   type="number"
-                  placeholder="150"
+                  placeholder="Enter reward points"
                   className="max-w-xs"
                   {...register('reward', { valueAsNumber: true })}
                 />
@@ -204,7 +204,7 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
                 <Input
                   id="maxParticipants"
                   type="number"
-                  placeholder="50"
+                  placeholder="Enter max participants"
                   className="max-w-xs"
                   {...register('maxParticipants', { valueAsNumber: true })}
                 />

@@ -218,35 +218,8 @@ export class QuestService {
       })) : [];
     } catch (error) {
       console.error('Error fetching submissions:', error);
-      // Return mock submissions for development
-      return [
-        {
-          id: '1',
-          questId: '1',
-          userId: userId || '1',
-          status: 'approved',
-          content: {
-            type: 'url',
-            url: 'https://example.com/my-project'
-          },
-          submittedAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-          reviewedAt: new Date().toISOString(),
-          feedback: 'Great work! Your implementation meets all requirements.'
-        },
-        {
-          id: '2',
-          questId: '2',
-          userId: userId || '1',
-          status: 'pending',
-          content: {
-            type: 'text',
-            text: 'I have completed the token creation quest and deployed my token successfully.'
-          },
-          submittedAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-          reviewedAt: undefined,
-          feedback: undefined
-        }
-      ];
+      // Return empty array instead of mock data to prevent false completed quest counts
+      return [];
     }
   }
 
@@ -285,22 +258,8 @@ export class QuestService {
       return badges;
     } catch (error) {
       console.error('Error fetching user badges:', error);
-      // Return mock badges for development
-      return [
-        {
-          id: '1',
-          name: 'First Steps',
-          description: 'Completed your first quest',
-          image: null,
-          rarity: 'common',
-          points: 10,
-          isActive: true,
-          maxToObtain: 1,
-          createdBy: 1,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }
-      ];
+      // Return empty array instead of mock data to prevent false badge counts
+      return [];
     }
   }
 

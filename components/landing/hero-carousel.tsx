@@ -58,9 +58,9 @@ const slides: CarouselSlide[] = [
       variant: 'default'
     },
     stats: [
-      { label: 'Difficulty Levels', value: '4', icon: <Star className="w-4 h-4" /> },
-      { label: 'Categories', value: '8+', icon: <BookOpen className="w-4 h-4" /> },
-      { label: 'Avg Completion', value: '2.5h', icon: <Zap className="w-4 h-4" /> }
+      { label: 'Difficulty Levels', value: 'TBD', icon: <Star className="w-4 h-4" /> },
+      { label: 'Categories', value: 'TBD', icon: <BookOpen className="w-4 h-4" /> },
+      { label: 'Avg Completion', value: 'TBD', icon: <Zap className="w-4 h-4" /> }
     ],
     gradient: 'from-green-500/20 via-emerald-500/20 to-teal-500/20'
   },
@@ -77,7 +77,7 @@ const slides: CarouselSlide[] = [
     },
     stats: [
       { label: 'XP System', value: 'Gamified', icon: <Trophy className="w-4 h-4" /> },
-      { label: 'Badges', value: '25+', icon: <Award className="w-4 h-4" /> },
+      { label: 'Badges', value: 'TBD', icon: <Award className="w-4 h-4" /> },
       { label: 'Leaderboard', value: 'Global', icon: <TrendingUp className="w-4 h-4" /> }
     ],
     gradient: 'from-yellow-500/20 via-orange-500/20 to-red-500/20'

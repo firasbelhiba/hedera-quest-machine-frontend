@@ -103,14 +103,8 @@ export default function QuestDetailPage() {
         // Add fallback reward/points if missing
         if (!questDetails.reward && !questDetails.points && !(questDetails as any).points) {
           // Set reward based on difficulty
-          const difficultyRewards = {
-            'beginner': 50,
-            'intermediate': 100,
-            'advanced': 200,
-            'expert': 350,
-            'master': 500
-          };
-          questDetails.reward = difficultyRewards[questDetails.difficulty as keyof typeof difficultyRewards] || 100;
+          // Reward values should be provided by the API, not hardcoded
+          // questDetails.reward will use the value from the API
         }
         
         setQuest(questDetails);

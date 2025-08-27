@@ -9,9 +9,10 @@ import useStore from '@/lib/store';
 export default function RewardsPage() {
   const { user } = useStore();
   
-  // Convert points to dollars (1 pt = $0.01)
+  // Points conversion rate should be configurable
   const pointsBalance = user?.points || 0;
-  const dollarBalance = (pointsBalance * 0.01).toFixed(2);
+  const conversionRate = 0; // Will be provided by API/config
+  const dollarBalance = (pointsBalance * conversionRate).toFixed(2);
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
@@ -67,8 +68,8 @@ export default function RewardsPage() {
               ${dollarBalance}
             </div>
             <Badge className="bg-green-500/20 text-green-300 border-green-500/30 font-mono text-xs">
-              1 PT = $0.01
-            </Badge>
+                RATE TBD
+              </Badge>
           </CardContent>
         </Card>
       </div>

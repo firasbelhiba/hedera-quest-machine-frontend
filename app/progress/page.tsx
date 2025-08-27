@@ -61,8 +61,9 @@ export default function ProgressPage() {
   }
 
   const nextLevel = user.level + 1;
-  const pointsForNextLevel = nextLevel * 200; // Example: 200 points per level
-  const currentLevelPoints = user.level * 200;
+  // Points calculation should be handled by backend/API
+  const pointsForNextLevel = 0; // Will be provided by API
+  const currentLevelPoints = 0; // Will be provided by API
   const progressToNext = ((user.points - currentLevelPoints) / (pointsForNextLevel - currentLevelPoints)) * 100;
 
   const submissionStats = {

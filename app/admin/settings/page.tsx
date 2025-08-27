@@ -41,7 +41,7 @@ export default function SettingsPage() {
     registrationEnabled: true,
     
     // Quest Settings
-    defaultQuestPoints: 100,
+    defaultQuestPoints: 0, // Will be configured by admin
     maxQuestAttempts: 3,
     questApprovalRequired: true,
     autoApproveThreshold: 0.8,
@@ -482,21 +482,21 @@ export default function SettingsPage() {
                     <div className="font-medium">Admin</div>
                     <div className="text-sm text-muted-foreground">Full system access</div>
                   </div>
-                  <Badge>5 users</Badge>
+                  <Badge>0 users</Badge>
                 </div>
                 <div className="flex items-center justify-between p-3 border rounded-lg">
                   <div>
                     <div className="font-medium">Moderator</div>
                     <div className="text-sm text-muted-foreground">Quest review and user management</div>
                   </div>
-                  <Badge variant="secondary">12 users</Badge>
+                  <Badge variant="secondary">0 users</Badge>
                 </div>
                 <div className="flex items-center justify-between p-3 border rounded-lg">
                   <div>
                     <div className="font-medium">User</div>
                     <div className="text-sm text-muted-foreground">Standard user access</div>
                   </div>
-                  <Badge variant="outline">1,230 users</Badge>
+                  <Badge variant="outline">0 users</Badge>
                 </div>
               </div>
             </CardContent>
@@ -904,11 +904,11 @@ export default function SettingsPage() {
                 <div className="grid grid-cols-2 gap-4 mt-2">
                   <div>
                     <Label className="text-sm">Requests per minute</Label>
-                    <Input type="number" defaultValue="100" />
+                    <Input type="number" defaultValue="0" />
                   </div>
                   <div>
                     <Label className="text-sm">Requests per hour</Label>
-                    <Input type="number" defaultValue="1000" />
+                    <Input type="number" defaultValue="0" />
                   </div>
                 </div>
               </div>

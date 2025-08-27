@@ -20,9 +20,10 @@ export function BalanceWidget({ className }: BalanceWidgetProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
-  // Convert points to dollars (1 pt = $0.01)
+  // Points conversion rate should be configurable
   const pointsBalance = user?.points || 0;
-  const dollarBalance = (pointsBalance * 0.01).toFixed(2);
+  const conversionRate = 0; // Will be provided by API/config
+  const dollarBalance = (pointsBalance * conversionRate).toFixed(2);
 
   // Set initial position to bottom-right corner
   useEffect(() => {
