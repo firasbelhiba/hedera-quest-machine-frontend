@@ -48,12 +48,14 @@ import {
   LogOut,
   Star,
   Zap,
-  Award
+  Award,
+  Gift
 } from 'lucide-react';
 
 const navigation = [
   { name: 'Home', href: '/', icon: BarChart3, description: 'Your unified dashboard with quests, progress, and stats' },
   { name: 'Leaderboard', href: '/leaderboard', icon: Users, description: 'See top performers' },
+  { name: 'Rewards', href: '/rewards', icon: Gift, description: 'View your reward points and redemption options' },
   { name: 'Profile', href: '/profile', icon: User, description: 'Manage your account' },
 ];
 
