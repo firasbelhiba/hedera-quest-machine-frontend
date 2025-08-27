@@ -18,7 +18,13 @@ import ErrorBoundary from '@/components/error-boundary';
 import { useToast } from '@/hooks/use-toast';
 
 const registerSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
+  name: z.string()
+    .min(2, 'Name must be at least 2 characters')
+    .max(50, 'Name must be less than 50 characters')
+    .regex(/^[a-zA-Z\s\-']+$/, 'Name can only contain letters, spaces, hyphens, and apostrophes')
+    .refine((val) => val.trim().length >= 2, 'Name must contain at least 2 non-space characters')
+    .refine((val) => !/^[\s\-']+$/.test(val), 'Name must contain at least one letter')
+    .refine((val) => !val.includes('  '), 'Name cannot contain consecutive spaces'),
   email: z.string().email('Please enter a valid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   confirmPassword: z.string(),
