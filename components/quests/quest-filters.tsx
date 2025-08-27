@@ -28,13 +28,7 @@ const categories: { value: QuestCategory; label: string }[] = [
   { value: 'file-service', label: 'File Service' },
 ];
 
-const difficulties: { value: Difficulty; label: string; color: string }[] = [
-  { value: 'beginner', label: 'Beginner', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300 border-emerald-200' },
-  { value: 'intermediate', label: 'Intermediate', color: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300 border-amber-200' },
-  { value: 'advanced', label: 'Advanced', color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300 border-orange-200' },
-  { value: 'expert', label: 'Expert', color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300 border-red-200' },
-  { value: 'master', label: 'Master', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300 border-purple-200' },
-];
+
 
 export function QuestFilters({ filters, onFiltersChange, className }: QuestFiltersProps) {
   const [searchValue, setSearchValue] = useState(filters.search);
@@ -51,12 +45,7 @@ export function QuestFilters({ filters, onFiltersChange, className }: QuestFilte
     onFiltersChange({ ...filters, categories: newCategories });
   };
 
-  const handleDifficultyToggle = (difficulty: Difficulty) => {
-    const newDifficulties = filters.difficulties.includes(difficulty)
-      ? filters.difficulties.filter(d => d !== difficulty)
-      : [...filters.difficulties, difficulty];
-    onFiltersChange({ ...filters, difficulties: newDifficulties });
-  };
+
 
   const clearFilters = () => {
     setSearchValue('');
@@ -69,7 +58,6 @@ export function QuestFilters({ filters, onFiltersChange, className }: QuestFilte
   };
 
   const hasActiveFilters = filters.categories.length > 0 || 
-    filters.difficulties.length > 0 || 
     filters.search || 
     filters.showCompleted;
 
@@ -152,29 +140,7 @@ export function QuestFilters({ filters, onFiltersChange, className }: QuestFilte
           )}
         </div>
 
-        {/* Difficulty */}
-        <div>
-          <Label className="text-sm font-medium mb-3 block">Difficulty</Label>
-          <div className="space-y-2">
-            {difficulties.map((difficulty) => (
-              <div key={difficulty.value} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`difficulty-${difficulty.value}`}
-                  checked={filters.difficulties.includes(difficulty.value)}
-                  onCheckedChange={() => handleDifficultyToggle(difficulty.value)}
-                />
-                <Label
-                  htmlFor={`difficulty-${difficulty.value}`}
-                  className="text-sm font-normal cursor-pointer flex-1"
-                >
-                  <Badge className={cn('text-xs', difficulty.color)} variant="outline">
-                    {difficulty.label}
-                  </Badge>
-                </Label>
-              </div>
-            ))}
-          </div>
-        </div>
+
 
         {/* Show Completed */}
         <div className="flex items-center space-x-2">

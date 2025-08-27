@@ -1,9 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { User } from '@/lib/types';
 import { QuestService } from '@/lib/services';
 import { Button } from '@/components/ui/button';
@@ -30,20 +27,13 @@ import {
 import { SiDiscord } from 'react-icons/si';
 import { formatDistanceToNow } from 'date-fns';
 
-const profileSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-});
 
-type ProfileFormData = z.infer<typeof profileSchema>;
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [profileData, setProfileData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [saveSuccess, setSaveSuccess] = useState(false);
   const [isVerifyingEmail, setIsVerifyingEmail] = useState(false);
   const [emailVerificationSuccess, setEmailVerificationSuccess] = useState(false);
   const [isConnectingTwitter, setIsConnectingTwitter] = useState(false);
@@ -51,9 +41,6 @@ export default function ProfilePage() {
   const [isConnectingDiscord, setIsConnectingDiscord] = useState(false);
 
   const { toast } = useToast();
-  const { register, handleSubmit, formState: { errors }, reset, watch } = useForm<ProfileFormData>({
-    resolver: zodResolver(profileSchema)
-  });
 
   const handleVerifyEmail = async () => {
      const email = profileData?.user?.email;
@@ -130,17 +117,13 @@ export default function ProfilePage() {
           points: 0,
           level: 1,
           streak: 0,
-          joinedAt: new Date().toISOString(),
+          joinedAt: data.user.created_at || new Date().toISOString(),
           role: data.is_admin ? 'admin' : 'user',
           badges: [],
           completedQuests: []
         };
         
         setUser(userData);
-        reset({
-          name: userData.name || '',
-          email: userData.email
-        });
     } catch (error) {
       console.error('Failed to load user data:', error);
       setSaveError('Failed to load profile data');
@@ -151,26 +134,9 @@ export default function ProfilePage() {
 
   useEffect(() => {
     loadUser();
-  }, [reset]);
+  }, []);
 
-  const onSubmit = async (data: ProfileFormData) => {
-    if (!user) return;
 
-    setIsSaving(true);
-    setSaveError(null);
-    setSaveSuccess(false);
-
-    try {
-      const updatedUser = await QuestService.updateUserProfile(String(user.id), data);
-      setUser(updatedUser);
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 3000);
-    } catch (error) {
-      setSaveError(error instanceof Error ? error.message : 'Failed to save profile');
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
@@ -473,52 +439,100 @@ export default function ProfilePage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-6">
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="name" className="font-mono text-sm text-primary">FULL_NAME</Label>
-                    <Input
-                      id="name"
-                      {...register('name')}
-                      className="font-mono border-2 border-dashed border-primary/20 focus:border-solid focus:border-primary/50 bg-gradient-to-r from-primary/5 to-purple-500/5"
-                    />
-                    {errors.name && (
-                      <p className="text-sm text-destructive mt-1 font-mono">{'>'} {errors.name.message}</p>
-                    )}
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label className="font-mono text-sm text-primary">FULL_NAME</Label>
+                    <div className="p-3 border-2 border-dashed border-primary/20 bg-gradient-to-r from-primary/5 to-purple-500/5 rounded-md">
+                      <p className="font-mono text-sm">
+                        {profileData?.user?.firstName && profileData?.user?.lastName 
+                          ? `${profileData.user.firstName} ${profileData.user.lastName}` 
+                          : profileData?.user?.username || 'Not provided'}
+                      </p>
+                    </div>
                   </div>
 
-                  <div>
-                    <Label htmlFor="email" className="font-mono text-sm text-primary">EMAIL_ADDRESS</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      {...register('email')}
-                      className="font-mono border-2 border-dashed border-primary/20 focus:border-solid focus:border-primary/50 bg-gradient-to-r from-primary/5 to-purple-500/5"
-                    />
-                    {errors.email && (
-                      <p className="text-sm text-destructive mt-1 font-mono">{'>'} {errors.email.message}</p>
-                    )}
+                  <div className="space-y-2">
+                    <Label className="font-mono text-sm text-primary">EMAIL_ADDRESS</Label>
+                    <div className="p-3 border-2 border-dashed border-primary/20 bg-gradient-to-r from-primary/5 to-purple-500/5 rounded-md">
+                      <div className="flex items-center justify-between">
+                        <p className="font-mono text-sm">{profileData?.user?.email || 'Not provided'}</p>
+                        {profileData?.user?.email && (
+                          <div className="flex items-center gap-2">
+                            {profileData?.user?.emailVerified ? (
+                              <Badge className="bg-green-500/20 text-green-700 dark:text-green-300 border border-dashed border-green-500/50 font-mono text-xs">
+                                <CheckCircle className="w-3 h-3 mr-1" />
+                                VERIFIED
+                              </Badge>
+                            ) : (
+                              <div className="flex items-center gap-2">
+                                <Badge className="bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 border border-dashed border-yellow-500/50 font-mono text-xs">
+                                  <AlertCircle className="w-3 h-3 mr-1" />
+                                  UNVERIFIED
+                                </Badge>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="h-6 px-2 text-xs font-mono border-dashed border-primary/50 hover:border-solid"
+                                  onClick={handleVerifyEmail}
+                                  disabled={isVerifyingEmail}
+                                >
+                                  {isVerifyingEmail ? 'SENDING...' : 'VERIFY'}
+                                </Button>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
 
+                {/* Additional Profile Information */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label className="font-mono text-sm text-primary">USERNAME</Label>
+                    <div className="p-3 border-2 border-dashed border-primary/20 bg-gradient-to-r from-primary/5 to-purple-500/5 rounded-md">
+                      <p className="font-mono text-sm">{profileData?.user?.username || 'Not provided'}</p>
+                    </div>
+                  </div>
 
+              
+                </div>
 
+                {profileData?.user?.role && (
+                  <div className="space-y-2">
+                    <Label className="font-mono text-sm text-primary">ACCOUNT_TYPE</Label>
+                    <div className="p-3 border-2 border-dashed border-primary/20 bg-gradient-to-r from-primary/5 to-purple-500/5 rounded-md">
+                      <Badge className={`font-mono ${
+                        profileData.user.role === 'admin' 
+                          ? 'bg-red-500/20 text-red-700 dark:text-red-300 border border-dashed border-red-500/50'
+                          : 'bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-dashed border-blue-500/50'
+                      }`}>
+                        <Shield className="w-3 h-3 mr-1" />
+                        {profileData.user.role.toUpperCase()}
+                      </Badge>
+                    </div>
+                  </div>
+                )}
                 {saveError && (
-                  <Alert variant="destructive" className="border-2 border-dashed border-red-500/20 bg-gradient-to-r from-red-500/5 to-pink-500/5">
-                    <AlertCircle className="w-4 h-4" />
-                    <AlertDescription className="font-mono">{'>'} {saveError}</AlertDescription>
+                  <Alert className="border-2 border-dashed border-destructive/50 bg-destructive/5">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription className="font-mono text-sm">
+                      {'>'} {saveError}
+                    </AlertDescription>
                   </Alert>
                 )}
 
-                {saveSuccess && (
-                  <Alert className="border-2 border-dashed border-green-500/20 bg-gradient-to-r from-green-500/5 to-emerald-500/5">
-                    <CheckCircle className="w-4 h-4" />
-                    <AlertDescription className="font-mono">{'>'} Profile updated successfully!</AlertDescription>
+                {emailVerificationSuccess && (
+                  <Alert className="border-2 border-dashed border-blue-500/50 bg-blue-500/5">
+                    <CheckCircle className="h-4 w-4" />
+                    <AlertDescription className="font-mono text-sm text-blue-700 dark:text-blue-300">
+                      {'>'} Verification email sent! Check your inbox.
+                    </AlertDescription>
                   </Alert>
                 )}
-
-
-              </form>
+              </div>
             </CardContent>
           </Card>
 
