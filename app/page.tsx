@@ -406,7 +406,7 @@ export default function Dashboard() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
                 {featuredQuests.map((quest) => (
                   <QuestCard 
                     key={quest.id} 
@@ -419,70 +419,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          {/* Recent Activity */}
-          <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5 hover:border-solid transition-all duration-200">
-            <CardHeader className="border-b border-dashed border-primary/20">
-              <CardTitle className="flex items-center gap-2 font-mono text-lg">
-                <div className="p-1 bg-primary/10 rounded border border-dashed border-primary/30">
-                  <Clock className="w-4 h-4 text-primary" />
-                </div>
-                {'>'} RECENT_ACTIVITY
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-6">
-              {recentActivity.length > 0 ? (
-                <div className="space-y-4">
-                  {recentActivity.map((submission) => (
-                    <div key={submission.id} className="flex items-center gap-4 p-3 border-2 border-dashed border-primary/10 rounded-lg bg-gradient-to-r from-background/50 to-muted/20 hover:border-solid transition-all duration-200">
-                      <div className={cn(
-                        'w-8 h-8 rounded-lg border-2 border-dashed flex items-center justify-center',
-                        submission.status === 'approved' && 'bg-green-500/10 border-green-500/30',
-                        submission.status === 'pending' && 'bg-yellow-500/10 border-yellow-500/30',
-                        submission.status === 'needs-revision' && 'bg-orange-500/10 border-orange-500/30',
-                        submission.status === 'rejected' && 'bg-red-500/10 border-red-500/30'
-                      )}>
-                        {submission.status === 'approved' && <CheckCircle className="w-4 h-4 text-green-600" />}
-                        {submission.status === 'pending' && <Clock className="w-4 h-4 text-yellow-600" />}
-                        {submission.status === 'needs-revision' && <AlertCircle className="w-4 h-4 text-orange-600" />}
-                        {submission.status === 'rejected' && <XCircle className="w-4 h-4 text-red-600" />}
-                      </div>
-                      
-                      <div className="flex-1">
-                        <div className="font-medium font-mono text-primary">
-                          {submission.status === 'approved' && 'QUEST_COMPLETED'}
-                          {submission.status === 'pending' && 'QUEST_SUBMITTED'}
-                          {submission.status === 'needs-revision' && 'REVISION_REQUESTED'}
-                          {submission.status === 'rejected' && 'SUBMISSION_REJECTED'}
-                        </div>
-                        <div className="text-sm text-muted-foreground font-mono">
-                          {'>'} QUEST_#{submission.questId} • {formatDistanceToNow(new Date(submission.submittedAt), { addSuffix: true })}
-                        </div>
-                      </div>
-                      
-                      {submission.points && (
-                        <div className="text-sm font-medium font-mono bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">
-                          +{submission.points} PTS
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <div className="relative mx-auto w-16 h-16 mb-4">
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-lg border-2 border-dashed border-primary/30" />
-                    <div className="relative w-full h-full bg-gradient-to-r from-primary/10 to-purple-500/10 rounded-lg flex items-center justify-center">
-                      <Calendar className="w-8 h-8 text-primary" />
-                    </div>
-                  </div>
-                  <h3 className="text-lg font-semibold mb-2 font-mono text-primary">NO_RECENT_ACTIVITY</h3>
-                  <p className="text-muted-foreground font-mono text-sm">
-                    {'>'} Your quest submissions and achievements will appear here.
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+
         </TabsContent>
 
         <TabsContent value="quests" className="space-y-6">
