@@ -98,14 +98,13 @@ const useStore = create<AppState>((set, get) => ({
 
   loadCurrentUser: async () => {
     // Only load if we don't already have a user
-    const { user } = get();
+    const { user, isLoading } = get();
     if (user) {
       console.log('User already loaded, skipping API call');
       return;
     }
 
     // Prevent multiple concurrent calls
-    const { isLoading } = get();
     if (isLoading) {
       console.log('Already loading user, skipping API call');
       return;

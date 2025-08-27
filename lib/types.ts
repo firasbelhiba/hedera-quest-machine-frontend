@@ -103,16 +103,20 @@ export interface Badge {
 }
 
 export interface Event {
-  id: string;
+  id: number;
   title: string;
   description: string;
-  startDate: string;
-  endDate: string;
-  type: EventType;
-  quests: string[];
-  participants: number;
+  reward: string;
+  reward_image: string;
+  created_at: string;
+  updated_at: string;
+  startDate?: string;
+  endDate?: string;
+  type?: EventType;
+  quests?: string[];
+  participants?: number;
   maxParticipants?: number;
-  isActive: boolean;
+  isActive?: boolean;
 }
 
 export type QuestCategory = 

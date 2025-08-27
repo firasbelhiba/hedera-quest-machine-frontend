@@ -54,9 +54,9 @@ export default function RootLayout({
                   <div className="flex items-center justify-center min-h-screen">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                   </div>
-                ) : !isAuthenticated ? (
+                ) : !isAuthenticated || !user ? (
                   <AuthPage onAuthSuccess={handleAuthSuccess} />
-                ) : user?.role === 'admin' ? (
+                ) : user.role === 'admin' ? (
                   <div className="flex h-screen bg-background">
                     <Sidebar
                       isCollapsed={sidebarCollapsed}

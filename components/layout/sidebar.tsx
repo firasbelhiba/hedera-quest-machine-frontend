@@ -50,9 +50,12 @@ interface SidebarProps {
 
 export function Sidebar({ isCollapsed, onToggle, userRole = 'user' }: SidebarProps) {
   const pathname = usePathname();
-  const { user } = useStore();
+  const { user, isLoading } = useStore();
   const isAdmin = userRole === 'admin' || userRole === 'moderator';
   const isAdminPage = pathname?.startsWith('/admin') || false;
+  
+  // Don't show admin navigation until user data is fully loaded
+  const shouldShowAdminNav = isAdmin && !isLoading && user;
 
   return (
     <div
@@ -168,7 +171,7 @@ export function Sidebar({ isCollapsed, onToggle, userRole = 'user' }: SidebarPro
             </div>
 
             {/* Admin Navigation */}
-            {isAdmin && (
+            {shouldShowAdminNav && (
               <>
                 <div className="pt-4 border-t-2 border-dashed border-purple-500/30">
                   {!isCollapsed && (

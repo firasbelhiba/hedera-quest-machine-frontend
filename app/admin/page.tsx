@@ -23,6 +23,7 @@ import UserManagement from '@/components/admin/user-management';
 import QuestManagement from '@/components/admin/quest-management';
 import SubmissionReview from '@/components/admin/submission-review';
 import AnalyticsDashboard from '@/components/admin/analytics-dashboard';
+import EventManagement from '@/components/admin/event-management';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 
 const RC: any = ResponsiveContainer as any;
@@ -180,7 +181,7 @@ export default function AdminDashboard() {
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-r from-muted/30 via-muted/20 to-muted/30 rounded-xl" />
             <div className="relative p-2 bg-background/80 backdrop-blur-sm border border-border/50 rounded-xl">
-              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-1 sm:gap-2 bg-transparent p-0 h-auto">
+              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-1 sm:gap-2 bg-transparent p-0 h-auto">
                 <TabsTrigger 
                   value="overview" 
                   className="relative font-mono text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-200 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:scale-105 hover:bg-muted/50"
@@ -207,6 +208,15 @@ export default function AdminDashboard() {
                   <div className="flex items-center gap-1 sm:gap-2">
                     <Target className="w-3 h-3 sm:w-4 sm:h-4" />
                     <span>Quests</span>
+                  </div>
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="events" 
+                  className="relative font-mono text-xs sm:text-sm px-2 sm:px-4 py-2 sm:py-3 rounded-lg transition-all duration-200 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:scale-105 hover:bg-muted/50"
+                >
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <div className="w-2 h-2 rounded-full bg-current opacity-60" />
+                    <span>Events</span>
                   </div>
                 </TabsTrigger>
                 <TabsTrigger 
@@ -440,6 +450,10 @@ export default function AdminDashboard() {
 
         <TabsContent value="quests" className="space-y-6">
           <QuestManagement />
+        </TabsContent>
+
+        <TabsContent value="events" className="space-y-6">
+          <EventManagement />
         </TabsContent>
 
         <TabsContent value="submissions" className="space-y-6">

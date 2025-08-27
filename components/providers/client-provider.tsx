@@ -14,7 +14,8 @@ interface ClientProviderProps {
  */
 export function ClientProvider({ children }: ClientProviderProps) {
   const [mounted, setMounted] = useState(false);
-  const { user, loadCurrentUser } = useStore();
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+  const { user, loadCurrentUser, isLoading } = useStore();
   
   // Only run on client-side to prevent hydration mismatch
   useEffect(() => {
@@ -28,14 +29,19 @@ export function ClientProvider({ children }: ClientProviderProps) {
     if (hasToken) {
       // Only load user data if we have a token and no user is already loaded
       // This prevents race conditions after login
-      if (!user) {
-        loadCurrentUser();
+      if (!user && !isLoading) {
+        loadCurrentUser().finally(() => setInitialLoadComplete(true));
+      } else {
+        setInitialLoadComplete(true);
       }
+    } else {
+      // No token, mark as complete immediately
+      setInitialLoadComplete(true);
     }
-  }, [loadCurrentUser, user]);
+  }, [loadCurrentUser, user, isLoading]);
 
   // Return null during SSR to prevent hydration mismatch
-  if (!mounted) {
+  if (!mounted || !initialLoadComplete) {
     return null;
   }
 
