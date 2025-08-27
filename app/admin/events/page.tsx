@@ -75,7 +75,11 @@ export default function EventsPage() {
     }
 
     // Sort by start date
-    filtered.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+    filtered.sort((a, b) => {
+      const aDate = a.startDate ? new Date(a.startDate).getTime() : 0;
+      const bDate = b.startDate ? new Date(b.startDate).getTime() : 0;
+      return bDate - aDate;
+    });
 
     setFilteredEvents(filtered);
   };
@@ -96,6 +100,7 @@ export default function EventsPage() {
   };
 
   const isEventActive = (event: Event) => {
+    if (!event.startDate || !event.endDate) return false;
     const now = new Date();
     const start = new Date(event.startDate);
     const end = new Date(event.endDate);
@@ -103,12 +108,15 @@ export default function EventsPage() {
   };
 
   const isEventUpcoming = (event: Event) => {
+    if (!event.startDate) return false;
     const now = new Date();
     const start = new Date(event.startDate);
     return now < start;
   };
 
-  const formatDateRange = (startDate: string, endDate: string) => {
+  const formatDateRange = (startDate?: string, endDate?: string) => {
+    if (!startDate || !endDate) return 'Date not set';
+    
     const start = new Date(startDate);
     const end = new Date(endDate);
     
@@ -182,7 +190,7 @@ export default function EventsPage() {
               <Users className="w-4 h-4 text-orange-500" />
               <div>
                 <p className="text-sm text-muted-foreground">Total Participants</p>
-                <p className="text-2xl font-bold">{events.reduce((sum, e) => sum + e.participants, 0)}</p>
+                <p className="text-2xl font-bold">{events.reduce((sum, e) => sum + (e.participants || 0), 0)}</p>
               </div>
             </div>
           </CardContent>
@@ -243,8 +251,8 @@ export default function EventsPage() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge className={cn('text-xs', getEventTypeColor(event.type))} variant="outline">
-                            {event.type.replace('-', ' ')}
+                          <Badge className={cn('text-xs', getEventTypeColor(event.type || 'other'))} variant="outline">
+                            {(event.type || 'other').replace('-', ' ')}
                           </Badge>
                         </TableCell>
                         <TableCell>
@@ -301,8 +309,8 @@ export default function EventsPage() {
                   <Card key={event.id} className="border-green-200 dark:border-green-800">
                     <CardHeader>
                       <div className="flex items-center justify-between">
-                        <Badge className={getEventTypeColor(event.type)} variant="outline">
-                          {event.type.replace('-', ' ')}
+                        <Badge className={getEventTypeColor(event.type || 'other')} variant="outline">
+                          {(event.type || 'other').replace('-', ' ')}
                         </Badge>
                         <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
                           Active
@@ -319,7 +327,7 @@ export default function EventsPage() {
                         </div>
                         <div className="flex items-center gap-2">
                           <Users className="w-4 h-4" />
-                          {event.participants} participants
+                          {event.participants || 0} participants
                         </div>
                       </div>
                       <Button 
@@ -345,8 +353,8 @@ export default function EventsPage() {
                   <Card key={event.id} className="border-blue-200 dark:border-blue-800">
                     <CardHeader>
                       <div className="flex items-center justify-between">
-                        <Badge className={getEventTypeColor(event.type)} variant="outline">
-                          {event.type.replace('-', ' ')}
+                        <Badge className={getEventTypeColor(event.type || 'other')} variant="outline">
+                          {(event.type || 'other').replace('-', ' ')}
                         </Badge>
                         <Badge variant="secondary">Upcoming</Badge>
                       </div>
@@ -361,7 +369,7 @@ export default function EventsPage() {
                         </div>
                         <div className="flex items-center gap-2">
                           <Users className="w-4 h-4" />
-                          {event.participants} participants
+                          {event.participants || 0} participants
                         </div>
                       </div>
                       <Button 
@@ -387,8 +395,8 @@ export default function EventsPage() {
                   <Card key={event.id} className="opacity-75">
                     <CardHeader>
                       <div className="flex items-center justify-between">
-                        <Badge className={getEventTypeColor(event.type)} variant="outline">
-                          {event.type.replace('-', ' ')}
+                        <Badge className={getEventTypeColor(event.type || 'other')} variant="outline">
+                          {(event.type || 'other').replace('-', ' ')}
                         </Badge>
                         <Badge variant="outline">Past</Badge>
                       </div>
@@ -403,7 +411,7 @@ export default function EventsPage() {
                         </div>
                         <div className="flex items-center gap-2">
                           <Users className="w-4 h-4" />
-                          {event.participants} participants
+                          {event.participants || 0} participants
                         </div>
                       </div>
                       <Button 
@@ -432,8 +440,8 @@ export default function EventsPage() {
             </DialogHeader>
             <div className="space-y-4">
               <div className="flex gap-2">
-                <Badge className={getEventTypeColor(selectedEvent.type)} variant="outline">
-                  {selectedEvent.type.replace('-', ' ')}
+                <Badge className={getEventTypeColor(selectedEvent.type || 'other')} variant="outline">
+                  {(selectedEvent.type || 'other').replace('-', ' ')}
                 </Badge>
                 <Badge variant={
                   isEventActive(selectedEvent) ? "default" : 
@@ -450,9 +458,9 @@ export default function EventsPage() {
                 <div>
                   <h4 className="font-semibold mb-2">Event Details</h4>
                   <div className="space-y-2 text-sm">
-                    <div>Start: {formatDistanceToNow(new Date(selectedEvent.startDate), { addSuffix: true })}</div>
-                <div>End: {formatDistanceToNow(new Date(selectedEvent.endDate), { addSuffix: true })}</div>
-                    <div>Participants: {selectedEvent.participants}</div>
+                    <div>Start: {selectedEvent.startDate ? formatDistanceToNow(new Date(selectedEvent.startDate), { addSuffix: true }) : 'Not set'}</div>
+                <div>End: {selectedEvent.endDate ? formatDistanceToNow(new Date(selectedEvent.endDate), { addSuffix: true }) : 'Not set'}</div>
+                    <div>Participants: {selectedEvent.participants || 0}</div>
                     {selectedEvent.maxParticipants && (
                       <div>Max Participants: {selectedEvent.maxParticipants}</div>
                     )}
@@ -462,11 +470,11 @@ export default function EventsPage() {
                 <div>
                   <h4 className="font-semibold mb-2">Associated Quests</h4>
                   <div className="space-y-1">
-                    {selectedEvent.quests.map((questId) => (
+                    {selectedEvent.quests?.map((questId) => (
                       <div key={questId} className="text-sm font-mono">
                         Quest #{questId}
                       </div>
-                    ))}
+                    )) || <div className="text-sm text-muted-foreground">No quests associated</div>}
                   </div>
                 </div>
               </div>

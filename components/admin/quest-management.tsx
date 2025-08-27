@@ -623,7 +623,7 @@ function QuestManagement() {
 
                   <div className="flex flex-wrap gap-2 mb-4">
                     {getDifficultyBadge(selectedQuest.difficulty)}
-                    {getStatusBadge(selectedQuest.status)}
+                    {getStatusBadge(selectedQuest.status, selectedQuest)}
                   </div>
 
                   {selectedQuest.requirements && selectedQuest.requirements.length > 0 && (

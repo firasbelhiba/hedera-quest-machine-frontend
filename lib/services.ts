@@ -123,7 +123,7 @@ export class QuestService {
     title: string;
     description: string;
     reward: number;
-    difficulty: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+    difficulty: 'easy' | 'medium' | 'hard' | 'beginner' | 'intermediate' | 'advanced' | 'expert';
     status?: 'active' | 'completed' | 'expired' | 'draft';
     startDate?: string;
     endDate?: string;
@@ -131,6 +131,8 @@ export class QuestService {
     badgeIds?: number[];
     platform_type?: string;
     interaction_type?: string;
+    quest_link?: string;
+    event_id?: number;
   }): Promise<Quest> {
     try {
       const response = await QuestsApi.create(quest);

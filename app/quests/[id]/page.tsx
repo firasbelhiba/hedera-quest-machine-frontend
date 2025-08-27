@@ -48,6 +48,9 @@ import {
   Eye,
   Shield,
   CheckSquare,
+  Heart,
+  MessageCircle,
+  Share,
 } from 'lucide-react';
 
 const getCategoryIcon = (category: string) => {
