@@ -96,6 +96,23 @@ export default function QuestDetailPage() {
           throw new Error('Quest not found');
         }
 
+        console.log('Quest data loaded:', questDetails);
+        console.log('Quest reward:', questDetails.reward);
+        console.log('Quest points:', (questDetails as any).points);
+        
+        // Add fallback reward/points if missing
+        if (!questDetails.reward && !questDetails.points && !(questDetails as any).points) {
+          // Set reward based on difficulty
+          const difficultyRewards = {
+            'beginner': 50,
+            'intermediate': 100,
+            'advanced': 200,
+            'expert': 350,
+            'master': 500
+          };
+          questDetails.reward = difficultyRewards[questDetails.difficulty as keyof typeof difficultyRewards] || 100;
+        }
+        
         setQuest(questDetails);
         setUser(userData);
       } catch (err) {
@@ -234,6 +251,30 @@ export default function QuestDetailPage() {
                           )}
                         </div>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Quest Points/Rewards Section */}
+                  <div className="flex items-center justify-center mt-6">
+                    <div className="flex items-center text-sm text-muted-foreground ml-2 bg-muted/30 px-2 py-1 rounded border border-dashed font-mono">
+                      <Trophy className="w-4 h-4 mr-1" />
+                      {(() => {
+                        const reward = quest.reward;
+                        const points = quest.points || (quest as any).points;
+                        
+                        // Try reward first (could be string or number)
+                        if (reward !== undefined && reward !== null && reward !== '') {
+                          return typeof reward === 'string' ? (isNaN(Number(reward)) ? reward : Number(reward)) : reward;
+                        }
+                        
+                        // Try points
+                        if (points !== undefined && points !== null && points !== 0) {
+                          return points;
+                        }
+                        
+                        // Default fallback
+                        return 'TBD';
+                      })()} pts
                     </div>
                   </div>
 
@@ -399,17 +440,29 @@ export default function QuestDetailPage() {
                   aria-label="Quest Actions"
                 >
                   <div className="flex flex-col gap-4">
-                    <Button
-                      size="lg"
-                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 sm:py-4 px-6 sm:px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border-0 text-sm sm:text-base"
-                      asChild
-                      aria-label="Start quest on external platform"
-                    >
-                      <a href={(quest as any).externalUrl} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-3">
+                    {quest.quest_link ? (
+                      <Button
+                        size="lg"
+                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 sm:py-4 px-6 sm:px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border-0 text-sm sm:text-base"
+                        asChild
+                        aria-label="Start quest on external platform"
+                      >
+                        <a href={quest.quest_link} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-3">
+                          <ExternalLink className="w-5 h-5" />
+                          Start Quest
+                        </a>
+                      </Button>
+                    ) : (
+                      <Button
+                        size="lg"
+                        className="w-full bg-gray-400 text-white font-semibold py-3 sm:py-4 px-6 sm:px-8 rounded-xl cursor-not-allowed text-sm sm:text-base"
+                        disabled
+                        aria-label="Quest link not available"
+                      >
                         <ExternalLink className="w-5 h-5" />
-                        Start Quest
-                      </a>
-                    </Button>
+                        Quest Link Not Available
+                      </Button>
+                    )}
 
                     <AlertDialog open={showVerifyDialog} onOpenChange={setShowVerifyDialog}>
                       <AlertDialogTrigger asChild>

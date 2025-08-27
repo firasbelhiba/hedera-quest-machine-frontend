@@ -89,16 +89,31 @@ export default function Dashboard() {
         }
         
         // Load basic data for both authenticated and non-authenticated users
-        const [statsData, questsData] = await Promise.all([
+        const [statsData, questsData, completionsData] = await Promise.all([
           QuestService.getDashboardStats().catch(() => null),
-          QuestService.getQuests().catch(() => [])
+          QuestService.getQuests().catch(() => []),
+          QuestService.getQuestCompletions().catch(() => ({ quests: [] })) // Fallback if API fails
         ]);
+        
+        // Create a map of quest completions for quick lookup
+        const completionsMap = new Map();
+        if (completionsData.quests) {
+          completionsData.quests.forEach((quest: any) => {
+            completionsMap.set(String(quest.id), quest.completions?.length || 0);
+          });
+        }
+
+        // Enhance quests with real completion data
+        const enhancedQuests = questsData.map(quest => ({
+          ...quest,
+          completions: completionsMap.get(String(quest.id)) || quest.completions || 0
+        }));
         
         setStats(statsData);
         // Filter featured quests to only show active ones
-        const activeQuests = questsData.filter(quest => quest.status === 'active' || quest.status === 'published');
+        const activeQuests = enhancedQuests.filter(quest => quest.status === 'active' || quest.status === 'published');
         setFeaturedQuests(activeQuests.slice(0, 6));
-        setQuests(questsData);
+        setQuests(enhancedQuests);
         setUser(userData);
         
         // Only load user-specific data if user is authenticated
@@ -341,8 +356,8 @@ export default function Dashboard() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          {/* Level Progress */}
-          <Card className="border-2 border-dashed border-yellow-500/20 bg-gradient-to-br from-yellow-500/5 to-orange-500/5 hover:border-solid transition-all duration-200">
+          {/* Level Progress - Commented out */}
+          {/* <Card className="border-2 border-dashed border-yellow-500/20 bg-gradient-to-br from-yellow-500/5 to-orange-500/5 hover:border-solid transition-all duration-200">
             <CardHeader className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10">
               <CardTitle className="flex items-center gap-2 font-mono">
                 <div className="p-1 bg-yellow-500/20 rounded border border-dashed border-yellow-500/40">
@@ -374,7 +389,7 @@ export default function Dashboard() {
                 </div>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
 
           {/* Featured Quests */}
           <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-blue-500/5 hover:border-solid transition-all duration-200">

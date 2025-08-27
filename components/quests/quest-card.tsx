@@ -69,7 +69,7 @@ export function QuestCard({ quest, isCompleted = false, progress = 0, onSelect }
           </h3>
           <div className="flex items-center text-sm text-muted-foreground ml-2 bg-muted/30 px-2 py-1 rounded border border-dashed font-mono">
             <Trophy className="w-4 h-4 mr-1" />
-            {quest.points}pts
+{quest.reward || quest.points || (quest as any).points || 'TBD'} pts
           </div>
         </div>
         
@@ -81,11 +81,11 @@ export function QuestCard({ quest, isCompleted = false, progress = 0, onSelect }
           <div className="flex items-center space-x-4 font-mono">
             <div className="flex items-center text-muted-foreground">
               <Clock className="w-4 h-4 mr-1" />
-              {quest.estimatedTime}
+              {quest.estimatedTime || 'TBD'}
             </div>
             <div className="flex items-center text-muted-foreground">
               <Users className="w-4 h-4 mr-1" />
-              {quest.completions}
+              {quest.completions || 0}
             </div>
           </div>
           
