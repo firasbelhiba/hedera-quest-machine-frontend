@@ -240,26 +240,10 @@ export function Sidebar({ isCollapsed, onToggle, userRole = 'user' }: SidebarPro
                 [{user?.name ? user.name.charAt(0).toUpperCase() + user.name.slice(1) : 'LOADING...'}]
                 <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
               </p>
-              <div className="flex items-center gap-2 mt-1">
-                <Badge variant="secondary" className="text-xs px-2 py-0.5 font-mono bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-dashed border-blue-500/50">
-                  <Zap className="w-3 h-3 mr-1" />
-                  [LVL_{user?.level || 1}]
-                </Badge>
-              </div>
+
             </div>
           </div>
-          
-          {/* Progress Bar */}
-          <div className="space-y-2">
-            <div className="flex justify-between text-xs text-muted-foreground font-mono">
-              <span>[PROGRESS_TO_LVL_{(user?.level || 1) + 1}]</span>
-              <span>[{Math.min(((user?.level || 1) * 100) % 100, 85)}%]</span>
-            </div>
-            <Progress 
-              value={Math.min(((user?.level || 1) * 100) % 100, 85)} 
-              className="h-2 bg-muted border border-dashed border-purple-500/30"
-            />
-          </div>
+
         </div>
       )}
       

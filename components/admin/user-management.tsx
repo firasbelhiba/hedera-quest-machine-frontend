@@ -346,10 +346,6 @@ export function UserManagement({ className }: UserManagementProps) {
                     </TableCell>
                     <TableCell className="py-4">
                       <div className="flex items-center gap-3 text-sm font-mono">
-                        <div className="flex items-center gap-1.5 bg-yellow-50 dark:bg-yellow-900/20 px-2 py-1 rounded border border-dashed border-yellow-300/50">
-                          <Trophy className="w-3.5 h-3.5 text-yellow-600" />
-                          <span className="font-semibold">{user.level}</span>
-                        </div>
                         <div className="flex items-center gap-1.5 bg-purple-50 dark:bg-purple-900/20 px-2 py-1 rounded border border-dashed border-purple-300/50">
                           <Star className="w-3.5 h-3.5 text-purple-600" />
                           <span className="font-semibold">{user.total_points?.toLocaleString()}</span>

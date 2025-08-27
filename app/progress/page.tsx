@@ -152,44 +152,7 @@ export default function ProgressPage() {
         </Card>
       </div>
 
-      {/* Level Progress - Hidden for Admin Users */}
-      {user.role !== 'admin' && (
-        <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5 hover:border-solid transition-all duration-200">
-          <CardHeader className="border-b border-dashed border-primary/20">
-            <CardTitle className="flex items-center gap-2 font-mono text-lg">
-              <div className="p-1 bg-primary/10 rounded border border-dashed border-primary/30">
-                <TrendingUp className="w-4 h-4 text-primary" />
-              </div>
-              {'>'} LEVEL_PROGRESS
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-6">
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <div>
-                  <div className="text-lg font-semibold font-mono bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">LEVEL_{user.level}</div>
-                  <div className="text-sm text-muted-foreground font-mono">
-                    {user.points.toLocaleString()} / {pointsForNextLevel.toLocaleString()} points
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-lg font-semibold font-mono bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">LEVEL_{nextLevel}</div>
-                  <div className="text-sm text-muted-foreground font-mono">
-                    {'>'} {pointsForNextLevel - user.points} points to go
-                  </div>
-                </div>
-              </div>
-              <div className="relative">
-                <div className="h-3 bg-muted rounded-lg border border-dashed border-primary/20" />
-                <div 
-                  className="absolute top-0 left-0 h-3 bg-gradient-to-r from-primary to-purple-500 rounded-lg transition-all duration-500"
-                  style={{ width: `${Math.max(0, Math.min(100, progressToNext))}%` }}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+
 
       <Tabs defaultValue="badges" className="space-y-6">
         <TabsList className="grid w-full grid-cols-3 bg-muted/50 rounded-lg p-1">

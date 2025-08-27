@@ -269,7 +269,7 @@ export default function LeaderboardPage() {
                         <div>
                           <h4 className="font-semibold">{entry.user.name}</h4>
                           <p className="text-sm text-muted-foreground">
-                            Level {entry.user.level} • {entry.user.completedQuests.length} Quests
+                            {entry.user.completedQuests.length} Quests Completed
                           </p>
                         </div>
                       </div>
