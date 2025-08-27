@@ -40,9 +40,9 @@ const slides: CarouselSlide[] = [
       variant: 'default'
     },
     stats: [
-      { label: 'Active Learners', value: '10K+', icon: <Users className="w-4 h-4" /> },
-      { label: 'Quests Available', value: '50+', icon: <Target className="w-4 h-4" /> },
-      { label: 'Success Rate', value: '95%', icon: <TrendingUp className="w-4 h-4" /> }
+      { label: 'Active Learners', value: 'TBD', icon: <Users className="w-4 h-4" /> },
+      { label: 'Quests Available', value: 'TBD', icon: <Target className="w-4 h-4" /> },
+      { label: 'Success Rate', value: 'TBD', icon: <TrendingUp className="w-4 h-4" /> }
     ],
     gradient: 'from-purple-500/20 via-cyan-500/20 to-blue-500/20'
   },

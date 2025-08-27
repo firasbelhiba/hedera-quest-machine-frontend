@@ -34,59 +34,43 @@ const stats: Stat[] = [
   {
     id: 'active-learners',
     label: 'Active Learners',
-    value: '10,247',
+    value: '0',
     icon: <Users className="w-5 h-5" />,
     gradient: 'from-blue-500/5 to-cyan-500/5',
     borderColor: 'border-blue-500/20',
-    description: 'Developers actively learning',
-    trend: {
-      value: '+12%',
-      isPositive: true
-    }
+    description: 'Developers actively learning'
   },
   {
     id: 'quests-completed',
     label: 'Quests Completed',
-    value: '45,892',
+    value: '0',
     icon: <Target className="w-5 h-5" />,
     gradient: 'from-green-500/5 to-emerald-500/5',
     borderColor: 'border-green-500/20',
-    description: 'Successfully finished quests',
-    trend: {
-      value: '+8%',
-      isPositive: true
-    }
+    description: 'Successfully finished quests'
   },
   {
     id: 'badges-earned',
     label: 'Badges Earned',
-    value: '23,156',
+    value: '0',
     icon: <Award className="w-5 h-5" />,
     gradient: 'from-yellow-500/5 to-orange-500/5',
     borderColor: 'border-yellow-500/20',
-    description: 'Achievements unlocked',
-    trend: {
-      value: '+15%',
-      isPositive: true
-    }
+    description: 'Achievements unlocked'
   },
   {
     id: 'success-rate',
     label: 'Success Rate',
-    value: '94.7%',
+    value: '0%',
     icon: <TrendingUp className="w-5 h-5" />,
     gradient: 'from-purple-500/5 to-indigo-500/5',
     borderColor: 'border-purple-500/20',
-    description: 'Quest completion rate',
-    trend: {
-      value: '+2.3%',
-      isPositive: true
-    }
+    description: 'Quest completion rate'
   },
   {
     id: 'avg-completion-time',
     label: 'Avg Completion',
-    value: '2.4h',
+    value: '0h',
     icon: <Clock className="w-5 h-5" />,
     gradient: 'from-pink-500/5 to-rose-500/5',
     borderColor: 'border-pink-500/20',
@@ -95,15 +79,11 @@ const stats: Stat[] = [
   {
     id: 'total-xp',
     label: 'Total XP Earned',
-    value: '1.2M',
+    value: '0',
     icon: <Zap className="w-5 h-5" />,
     gradient: 'from-orange-500/5 to-red-500/5',
     borderColor: 'border-orange-500/20',
-    description: 'Experience points gained',
-    trend: {
-      value: '+25%',
-      isPositive: true
-    }
+    description: 'Experience points gained'
   }
 ];
 

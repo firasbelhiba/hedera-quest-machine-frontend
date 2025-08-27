@@ -274,20 +274,7 @@ export default function Dashboard() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="border-2 border-dashed border-yellow-500/20 bg-gradient-to-br from-yellow-500/5 to-orange-500/5 hover:border-solid transition-all duration-200">
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-yellow-500/10 rounded-lg border border-dashed border-yellow-500/30">
-                <Trophy className="h-6 w-6 text-yellow-500" />
-              </div>
-              <div className="ml-4">
-                <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">LEVEL</p>
-                <p className="text-2xl font-bold font-mono">{user?.userLevel?.level || user?.level || 1}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
         <Card className="border-2 border-dashed border-red-500/20 bg-gradient-to-br from-red-500/5 to-pink-500/5 hover:border-solid transition-all duration-200">
           <CardContent className="p-6">
