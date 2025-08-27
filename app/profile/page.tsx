@@ -33,10 +33,6 @@ import { formatDistanceToNow } from 'date-fns';
 const profileSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
-  hederaAccountId: z.string().refine(
-    (val) => QuestService.validateHederaAccountId(val),
-    'Invalid Hedera account ID format'
-  ),
 });
 
 type ProfileFormData = z.infer<typeof profileSchema>;
@@ -143,8 +139,7 @@ export default function ProfilePage() {
         setUser(userData);
         reset({
           name: userData.name || '',
-          email: userData.email,
-          hederaAccountId: userData.hederaAccountId || undefined
+          email: userData.email
         });
     } catch (error) {
       console.error('Failed to load user data:', error);
@@ -452,7 +447,7 @@ export default function ProfilePage() {
       </Card>
 
       <Tabs defaultValue="profile" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger 
             value="profile" 
             className="font-mono text-sm data-[state=active]:bg-primary/20 data-[state=active]:border data-[state=active]:border-dashed data-[state=active]:border-primary/30 data-[state=active]:text-primary transition-all duration-200"
@@ -464,12 +459,6 @@ export default function ProfilePage() {
             className="font-mono text-sm data-[state=active]:bg-primary/20 data-[state=active]:border data-[state=active]:border-dashed data-[state=active]:border-primary/30 data-[state=active]:text-primary transition-all duration-200"
           >
             ACCOUNT
-          </TabsTrigger>
-          <TabsTrigger 
-            value="privacy" 
-            className="font-mono text-sm data-[state=active]:bg-primary/20 data-[state=active]:border data-[state=active]:border-dashed data-[state=active]:border-primary/30 data-[state=active]:text-primary transition-all duration-200"
-          >
-            PRIVACY
           </TabsTrigger>
         </TabsList>
 
@@ -512,20 +501,7 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                <div>
-                  <Label htmlFor="hederaAccountId" className="font-mono text-sm text-primary">HEDERA_ACCOUNT_ID</Label>
-                  <Input
-                    id="hederaAccountId"
-                    {...register('hederaAccountId')}
-                    className="font-mono border-2 border-dashed border-primary/20 focus:border-solid focus:border-primary/50 bg-gradient-to-r from-primary/5 to-purple-500/5"
-                  />
-                  {errors.hederaAccountId && (
-                    <p className="text-sm text-destructive mt-1 font-mono">{'>'} {errors.hederaAccountId.message}</p>
-                  )}
-                  <p className="text-xs text-muted-foreground mt-1 font-mono">
-                    {'>'} Format: 0.0.XXXXXX (e.g., 0.0.123456)
-                  </p>
-                </div>
+
 
                 {saveError && (
                   <Alert variant="destructive" className="border-2 border-dashed border-red-500/20 bg-gradient-to-r from-red-500/5 to-pink-500/5">
@@ -541,13 +517,7 @@ export default function ProfilePage() {
                   </Alert>
                 )}
 
-                <Button 
-                  type="submit" 
-                  disabled={isSaving}
-                  className="font-mono border-2 border-dashed border-primary/30 hover:border-solid hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all duration-200"
-                >
-                  {isSaving ? 'SAVING...' : 'SAVE_CHANGES'}
-                </Button>
+
               </form>
             </CardContent>
           </Card>
@@ -597,35 +567,7 @@ export default function ProfilePage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-              {/* Hedera Integration */}
-              <div className="border-2 border-dashed border-purple-500/30 bg-gradient-to-br from-purple-500/5 to-indigo-500/5 hover:border-solid transition-all duration-200 rounded-lg p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div>
-                    <h3 className="font-mono font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider">{'>'} HEDERA_INTEGRATION</h3>
-                    <p className="text-sm text-muted-foreground font-mono">
-                      [ACCOUNT] {user.hederaAccountId}
-                    </p>
-                  </div>
-                  <Badge className="bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-dashed border-purple-500/50 font-mono">
-                    <CheckCircle className="w-3 h-3 mr-1" />
-                    CONNECTED
-                  </Badge>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="border-dashed border-purple-500/50 hover:border-solid font-mono"
-                    onClick={() => user.hederaAccountId && window.open(QuestService.generateHashScanUrl(user.hederaAccountId), '_blank')}
-                  >
-                    <ExternalLink className="w-4 h-4 mr-1" />
-                    View on HashScan
-                  </Button>
-                  <Button variant="outline" size="sm" className="border-dashed border-purple-500/50 hover:border-solid font-mono">
-                    Update Account
-                  </Button>
-                </div>
-              </div>
+
 
               {/* Social Media Integration */}
               <div className="border-2 border-dashed border-blue-500/30 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 hover:border-solid transition-all duration-200 rounded-lg p-4">
@@ -941,81 +883,7 @@ export default function ProfilePage() {
         </TabsContent>
 
 
-        <TabsContent value="privacy" className="space-y-6">
-          <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5 hover:border-solid transition-all duration-200">
-            <CardHeader className="border-b border-dashed border-primary/20">
-              <CardTitle className="flex items-center gap-2 font-mono text-lg">
-                <div className="p-1 bg-primary/10 rounded border border-dashed border-primary/30">
-                  <Shield className="w-4 h-4 text-primary" />
-                </div>
-                {'>'} PRIVACY_&_SECURITY
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6 p-6">
-              {/* Privacy Settings */}
-              <div>
-                <h3 className="font-mono font-semibold mb-3 text-primary uppercase tracking-wider">{'>'} PROFILE_VISIBILITY</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 border-2 border-dashed border-green-500/20 rounded-lg bg-gradient-to-r from-green-500/5 to-emerald-500/5">
-                    <div>
-                      <div className="font-medium font-mono text-primary">SHOW_ON_LEADERBOARD</div>
-                      <div className="text-sm text-muted-foreground font-mono">
-                        {'>'} Allow others to see your rank and points
-                      </div>
-                    </div>
-                    <Button variant="outline" size="sm" className="font-mono border-2 border-dashed border-green-500/30 bg-green-500/10 text-green-600 hover:border-solid">ENABLED</Button>
-                  </div>
-                  <div className="flex items-center justify-between p-3 border-2 border-dashed border-green-500/20 rounded-lg bg-gradient-to-r from-green-500/5 to-emerald-500/5">
-                    <div>
-                      <div className="font-medium font-mono text-primary">PUBLIC_PROFILE</div>
-                      <div className="text-sm text-muted-foreground font-mono">
-                        {'>'} Make your achievements and badges visible to others
-                      </div>
-                    </div>
-                    <Button variant="outline" size="sm" className="font-mono border-2 border-dashed border-green-500/30 bg-green-500/10 text-green-600 hover:border-solid">ENABLED</Button>
-                  </div>
-                  <div className="flex items-center justify-between p-3 border-2 border-dashed border-red-500/20 rounded-lg bg-gradient-to-r from-red-500/5 to-pink-500/5">
-                    <div>
-                      <div className="font-medium font-mono text-primary">SHOW_ACTIVITY</div>
-                      <div className="text-sm text-muted-foreground font-mono">
-                        {'>'} Display your recent quest completions
-                      </div>
-                    </div>
-                    <Button variant="outline" size="sm" className="font-mono border-2 border-dashed border-red-500/30 bg-red-500/10 text-red-600 hover:border-solid">DISABLED</Button>
-                  </div>
-                </div>
-              </div>
 
-              {/* Data Export */}
-              <div className="border-t border-dashed border-primary/20 pt-6">
-                <h3 className="font-mono font-semibold mb-3 text-primary uppercase tracking-wider">{'>'} DATA_MANAGEMENT</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 border-2 border-dashed border-blue-500/20 rounded-lg bg-gradient-to-r from-blue-500/5 to-cyan-500/5">
-                    <div>
-                      <div className="font-medium font-mono text-primary">EXPORT_DATA</div>
-                      <div className="text-sm text-muted-foreground font-mono">
-                        {'>'} Download a copy of your data
-                      </div>
-                    </div>
-                    <Button variant="outline" size="sm" className="font-mono border-2 border-dashed border-primary/30 hover:border-solid hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all duration-200">
-                      <Link className="w-4 h-4 mr-1" />
-                      EXPORT
-                    </Button>
-                  </div>
-                  <div className="flex items-center justify-between p-3 border-2 border-dashed border-yellow-500/20 rounded-lg bg-gradient-to-r from-yellow-500/5 to-orange-500/5">
-                    <div>
-                      <div className="font-medium font-mono text-primary">DATA_RETENTION</div>
-                      <div className="text-sm text-muted-foreground font-mono">
-                        {'>'} How long we keep your data
-                      </div>
-                    </div>
-                    <Badge variant="outline" className="font-mono border-2 border-dashed border-yellow-500/30 bg-yellow-500/10 text-yellow-600">INDEFINITELY</Badge>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
     </div>
   );

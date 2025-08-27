@@ -131,20 +131,106 @@ function QuestManagement() {
   };
 
 
-   const getStatusBadge = (status: string | undefined) => {
-    if (!status) {
-      return <Badge variant="outline" className="font-mono">UNKNOWN</Badge>;
+   const getStatusBadge = (status: string | undefined, quest: Quest) => {
+    // Handle null, undefined, empty string, or missing status
+    if (!status || status.trim() === '') {
+      // Default to 'draft' for quests without status
+      const defaultStatus = 'draft';
+      return (
+        <div className="space-y-1">
+          <Badge className="bg-gray-500/20 text-gray-700 border-2 border-gray-500/40 font-mono font-bold w-full justify-center shadow-lg">
+            <AlertCircle className="w-3 h-3 mr-1" />DRAFT
+          </Badge>
+          <div className="text-xs text-gray-600 font-mono text-center">
+            No status set
+          </div>
+        </div>
+      );
     }
     
+    const createdDate = quest.created_at ? new Date(quest.created_at) : null;
+    const updatedDate = quest.updated_at ? new Date(quest.updated_at) : null;
+    
     switch (status) {
+      case 'active':
       case 'published':
-        return <Badge className="bg-green-500/10 text-green-500 border-green-500/20 font-mono"><CheckCircle className="w-3 h-3 mr-1" />PUBLISHED</Badge>;
+        return (
+          <div className="space-y-1">
+            <Badge className="bg-green-500/20 text-green-700 border-2 border-green-500/40 font-mono font-bold w-full justify-center shadow-lg animate-pulse">
+              <CheckCircle className="w-3 h-3 mr-1" />ACTIVE
+            </Badge>
+            {createdDate && (
+              <div className="text-xs text-green-600 font-mono text-center">
+                Started: {format(createdDate, 'MMM dd, yyyy')}
+              </div>
+            )}
+          </div>
+        );
       case 'draft':
-        return <Badge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20 font-mono"><AlertCircle className="w-3 h-3 mr-1" />DRAFT</Badge>;
+        return (
+          <div className="space-y-1">
+            <Badge className="bg-yellow-500/20 text-yellow-700 border-2 border-yellow-500/40 font-mono font-bold w-full justify-center shadow-lg">
+              <AlertCircle className="w-3 h-3 mr-1" />DRAFT
+            </Badge>
+            {updatedDate && (
+              <div className="text-xs text-yellow-600 font-mono text-center">
+                Modified: {format(updatedDate, 'MMM dd, yyyy')}
+              </div>
+            )}
+          </div>
+        );
+      case 'completed':
+        return (
+          <div className="space-y-1">
+            <Badge className="bg-blue-500/20 text-blue-700 border-2 border-blue-500/40 font-mono font-bold w-full justify-center shadow-lg">
+              <Trophy className="w-3 h-3 mr-1" />COMPLETED
+            </Badge>
+            {updatedDate && (
+              <div className="text-xs text-blue-600 font-mono text-center">
+                Finished: {format(updatedDate, 'MMM dd, yyyy')}
+              </div>
+            )}
+          </div>
+        );
+      case 'expired':
+        return (
+          <div className="space-y-1">
+            <Badge className="bg-red-500/20 text-red-700 border-2 border-red-500/40 font-mono font-bold w-full justify-center shadow-lg">
+              <XCircle className="w-3 h-3 mr-1" />EXPIRED
+            </Badge>
+            {updatedDate && (
+              <div className="text-xs text-red-600 font-mono text-center">
+                Expired: {format(updatedDate, 'MMM dd, yyyy')}
+              </div>
+            )}
+          </div>
+        );
       case 'archived':
-        return <Badge className="bg-gray-500/10 text-gray-500 border-gray-500/20 font-mono"><XCircle className="w-3 h-3 mr-1" />ARCHIVED</Badge>;
+        return (
+          <div className="space-y-1">
+            <Badge className="bg-gray-500/20 text-gray-700 border-2 border-gray-500/40 font-mono font-bold w-full justify-center shadow-lg">
+              <XCircle className="w-3 h-3 mr-1" />ARCHIVED
+            </Badge>
+            {updatedDate && (
+              <div className="text-xs text-gray-600 font-mono text-center">
+                Archived: {format(updatedDate, 'MMM dd, yyyy')}
+              </div>
+            )}
+          </div>
+        );
       default:
-        return <Badge variant="outline" className="font-mono">{status.toUpperCase()}</Badge>;
+        return (
+          <div className="space-y-1">
+            <Badge className="bg-slate-500/20 text-slate-700 border-2 border-slate-500/40 font-mono font-bold w-full justify-center shadow-lg">
+              <Compass className="w-3 h-3 mr-1" />{status.toUpperCase()}
+            </Badge>
+            {createdDate && (
+              <div className="text-xs text-slate-600 font-mono text-center">
+                Created: {format(createdDate, 'MMM dd, yyyy')}
+              </div>
+            )}
+          </div>
+        );
     }
   };
 
@@ -328,7 +414,7 @@ function QuestManagement() {
                 <TableRow className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border-b-2 border-dashed border-cyan-500/30">
                   <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4">[QUEST]</TableHead>
                   <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4">[DIFFICULTY]</TableHead>
-                  <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4">[STATUS]</TableHead>
+                  <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4 min-w-[140px] bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border-2 border-dashed border-cyan-500/40">[STATUS]</TableHead>
                   <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4">[STATS]</TableHead>
                   <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4">[UPDATED]</TableHead>
                   <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4 text-center">[ACTIONS]</TableHead>
@@ -346,20 +432,20 @@ function QuestManagement() {
                       </div>
                     </TableCell>
                     <TableCell className="py-4">{getDifficultyBadge(quest.difficulty)}</TableCell>
-                    <TableCell className="py-4">{getStatusBadge(quest.status)}</TableCell>
+                    <TableCell className="py-4 min-w-[140px]">{getStatusBadge(quest.status, quest)}</TableCell>
                     <TableCell className="py-4">
                       <div className="grid grid-cols-2 gap-2 text-xs font-mono">
                         <div className="flex items-center gap-1.5 bg-yellow-50 dark:bg-yellow-900/20 px-2 py-1 rounded border border-dashed border-yellow-300/50">
                           <Trophy className="w-3 h-3 text-yellow-600" />
-                          <span className="font-semibold">{quest.points}</span>
+                          <span className="font-semibold">{quest.reward || 'No reward'}</span>
                         </div>
                         <div className="flex items-center gap-1.5 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded border border-dashed border-blue-300/50">
                           <Users className="w-3 h-3 text-blue-600" />
-                          <span className="font-semibold">{quest.completions}</span>
+                          <span className="font-semibold">{quest.completions || 0}</span>
                         </div>
                         <div className="flex items-center gap-1.5 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded border border-dashed border-green-300/50">
                           <Clock className="w-3 h-3 text-green-600" />
-                          <span className="font-semibold">{quest.estimatedTime}m</span>
+                          <span className="font-semibold">{quest.estimatedTime || 0}m</span>
                         </div>
                         <div className="flex items-center gap-1.5 bg-purple-50 dark:bg-purple-900/20 px-2 py-1 rounded border border-dashed border-purple-300/50">
                           <Calendar className="w-3 h-3 text-purple-600" />

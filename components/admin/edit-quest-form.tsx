@@ -16,19 +16,24 @@ import { QuestService } from '@/lib/services';
 import { AlertCircle, CalendarIcon, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { Badge, Quest } from '@/lib/types';
+import { Badge, Quest, Event } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
+import { EventsApi } from '@/lib/api/events';
 
 const editQuestSchema = z.object({
   title: z.string().min(1, 'Title is required').optional(),
   description: z.string().min(10, 'Description must be at least 10 characters').optional(),
   reward: z.number().min(0, 'Reward must be positive').optional(),
-  difficulty: z.enum(['beginner', 'intermediate', 'advanced', 'expert']).optional(),
+  difficulty: z.enum(['easy', 'medium', 'hard', 'beginner', 'intermediate', 'advanced', 'expert']).optional(),
   status: z.enum(['draft', 'active', 'completed', 'expired']).optional(),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
   maxParticipants: z.number().min(1, 'Max participants must be at least 1').optional(),
   badgeIds: z.array(z.number()).optional(),
+  platform_type: z.string().optional(),
+  interaction_type: z.string().optional(),
+  quest_link: z.string().optional(),
+  event_id: z.number().optional(),
 });
 
 type EditQuestFormData = z.infer<typeof editQuestSchema>;
@@ -68,6 +73,8 @@ export function EditQuestForm({ quest, onSuccess, onCancel }: EditQuestFormProps
   );
   const [badges, setBadges] = useState<Badge[]>([]);
   const [loadingBadges, setLoadingBadges] = useState(false);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(false);
   const { toast } = useToast();
 
   const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<EditQuestFormData>({
@@ -82,21 +89,29 @@ export function EditQuestForm({ quest, onSuccess, onCancel }: EditQuestFormProps
     }
   });
 
-  // Fetch badges when component mounts
+  // Fetch badges and events when component mounts
   useEffect(() => {
-    const fetchBadges = async () => {
+    const fetchData = async () => {
       try {
         setLoadingBadges(true);
-        const badgesList = await QuestService.getAllBadges();
+        setLoadingEvents(true);
+        
+        const [badgesList, eventsList] = await Promise.all([
+          QuestService.getAllBadges(),
+          EventsApi.list()
+        ]);
+        
         setBadges(badgesList);
+        setEvents(eventsList);
       } catch (err) {
-        console.error('Error fetching badges:', err);
+        console.error('Error fetching data:', err);
       } finally {
         setLoadingBadges(false);
+        setLoadingEvents(false);
       }
     };
 
-    fetchBadges();
+    fetchData();
   }, []);
 
   const onSubmit = async (data: EditQuestFormData) => {
@@ -150,6 +165,19 @@ export function EditQuestForm({ quest, onSuccess, onCancel }: EditQuestFormProps
       const currentBadgeIds = quest.badges?.map(badge => typeof badge === 'object' ? badge.id : badge) || [];
       if (JSON.stringify(selectedBadges.sort()) !== JSON.stringify(currentBadgeIds.sort())) {
         updateData.badgeIds = selectedBadges.length > 0 ? selectedBadges : [];
+      }
+      
+      if (data.event_id !== quest.event_id) {
+        updateData.event_id = data.event_id;
+      }
+      if (data.platform_type !== quest.platform_type) {
+        updateData.platform_type = data.platform_type;
+      }
+      if (data.interaction_type !== quest.interaction_type) {
+        updateData.interaction_type = data.interaction_type;
+      }
+      if (data.quest_link !== quest.quest_link) {
+        updateData.quest_link = data.quest_link;
       }
       
       if (Object.keys(updateData).length === 0) {
@@ -276,6 +304,9 @@ export function EditQuestForm({ quest, onSuccess, onCancel }: EditQuestFormProps
                   <SelectValue placeholder="Select difficulty" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="easy">Easy</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="hard">Hard</SelectItem>
                   <SelectItem value="beginner">Beginner</SelectItem>
                   <SelectItem value="intermediate">Intermediate</SelectItem>
                   <SelectItem value="advanced">Advanced</SelectItem>
@@ -298,6 +329,116 @@ export function EditQuestForm({ quest, onSuccess, onCancel }: EditQuestFormProps
                 </SelectContent>
               </Select>
             </div>
+          </div>
+        </div>
+
+        {/* Event Association */}
+        <div className="space-y-6">
+          <h3 className="text-lg font-semibold border-b pb-2">Event Association</h3>
+          
+          <div className="space-y-2">
+            <Label htmlFor="event_id">Associated Event (Optional)</Label>
+            {loadingEvents ? (
+              <div className="flex items-center space-x-2 py-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span className="text-sm text-muted-foreground">Loading events...</span>
+              </div>
+            ) : (
+              <Select 
+                value={watch('event_id') ? String(watch('event_id')) : (quest.event_id ? String(quest.event_id) : "none")}
+                onValueChange={(value) => setValue('event_id', value === 'none' ? undefined : Number(value))}
+              >
+                <SelectTrigger className="max-w-xs">
+                  <SelectValue placeholder="Select an event" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No event</SelectItem>
+                  {events.map((event) => (
+                    <SelectItem key={event.id} value={String(event.id)}>
+                      {event.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            {errors.event_id && (
+              <p className="text-sm text-destructive">{errors.event_id.message}</p>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Associate this quest with a specific event
+            </p>
+          </div>
+        </div>
+
+        {/* Platform & Interaction */}
+        <div className="space-y-6">
+          <h3 className="text-lg font-semibold border-b pb-2">Platform & Interaction</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="platform_type">Platform Type</Label>
+              <Select
+                value={watch('platform_type') || quest.platform_type || "none"}
+                onValueChange={(value) => setValue('platform_type', value === 'none' ? undefined : value)}
+              >
+                <SelectTrigger className="max-w-xs">
+                  <SelectValue placeholder="Select platform" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">None</SelectItem>
+                  <SelectItem value="twitter">Twitter</SelectItem>
+                  <SelectItem value="discord">Discord</SelectItem>
+                  <SelectItem value="telegram">Telegram</SelectItem>
+                  <SelectItem value="website">Website</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.platform_type && (
+                <p className="text-sm text-destructive">{errors.platform_type.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="interaction_type">Interaction Type</Label>
+              <Select
+                value={watch('interaction_type') || quest.interaction_type || "none"}
+                onValueChange={(value) => setValue('interaction_type', value === 'none' ? undefined : value)}
+              >
+                <SelectTrigger className="max-w-xs">
+                  <SelectValue placeholder="Select interaction" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">None</SelectItem>
+                  <SelectItem value="like">Like</SelectItem>
+                  <SelectItem value="share">Share</SelectItem>
+                  <SelectItem value="comment">Comment</SelectItem>
+                  <SelectItem value="follow">Follow</SelectItem>
+                  <SelectItem value="join">Join</SelectItem>
+                  <SelectItem value="visit">Visit</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.interaction_type && (
+                <p className="text-sm text-destructive">{errors.interaction_type.message}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="quest_link">Quest Link (Optional)</Label>
+            <Input
+              id="quest_link"
+              type="url"
+              placeholder="https://example.com/quest-target"
+              className="max-w-md"
+              {...register('quest_link')}
+            />
+            {errors.quest_link && (
+              <p className="text-sm text-destructive">{errors.quest_link.message}</p>
+            )}
+            <p className="text-xs text-muted-foreground">
+              Link to the content or page users need to interact with
+            </p>
           </div>
         </div>
 

@@ -13,17 +13,18 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { QuestService } from '@/lib/services';
-import { AlertCircle, Eye, EyeOff, CalendarIcon, Clock, Loader2 } from 'lucide-react';
+import { AlertCircle, CalendarIcon, Loader2, EyeOff, Eye, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { Badge } from '@/lib/types';
+import { Badge, Event } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
+import { EventsApi } from '@/lib/api/events';
 
 const createQuestSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
   reward: z.number().min(0, 'Reward must be positive'),
-  difficulty: z.enum(['beginner', 'intermediate', 'advanced', 'expert']),
+  difficulty: z.enum(['easy', 'medium', 'hard', 'beginner', 'intermediate', 'advanced', 'expert']),
   status: z.enum(['draft', 'active', 'completed', 'expired']),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
@@ -32,6 +33,7 @@ const createQuestSchema = z.object({
   platform_type: z.string().optional(),
   interaction_type: z.string().optional(),
   quest_link: z.string().optional(),
+  event_id: z.number().optional(),
 });
 
 type CreateQuestFormData = z.infer<typeof createQuestSchema>;
@@ -52,6 +54,8 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
   const [selectedBadges, setSelectedBadges] = useState<number[]>([]);
   const [badges, setBadges] = useState<Badge[]>([]);
   const [loadingBadges, setLoadingBadges] = useState(false);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loadingEvents, setLoadingEvents] = useState(false);
   const [platform, setPlatform] = useState('');
   const { toast } = useToast();
 
@@ -70,21 +74,29 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
     }
   });
 
-  // Fetch badges when component mounts
+  // Fetch badges and events when component mounts
   useEffect(() => {
-    const fetchBadges = async () => {
+    const fetchData = async () => {
       try {
         setLoadingBadges(true);
-        const badgesList = await QuestService.getAllBadges();
+        setLoadingEvents(true);
+        
+        const [badgesList, eventsList] = await Promise.all([
+          QuestService.getAllBadges(),
+          EventsApi.list()
+        ]);
+        
         setBadges(badgesList);
+        setEvents(eventsList);
       } catch (err) {
-        console.error('Error fetching badges:', err);
+        console.error('Error fetching data:', err);
       } finally {
         setLoadingBadges(false);
+        setLoadingEvents(false);
       }
     };
 
-    fetchBadges();
+    fetchData();
   }, []);
 
   const onSubmit = async (data: CreateQuestFormData) => {
@@ -253,6 +265,36 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
                 )}
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="event_id">Associated Event (Optional)</Label>
+                {loadingEvents ? (
+                  <div className="flex items-center space-x-2 py-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span className="text-sm text-muted-foreground">Loading events...</span>
+                  </div>
+                ) : (
+                  <Select onValueChange={(value) => setValue('event_id', value === 'none' ? undefined : Number(value))}>
+                    <SelectTrigger className="max-w-xs">
+                      <SelectValue placeholder="Select an event" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">No event</SelectItem>
+                      {events.map((event) => (
+                        <SelectItem key={event.id} value={String(event.id)}>
+                          {event.title}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+                {errors.event_id && (
+                  <p className="text-sm text-destructive">{errors.event_id.message}</p>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  Associate this quest with a specific event
+                </p>
+              </div>
+
                              <div className="space-y-2">
                  <Label htmlFor="difficulty">Difficulty *</Label>
                  <Select onValueChange={(value) => setValue('difficulty', value as any)} defaultValue="medium">
@@ -260,6 +302,9 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
                      <SelectValue placeholder="Select difficulty" />
                    </SelectTrigger>
                    <SelectContent>
+                     <SelectItem value="easy">Easy</SelectItem>
+                     <SelectItem value="medium">Medium</SelectItem>
+                     <SelectItem value="hard">Hard</SelectItem>
                      <SelectItem value="beginner">Beginner</SelectItem>
                      <SelectItem value="intermediate">Intermediate</SelectItem>
                      <SelectItem value="advanced">Advanced</SelectItem>

@@ -37,7 +37,7 @@ export const QuestsApi = {
     title: string;
     description: string;
     reward: number;
-    difficulty: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+    difficulty: 'easy' | 'medium' | 'hard' | 'beginner' | 'intermediate' | 'advanced' | 'expert';
     status?: 'active' | 'completed' | 'expired' | 'draft';
     startDate?: string;
     endDate?: string;
@@ -45,6 +45,8 @@ export const QuestsApi = {
     badgeIds?: number[];
     platform_type?: string;
     interaction_type?: string;
+    quest_link?: string;
+    event_id?: number;
   }): Promise<Quest> {
     console.log('Creating quest with payload:', payload);
     

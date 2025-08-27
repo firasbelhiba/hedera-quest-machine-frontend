@@ -155,9 +155,8 @@ export function Navbar({ className }: NavbarProps) {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full border-2 border-dashed border-purple-500/50 hover:border-cyan-500/50 p-0 text-slate-300 hover:text-slate-100">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={user?.avatar} alt={user?.name} />
                     <AvatarFallback className="bg-gradient-to-r from-purple-500 to-cyan-500 text-white font-mono text-xs">
-                      {getInitials(user?.name || '')}
+                      <User className="h-4 w-4" />
                     </AvatarFallback>
                   </Avatar>
                 </Button>
@@ -201,12 +200,6 @@ export function Navbar({ className }: NavbarProps) {
                   <Link href="/profile" className="cursor-pointer font-mono">
                     <User className="mr-2 h-4 w-4" />
                     <span>[PROFILE]</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/settings" className="cursor-pointer font-mono">
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>[SETTINGS]</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="border-dashed border-purple-500/30" />

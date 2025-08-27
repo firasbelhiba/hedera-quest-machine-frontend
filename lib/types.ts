@@ -40,7 +40,7 @@ export interface Quest {
   category?: QuestCategory;
   difficulty: Difficulty;
   points?: number;
-  reward?: string;
+  reward?: string | number;
   estimatedTime?: string;
   requirements?: string[];
   submissionType?: SubmissionType;
@@ -60,15 +60,21 @@ export interface Quest {
   startDate?: string;
   endDate?: string;
   createdBy?: number;
+  added_by?: number;
   creator?: {
     id: number;
     firstName: string;
     lastName: string;
     username: string;
   };
-  badges?: any[];
+  badges?: Array<{
+    id: number;
+    name: string;
+  }>;
   platform_type?: string;
+  interaction_type?: string;
   quest_link?: string;
+  event_id?: number;
   user_status?: string;
 }
 
@@ -130,7 +136,7 @@ export type QuestCategory =
   | 'file-service'
   | 'community';
 
-export type Difficulty = 'beginner' | 'intermediate' | 'advanced' | 'expert' | 'master';
+export type Difficulty = 'easy' | 'medium' | 'hard' | 'beginner' | 'intermediate' | 'advanced' | 'expert' | 'master';
 
 export type SubmissionType = 'url' | 'text' | 'file' | 'transaction-id' | 'account-id';
 
