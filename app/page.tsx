@@ -95,7 +95,9 @@ export default function Dashboard() {
         ]);
         
         setStats(statsData);
-        setFeaturedQuests(questsData.slice(0, 6));
+        // Filter featured quests to only show active ones
+        const activeQuests = questsData.filter(quest => quest.status === 'active' || quest.status === 'published');
+        setFeaturedQuests(activeQuests.slice(0, 6));
         setQuests(questsData);
         setUser(userData);
         
@@ -214,8 +216,9 @@ export default function Dashboard() {
                          quest.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || quest.category === selectedCategory;
     const matchesDifficulty = selectedDifficulty === 'all' || quest.difficulty === selectedDifficulty;
+    const isActive = quest.status === 'active' || quest.status === 'published';
     
-    return matchesSearch && matchesCategory && matchesDifficulty;
+    return matchesSearch && matchesCategory && matchesDifficulty && isActive;
   });
 
   const recentActivity = submissions

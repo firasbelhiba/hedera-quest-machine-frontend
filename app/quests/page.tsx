@@ -60,6 +60,12 @@ export default function QuestsPage() {
   };
 
   const filteredQuests = (quests || []).filter(quest => {
+    // Filter by quest status - only show active or published quests
+    const isActive = quest.status === 'active' || quest.status === 'published';
+    if (!isActive) {
+      return false;
+    }
+    
     if (!filters.showCompleted && user?.completedQuests?.includes(String(quest.id))) {
       return false;
     }

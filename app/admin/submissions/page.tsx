@@ -74,6 +74,12 @@ export default function ReviewSubmissionsPage() {
   const filterQuests = () => {
     let filtered = [...questsWithCompletions];
 
+    // Filter by quest status - only show active or published quests
+    filtered = filtered.filter(quest => {
+      const isActive = quest.status === 'active' || quest.status === 'published';
+      return isActive;
+    });
+
     if (searchTerm) {
       filtered = filtered.filter(quest =>
         quest.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
