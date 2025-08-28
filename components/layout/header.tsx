@@ -20,6 +20,7 @@ import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import useStore from '@/lib/store';
 import { UsersApi, type AdminNotification } from '@/lib/api/users';
+import { useWebSocket } from '@/hooks/use-websocket';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -52,6 +53,37 @@ export function Header({ onMenuClick }: HeaderProps) {
 
   const isAdminPage = pathname?.startsWith('/admin');
 
+  // Helper function to generate notification title and message
+  const generateNotificationContent = (notification: Notification) => {
+    const title = notification.title || (() => {
+      switch (notification.notif_type) {
+        case 'new_quest':
+          return '[NEW_QUEST]';
+        case 'quest_validated':
+          return '[QUEST_VALIDATED]';
+        case 'quest_rejected':
+          return '[QUEST_REJECTED]';
+        default:
+          return '[NOTIFICATION]';
+      }
+    })();
+
+    const message = notification.message || (() => {
+      switch (notification.notif_type) {
+        case 'new_quest':
+          return `A new quest is available! Quest ID: ${notification.quest_id}`;
+        case 'quest_validated':
+          return `Your quest submission has been validated! Quest ID: ${notification.quest_id}`;
+        case 'quest_rejected':
+          return `Your quest submission has been rejected. Quest ID: ${notification.quest_id}`;
+        default:
+          return 'You have a new notification';
+      }
+    })();
+
+    return { title, message };
+  };
+
   // Load current user on component mount
   useEffect(() => {
     loadCurrentUser();
@@ -62,9 +94,12 @@ export function Header({ onMenuClick }: HeaderProps) {
     if (isAdminPage) return;
     setIsLoadingNotifications(true);
     try {
-      // This would be replaced with actual API call
-      setNotifications([]);
-      setUnreadCount(0);
+      const [notificationsResponse, unreadCountResponse] = await Promise.all([
+        UsersApi.getNotifications(),
+        UsersApi.getUnreadNotificationCount()
+      ]);
+      setNotifications(notificationsResponse.notifications || []);
+      setUnreadCount(unreadCountResponse.unreadCount || 0);
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
     } finally {
@@ -77,12 +112,12 @@ export function Header({ onMenuClick }: HeaderProps) {
     if (!isAdminPage) return;
     setIsLoadingNotifications(true);
     try {
-      const [notificationsResponse, unreadResponse] = await Promise.all([
+      const [notificationsResponse, unreadCountResponse] = await Promise.all([
         UsersApi.getAdminNotifications(),
         UsersApi.getAdminUnreadNotificationCount()
       ]);
-      setAdminNotifications(notificationsResponse.notifications);
-      setAdminUnreadCount(unreadResponse.unreadCount);
+      setAdminNotifications(notificationsResponse.notifications || []);
+      setAdminUnreadCount(unreadCountResponse.unreadCount || 0);
     } catch (error) {
       console.error('Failed to fetch admin notifications:', error);
     } finally {
@@ -90,16 +125,41 @@ export function Header({ onMenuClick }: HeaderProps) {
     }
   };
 
-  // Load notifications based on page context
+  // WebSocket integration for real-time notifications
+  const { isConnected, error: wsError } = useWebSocket({
+    onNotification: (data) => {
+      console.log('Received WebSocket notification:', data);
+      
+      // Refresh notifications when we receive a WebSocket notification
+      if (isAdminPage) {
+        fetchAdminNotifications();
+      } else {
+        fetchNotifications();
+      }
+    },
+    onConnect: () => {
+      console.log('WebSocket connected, fetching initial notifications');
+      // Fetch initial notifications on connection
+      if (isAdminPage) {
+        fetchAdminNotifications();
+      } else {
+        fetchNotifications();
+      }
+    },
+    onError: (error) => {
+      console.error('WebSocket error:', error);
+    },
+    autoReconnect: true,
+    reconnectInterval: 3000,
+    maxReconnectAttempts: 5
+  });
+
+  // Initial load and page context changes
   useEffect(() => {
     if (isAdminPage) {
       fetchAdminNotifications();
-      const interval = setInterval(fetchAdminNotifications, 30000);
-      return () => clearInterval(interval);
     } else {
       fetchNotifications();
-      const interval = setInterval(fetchNotifications, 30000);
-      return () => clearInterval(interval);
     }
   }, [isAdminPage]);
 
@@ -145,27 +205,49 @@ export function Header({ onMenuClick }: HeaderProps) {
     }
   };
 
-  const markAsRead = (notificationId: string) => {
-    if (isAdminPage) {
-      setAdminNotifications(prev => 
-        prev.map(n => n.id.toString() === notificationId ? { ...n, seen: true } : n)
-      );
-      setAdminUnreadCount(prev => Math.max(0, prev - 1));
-    } else {
-      setNotifications(prev => 
-        prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
-      );
-      setUnreadCount(prev => Math.max(0, prev - 1));
+  const markAsRead = async (notificationId: string) => {
+    const numericId = parseInt(notificationId, 10);
+    
+    try {
+      if (isAdminPage) {
+        await UsersApi.markAdminNotificationAsSeen(numericId);
+        setAdminNotifications(prev => 
+          prev.map(n => n.id === numericId ? { ...n, seen: true } : n)
+        );
+        setAdminUnreadCount(prev => Math.max(0, prev - 1));
+      } else {
+        await UsersApi.markNotificationAsSeen(numericId);
+        setNotifications(prev => 
+          prev.map(n => n.id === numericId ? { ...n, seen: true } : n)
+        );
+        setUnreadCount(prev => Math.max(0, prev - 1));
+      }
+    } catch (error) {
+      console.error('Failed to mark notification as seen:', error);
     }
   };
 
-  const markAllAsRead = () => {
-    if (isAdminPage) {
-      setAdminNotifications(prev => prev.map(n => ({ ...n, seen: true })));
-      setAdminUnreadCount(0);
-    } else {
-      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-      setUnreadCount(0);
+  const markAllAsRead = async () => {
+    try {
+      if (isAdminPage) {
+        // Mark all admin notifications as seen
+        const unseenNotifications = adminNotifications.filter(n => !n.seen);
+        await Promise.all(
+          unseenNotifications.map(n => UsersApi.markAdminNotificationAsSeen(n.id))
+        );
+        setAdminNotifications(prev => prev.map(n => ({ ...n, seen: true })));
+        setAdminUnreadCount(0);
+      } else {
+        // Mark all user notifications as seen
+        const unseenNotifications = notifications.filter(n => !n.seen);
+        await Promise.all(
+          unseenNotifications.map(n => UsersApi.markNotificationAsSeen(n.id))
+        );
+        setNotifications(prev => prev.map(n => ({ ...n, seen: true })));
+        setUnreadCount(0);
+      }
+    } catch (error) {
+      console.error('Failed to mark all notifications as seen:', error);
     }
   };
 
@@ -216,17 +298,26 @@ export function Header({ onMenuClick }: HeaderProps) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm" className="relative border-2 border-dashed border-purple-500/50 hover:border-cyan-500/50 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-cyan-500/20 font-mono" title="[NOTIFICATIONS]">
-              <Bell className="h-5 w-5" />
+              <Bell className={cn("h-5 w-5", isConnected ? "text-green-500" : "text-gray-500")} />
               {(isAdminPage ? adminUnreadCount : unreadCount) > 0 && (
                 <Badge className="absolute -top-1 -right-1 px-1 py-0 text-xs min-w-[1rem] h-5 flex items-center justify-center bg-red-500 hover:bg-red-600 border border-dashed border-red-700 font-mono">
                   {isAdminPage ? adminUnreadCount : unreadCount}
                 </Badge>
               )}
+              {!isConnected && (
+                <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-orange-500 rounded-full border border-white" title="WebSocket disconnected" />
+              )}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-80 border-2 border-dashed border-purple-500/50 bg-gradient-to-br from-purple-500/5 to-cyan-500/5 font-mono">
             <div className="flex items-center justify-between p-2 border-b border-dashed border-purple-500/30">
-              <DropdownMenuLabel className="p-0 font-mono text-purple-600">[NOTIFICATIONS]</DropdownMenuLabel>
+              <div className="flex items-center gap-2">
+                <DropdownMenuLabel className="p-0 font-mono text-purple-600">[NOTIFICATIONS]</DropdownMenuLabel>
+                <div className={cn(
+                  "w-2 h-2 rounded-full",
+                  isConnected ? "bg-green-500" : "bg-red-500"
+                )} title={isConnected ? "Connected" : "Disconnected"} />
+              </div>
               {(isAdminPage ? adminUnreadCount : unreadCount) > 0 && (
                 <Button
                   variant="ghost"
@@ -247,28 +338,28 @@ export function Header({ onMenuClick }: HeaderProps) {
                       key={notification.id}
                       className={cn(
                          "flex items-start gap-3 p-3 cursor-pointer border border-dashed border-transparent hover:border-purple-500/30 hover:bg-gradient-to-r hover:from-purple-500/10 hover:to-cyan-500/10 font-mono",
-                         !(isAdminPage ? (notification as AdminNotification).seen : (notification as Notification).read) && "bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/30"
+                         !(isAdminPage ? (notification as AdminNotification).seen : (notification as Notification).seen) && "bg-gradient-to-r from-blue-500/10 to-purple-500/10 border-blue-500/30"
                        )}
                       onClick={() => handleNotificationClick(notification)}
                     >
                       <div className="flex-shrink-0 mt-0.5">
-                        {getNotificationIcon(notification.type)}
+                        {getNotificationIcon(isAdminPage ? (notification as AdminNotification).type : (notification as Notification).notif_type)}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <p className="text-sm font-medium truncate">
-                             {isAdminPage ? `[${(notification as AdminNotification).type.toUpperCase()}]` : (notification as Notification).title}
-                           </p>
-                           {!(isAdminPage ? (notification as AdminNotification).seen : (notification as Notification).read) && (
+                              {isAdminPage ? `[${(notification as AdminNotification).type?.toUpperCase() || 'NOTIFICATION'}]` : generateNotificationContent(notification as Notification).title}
+                            </p>
+                           {!(isAdminPage ? (notification as AdminNotification).seen : (notification as Notification).seen) && (
                              <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
                            )}
                         </div>
                         <p className="text-xs text-muted-foreground line-clamp-2 mb-1">
-                           {notification.message}
-                         </p>
+                            {isAdminPage ? (notification as AdminNotification).message : generateNotificationContent(notification as Notification).message}
+                          </p>
                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
                            <Clock className="w-3 h-3" />
-                           {formatTimestamp(isAdminPage ? (notification as AdminNotification).createdAt : (notification as Notification).timestamp)}
+                           {formatTimestamp(isAdminPage ? (notification as AdminNotification).createdAt : (notification as Notification).created_at)}
                          </div>
                       </div>
                     </DropdownMenuItem>

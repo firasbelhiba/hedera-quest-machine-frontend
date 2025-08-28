@@ -24,7 +24,7 @@ const createQuestSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
   reward: z.number().min(0, 'Reward must be positive'),
-  difficulty: z.enum(['easy', 'medium', 'hard', 'beginner', 'intermediate', 'advanced', 'expert']),
+  difficulty: z.enum(['easy', 'medium', 'hard', 'expert']),
   status: z.enum(['draft', 'active', 'completed', 'expired']),
   startDate: z.string().optional(),
   endDate: z.string().optional(),
@@ -63,6 +63,7 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
     twitter: ['follow', 'like', 'comment', 'tweet'],
     facebook: ['follow', 'like', 'comment', 'share'],
     discord: ['join', 'message', 'react'],
+    other: ['visit', 'signup', 'complete', 'submit', 'participate'],
   };
 
   const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<CreateQuestFormData>({
@@ -226,6 +227,7 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
                     <SelectItem value="twitter">Twitter</SelectItem>
                     <SelectItem value="facebook">Facebook</SelectItem>
                     <SelectItem value="discord">Discord</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
                 {errors.platform_type && (
@@ -305,9 +307,6 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
                      <SelectItem value="easy">Easy</SelectItem>
                      <SelectItem value="medium">Medium</SelectItem>
                      <SelectItem value="hard">Hard</SelectItem>
-                     <SelectItem value="beginner">Beginner</SelectItem>
-                     <SelectItem value="intermediate">Intermediate</SelectItem>
-                     <SelectItem value="advanced">Advanced</SelectItem>
                      <SelectItem value="expert">Expert</SelectItem>
                    </SelectContent>
                  </Select>

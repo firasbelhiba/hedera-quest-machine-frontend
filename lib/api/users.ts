@@ -10,6 +10,8 @@ export interface Notification {
   quest_id: number;
   to_user: number;
   admin_id: number | null;
+  title?: string;
+  message?: string;
 }
 
 export interface AdminNotification {
@@ -45,6 +47,15 @@ export const UsersApi = {
   },
   async getAdminUnreadNotificationCount(): Promise<{ status: string; unreadCount: number }> {
     const { data } = await api.get('/admin/notification/number');
+    return data;
+  },
+  // Mark notifications as seen
+  async markNotificationAsSeen(notificationId: number): Promise<{ status: string; message: string }> {
+    const { data } = await api.put(`/user/notifications/${notificationId}/mark-as-seen`);
+    return data;
+  },
+  async markAdminNotificationAsSeen(notificationId: number): Promise<{ status: string; message: string }> {
+    const { data } = await api.put(`/admin/notifications/${notificationId}/mark-as-seen`);
     return data;
   }
 };
