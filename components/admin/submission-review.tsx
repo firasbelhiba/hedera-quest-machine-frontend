@@ -61,7 +61,11 @@ import {
   Code,
   Link,
   ArrowLeft,
-  Loader2
+  Loader2,
+  Target,
+  Grid3X3,
+  List,
+  Table as TableIcon
 } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -128,91 +132,19 @@ interface SubmissionReviewProps {
   className?: string;
 }
 
-// Mock data - replace with actual API calls
-const mockSubmissions: Submission[] = [
-  {
-    id: '1',
-    questId: 'q1',
-    questTitle: 'Smart Contract Basics',
-    userId: 'u1',
-    userName: 'Alice Johnson',
-    userEmail: 'alice@example.com',
-    status: 'pending',
-    submittedAt: '2024-01-20T10:30:00Z',
-    submissionUrl: 'https://github.com/alice/smart-contract-basics',
-    repositoryUrl: 'https://github.com/alice/smart-contract-basics',
-    description: 'Implemented a basic smart contract with all required functions. Added comprehensive tests and documentation.',
-    questPoints: 0, // Will be provided by API
-    questDifficulty: 'beginner'
-  },
-  {
-    id: '2',
-    questId: 'q2',
-    questTitle: 'Token Creation Workshop',
-    userId: 'u2',
-    userName: 'Bob Smith',
-    userEmail: 'bob@example.com',
-    status: 'approved',
-    submittedAt: '2024-01-19T14:15:00Z',
-    reviewedAt: '2024-01-19T16:45:00Z',
-    reviewedBy: 'admin1',
-    submissionUrl: 'https://github.com/bob/hts-token',
-    repositoryUrl: 'https://github.com/bob/hts-token',
-    description: 'Created HTS token with custom properties and implemented transfer functionality.',
-    feedback: 'Excellent implementation with clean code and good documentation.',
-    score: 95,
-    questPoints: 0, // Will be provided by API
-    questDifficulty: 'intermediate'
-  },
-  {
-    id: '3',
-    questId: 'q3',
-    questTitle: 'NFT Marketplace Development',
-    userId: 'u3',
-    userName: 'Carol Davis',
-    userEmail: 'carol@example.com',
-    status: 'needs_revision',
-    submittedAt: '2024-01-18T09:20:00Z',
-    reviewedAt: '2024-01-18T15:30:00Z',
-    reviewedBy: 'admin2',
-    submissionUrl: 'https://github.com/carol/nft-marketplace',
-    repositoryUrl: 'https://github.com/carol/nft-marketplace',
-    description: 'Built NFT marketplace with minting and trading features.',
-    feedback: 'Good start but needs better error handling and more comprehensive tests.',
-    score: 70,
-    questPoints: 0, // Will be provided by API
-    questDifficulty: 'advanced'
-  },
-  {
-    id: '4',
-    questId: 'q1',
-    questTitle: 'Smart Contract Basics',
-    userId: 'u4',
-    userName: 'David Wilson',
-    userEmail: 'david@example.com',
-    status: 'rejected',
-    submittedAt: '2024-01-17T11:45:00Z',
-    reviewedAt: '2024-01-17T17:20:00Z',
-    reviewedBy: 'admin1',
-    submissionUrl: 'https://github.com/david/contract-attempt',
-    repositoryUrl: 'https://github.com/david/contract-attempt',
-    description: 'Basic smart contract implementation.',
-    feedback: 'Code does not compile and lacks required functionality. Please review the quest requirements.',
-    score: 25,
-    questPoints: 100,
-    questDifficulty: 'beginner'
-  }
-];
+// Mock data removed - now using real API data from QuestService.getSubmissions()
 
-export default function SubmissionReview() {
+export default function SubmissionReview({ className }: SubmissionReviewProps = {}) {
   const { toast } = useToast();
-  const [submissions, setSubmissions] = useState<Submission[]>(mockSubmissions);
-  const [filteredSubmissions, setFilteredSubmissions] = useState<Submission[]>(mockSubmissions);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [filteredSubmissions, setFilteredSubmissions] = useState<Submission[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [difficultyFilter, setDifficultyFilter] = useState('all');
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
   const [isReviewDialogOpen, setIsReviewDialogOpen] = useState(false);
+  const [selectedDetailSubmission, setSelectedDetailSubmission] = useState<Submission | null>(null);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [reviewScore, setReviewScore] = useState(0);
   const [reviewFeedback, setReviewFeedback] = useState('');
   const [quests, setQuests] = useState<Quest[]>([]);
@@ -220,30 +152,59 @@ export default function SubmissionReview() {
   const [questSubmissions, setQuestSubmissions] = useState<ExtendedSubmission[]>([]);
   const [loading, setLoading] = useState(false);
   const [view, setView] = useState<'overview' | 'quest-detail'>('overview');
-  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
-  const [selectedDetailSubmission, setSelectedDetailSubmission] = useState<ExtendedSubmission | null>(null);
 
-  // Load quests on component mount
+  const [viewMode, setViewMode] = useState<'card' | 'table' | 'list'>('card');
+
+  // Load submissions and quests on component mount
   useEffect(() => {
-    const loadQuests = async () => {
+    const loadData = async () => {
       try {
         setLoading(true);
+        
+        // Load submissions
+        const submissionsData = await QuestService.getSubmissions();
+        
+        // Transform basic submission data to match expected format
+        const enrichedSubmissions = submissionsData.map((submission: any, index: number) => ({
+          id: submission.id || `sub-${index + 1}`,
+          questId: submission.questId || `quest-${index + 1}`,
+          userId: submission.userId || `user-${index + 1}`,
+          userName: submission.userName || `User ${index + 1}`,
+          userEmail: submission.userEmail || `user${index + 1}@example.com`,
+          questTitle: submission.questTitle || `Quest ${index + 1}`,
+          questDifficulty: submission.questDifficulty || 'beginner',
+          questPoints: submission.questPoints || 100,
+          status: submission.status || 'pending',
+          submittedAt: submission.submittedAt || new Date().toISOString(),
+          reviewedAt: submission.reviewedAt,
+          content: submission.content || { type: 'text', text: 'Sample submission content' },
+          feedback: submission.feedback,
+          points: submission.points,
+          score: submission.score,
+          description: submission.description || 'Sample submission description',
+          submissionUrl: submission.submissionUrl || submission.content?.url
+        }));
+        
+        // Only use real API data, no sample data
+        setSubmissions(enrichedSubmissions);
+        
+        // Load quests
         const response = await QuestService.getQuestCompletions();
         if (response.success) {
           setQuests(response.quests || []);
           toast({
-            title: "Quests Loaded",
-            description: `Successfully loaded ${response.quests?.length || 0} quests.`,
+            title: "Data Loaded",
+            description: `Successfully loaded ${enrichedSubmissions.length} submissions and ${response.quests?.length || 0} quests.`,
             variant: "default",
           });
         } else {
           throw new Error('Failed to load quests');
         }
       } catch (error) {
-        console.error('Error loading quests:', error);
+        console.error('Error loading data:', error);
         toast({
           title: "Loading Failed",
-          description: "Failed to load quests. Please refresh the page to try again.",
+          description: "Failed to load submissions and quests. Please refresh the page to try again.",
           variant: "destructive",
         });
       } finally {
@@ -251,7 +212,7 @@ export default function SubmissionReview() {
       }
     };
 
-    loadQuests();
+    loadData();
   }, [toast]);
 
   useEffect(() => {
@@ -353,131 +314,100 @@ export default function SubmissionReview() {
     }
   };
 
-  const handleReviewSubmission = (submissionId: string, status: 'approved' | 'rejected' | 'needs_revision', feedback: string, score: number) => {
-    setSubmissions(prev => prev.map(submission => {
-      if (submission.id === submissionId) {
-        return {
-          ...submission,
-          status,
-          feedback,
-          score,
-          reviewedAt: new Date().toISOString(),
-          reviewedBy: 'current_admin'
-        };
-      }
-      return submission;
-    }));
-    setIsReviewDialogOpen(false);
-    setSelectedSubmission(null);
-    setReviewFeedback('');
-    setReviewScore(0);
+  // Helper function to format dates
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
-  const handleQuestSelect = async (quest: Quest) => {
-    try {
-      setSelectedQuest(quest);
-      setView('quest-detail');
-      
-      // Transform quest completions to match ExtendedSubmission format
-      let questSubmissions = quest.completions || [];
-      
-      if (questSubmissions.length > 0) {
-        questSubmissions = questSubmissions.map((submission: any) => {
-          if (submission.user && submission.user.firstName && submission.user.lastName) {
-            return {
-              ...submission,
-              user: {
-                ...submission.user,
-                name: `${submission.user.firstName} ${submission.user.lastName}`.trim(),
-                email: submission.user.email || `${submission.user.username}@example.com`
-              }
-            };
-          }
-          return submission;
-        });
-      }
-      
-      setQuestSubmissions(questSubmissions);
-      
-      toast({
-        title: "Quest Selected",
-        description: `Loaded ${questSubmissions.length} submissions for "${quest.title}".`,
-        variant: "default",
-      });
-      
-    } catch (error) {
-      console.error('Error selecting quest:', error);
-      toast({
-        title: "Selection Failed",
-        description: "Failed to load quest submissions. Please try again.",
-        variant: "destructive",
-      });
-    }
+  // Function to open review dialog
+  const openReviewDialog = (submission: any) => {
+    setSelectedSubmission(submission);
+    setReviewScore(submission.score || 0);
+    setReviewFeedback(submission.feedback || '');
+    setIsReviewDialogOpen(true);
   };
 
-  const handleStatusUpdate = async (submissionId: string, action: string, feedback?: string) => {
+  // Function to handle quest selection
+  const handleQuestSelect = (quest: Quest) => {
+    setSelectedQuest(quest);
+    setQuestSubmissions(quest.completions || []);
+    setView('quest-detail');
+  };
+
+  // Function to handle status updates from quick action buttons
+  const handleStatusUpdate = async (submissionId: string, status: 'approved' | 'rejected' | 'needs_revision', feedback: string) => {
+    await handleReviewSubmission(submissionId, status, feedback, status === 'approved' ? 100 : 0);
+  };
+
+  const handleReviewSubmission = async (submissionId: string, status: 'approved' | 'rejected' | 'needs_revision', feedback: string, score: number) => {
     try {
       setLoading(true);
       
-      let status: 'approved' | 'rejected' | 'needs-revision';
-      let statusText: string;
+      // Call the API to review the submission
+      await QuestService.reviewSubmission(submissionId, status, feedback, score);
       
-      switch (action) {
-        case 'approved':
-          status = 'approved';
-          statusText = 'approved';
-          break;
-        case 'rejected':
-          status = 'rejected';
-          statusText = 'rejected';
-          break;
-        case 'needs-revision':
-          status = 'needs-revision';
-          statusText = 'marked for revision';
-          break;
-        default:
-          throw new Error(`Invalid action: ${action}`);
-      }
+      // Update local state for general submissions
+      setSubmissions(prev => prev.map(submission => {
+        if (submission.id === submissionId) {
+          return {
+            ...submission,
+            status,
+            feedback,
+            score,
+            reviewedAt: new Date().toISOString(),
+            reviewedBy: 'current_admin'
+          };
+        }
+        return submission;
+      }));
       
-      // Use the proper API service method
-      await QuestService.reviewSubmission(submissionId, status, feedback);
+      // Update quest submissions state to refresh the table
+      setQuestSubmissions(prev => prev.map(submission => {
+        if (submission.id === submissionId) {
+          return {
+            ...submission,
+            status,
+            feedback,
+            score,
+            reviewedAt: new Date().toISOString(),
+            reviewedBy: 'current_admin'
+          };
+        }
+        return submission;
+      }));
       
-      // Update local state
-      setQuestSubmissions(prev => prev.map(sub => 
-        sub.id === submissionId ? { 
-          ...sub, 
-          status,
-          feedback,
-          reviewedAt: new Date().toISOString()
-        } : sub
-      ));
-      
-      // Show success toast
       toast({
-        title: "Submission Updated",
-        description: `Submission has been successfully ${statusText}.`,
+        title: "Review Submitted",
+        description: `Submission has been ${status}.`,
         variant: "default",
       });
       
-      // Close detail dialog if open
-      if (isDetailDialogOpen) {
-        setIsDetailDialogOpen(false);
-        setSelectedDetailSubmission(null);
-      }
-      
     } catch (error) {
-      console.error('Error updating submission status:', error);
-      
-      // Show error toast
+      console.error('Error reviewing submission:', error);
       toast({
-        title: "Update Failed",
-        description: "Failed to update submission status. Please try again.",
+        title: "Review Failed",
+        description: "Failed to submit review. Please try again.",
         variant: "destructive",
       });
     } finally {
       setLoading(false);
+      setIsReviewDialogOpen(false);
+      setSelectedSubmission(null);
+      setReviewFeedback('');
+      setReviewScore(0);
     }
   };
+
+
+
+
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -509,122 +439,135 @@ export default function SubmissionReview() {
     }
   };
 
-  const openReviewDialog = (submission: Submission) => {
-    setSelectedSubmission(submission);
-    setReviewFeedback(submission.feedback || '');
-    setReviewScore(submission.score || 0);
-    setIsReviewDialogOpen(true);
-  };
 
-  const formatDate = (dateString: string) => {
-    return formatDistanceToNow(new Date(dateString), { addSuffix: true });
-  };
 
   if (view === 'quest-detail' && selectedQuest) {
     return (
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center gap-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setView('overview')}
-            className="bg-gray-800 border border-gray-600 text-green-400 hover:bg-gray-700"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Overview
-          </Button>
-          <div>
-            <h2 className="text-xl font-bold text-green-400">Quest Submissions</h2>
-            <p className="text-gray-400">Review submissions for: {selectedQuest.title}</p>
-          </div>
-        </div>
+      <>
+        <div className="space-y-6">
+          {/* Header */}
+          <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-blue-500/5">
+            <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-500/10">
+              <CardTitle className="flex items-center gap-2 font-mono">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setView('overview')}
+                  className="bg-gradient-to-r from-primary/10 to-blue-500/10 border border-dashed border-primary/30 text-primary hover:bg-primary/20 font-mono"
+                >
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  [BACK_TO_OVERVIEW]
+                </Button>
+                <div className="p-1 bg-primary/20 rounded border border-dashed border-primary/40">
+                  <Target className="w-4 h-4 text-primary" />
+                </div>
+                🎯 QUEST_SUBMISSIONS_REVIEW
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="font-mono text-muted-foreground">Review submissions for: <span className="text-primary font-bold">{selectedQuest.title}</span></p>
+            </CardContent>
+          </Card>
 
         {/* Quest Info */}
-        <Card className="bg-gray-900 border border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-white">{selectedQuest.title}</CardTitle>
+        <Card className="border-2 border-dashed border-cyan-500/20 bg-gradient-to-br from-cyan-500/5 to-blue-500/5">
+          <CardHeader className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10">
+            <CardTitle className="flex items-center gap-2 font-mono">
+              <div className="p-1 bg-cyan-500/20 rounded border border-dashed border-cyan-500/40">
+                <FileText className="w-4 h-4 text-cyan-500" />
+              </div>
+              📋 QUEST_INFO
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-400 mb-4">{selectedQuest.description}</p>
-            <div className="flex gap-4 text-sm">
-              <div className="text-gray-400">
-                Total Submissions: <span className="text-white font-medium">{questSubmissions.length}</span>
+            <p className="font-mono text-muted-foreground mb-4">{selectedQuest.description}</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm font-mono">
+              <div className="bg-gradient-to-r from-primary/10 to-blue-500/10 p-3 rounded border border-dashed border-primary/20">
+                <div className="text-muted-foreground">TOTAL:</div>
+                <div className="text-primary font-bold text-lg">{questSubmissions.length}</div>
               </div>
-              <div className="text-gray-400">
-                Pending: <span className="text-yellow-400 font-medium">{questSubmissions.filter(s => s.status === 'pending').length}</span>
+              <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 p-3 rounded border border-dashed border-yellow-500/20">
+                <div className="text-muted-foreground">PENDING:</div>
+                <div className="text-yellow-500 font-bold text-lg">{questSubmissions.filter(s => s.status === 'pending').length}</div>
               </div>
-              <div className="text-gray-400">
-                Approved: <span className="text-green-400 font-medium">{questSubmissions.filter(s => s.status === 'approved').length}</span>
+              <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 p-3 rounded border border-dashed border-green-500/20">
+                <div className="text-muted-foreground">APPROVED:</div>
+                <div className="text-green-500 font-bold text-lg">{questSubmissions.filter(s => s.status === 'approved').length}</div>
               </div>
-              <div className="text-gray-400">
-                Rejected: <span className="text-red-400 font-medium">{questSubmissions.filter(s => s.status === 'rejected').length}</span>
+              <div className="bg-gradient-to-r from-red-500/10 to-rose-500/10 p-3 rounded border border-dashed border-red-500/20">
+                <div className="text-muted-foreground">REJECTED:</div>
+                <div className="text-red-500 font-bold text-lg">{questSubmissions.filter(s => s.status === 'rejected').length}</div>
               </div>
             </div>
           </CardContent>
         </Card>
 
         {/* Quest Submissions Table */}
-        <Card className="bg-gray-900 border border-gray-700">
-          <CardHeader>
-            <CardTitle className="text-white">Submissions ({questSubmissions.length})</CardTitle>
+        <Card className="border-2 border-dashed border-purple-500/20 bg-gradient-to-br from-purple-500/5 to-blue-500/5">
+          <CardHeader className="bg-gradient-to-r from-purple-500/10 to-blue-500/10">
+            <CardTitle className="flex items-center gap-2 font-mono">
+              <div className="p-1 bg-purple-500/20 rounded border border-dashed border-purple-500/40">
+                <FileText className="w-4 h-4 text-purple-500" />
+              </div>
+              📝 SUBMISSIONS_TABLE ({questSubmissions.length})
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-b border-gray-700">
-                    <TableHead className="text-gray-400">User</TableHead>
-                    <TableHead className="text-gray-400">Content</TableHead>
-                    <TableHead className="text-gray-400">Submitted</TableHead>
-                    <TableHead className="text-gray-400">Status</TableHead>
-                    <TableHead className="text-gray-400">Validation</TableHead>
-                    <TableHead className="text-gray-400">Actions</TableHead>
+                  <TableRow className="border-b border-dashed border-purple-500/30">
+                    <TableHead className="text-muted-foreground font-mono">[USER]</TableHead>
+                    <TableHead className="text-muted-foreground font-mono">[CONTENT]</TableHead>
+                    <TableHead className="text-muted-foreground font-mono">[SUBMITTED]</TableHead>
+                    <TableHead className="text-muted-foreground font-mono">[STATUS]</TableHead>
+                    <TableHead className="text-muted-foreground font-mono">[VALIDATION]</TableHead>
+                    <TableHead className="text-muted-foreground font-mono">[ACTIONS]</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {questSubmissions.map((submission) => (
-                    <TableRow key={submission.id} className="border-b border-gray-700 hover:bg-gray-800">
+                    <TableRow key={submission.id} className="border-b border-dashed border-purple-500/20 hover:bg-gradient-to-r hover:from-purple-500/5 hover:to-blue-500/5">
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-gray-800 border border-gray-600 flex items-center justify-center">
-                            <User className="w-4 h-4 text-green-400" />
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-r from-primary/20 to-blue-500/20 border border-dashed border-primary/40 flex items-center justify-center">
+                            <User className="w-4 h-4 text-primary" />
                           </div>
                           <div>
-                            <div className="text-white">{submission.user?.name || 'Unknown User'}</div>
-                            <div className="text-xs text-gray-400">@{submission.user?.username || submission.user?.email}</div>
+                            <div className="font-mono font-medium text-foreground">{submission.user?.name || 'Unknown User'}</div>
+                            <div className="text-xs text-muted-foreground font-mono">@{submission.user?.username || submission.user?.email}</div>
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="max-w-xs">
                           {submission.content?.type === 'text' && (
-                            <p className="text-sm truncate text-gray-400">{submission.content.text}</p>
+                            <p className="text-sm truncate text-muted-foreground font-mono">{submission.content.text}</p>
                           )}
                           {submission.content?.type === 'url' && (
                             <a 
                               href={submission.content.url} 
                               target="_blank" 
                               rel="noopener noreferrer"
-                              className="text-cyan-400 hover:text-green-400 text-sm truncate block"
+                              className="text-cyan-500 hover:text-primary text-sm truncate block font-mono underline"
                             >
                               {submission.content.url}
                             </a>
                           )}
                           {submission.content?.type === 'account-id' && (
-                            <code className="text-xs bg-gray-800 border border-gray-600 px-2 py-1 rounded text-green-400">
+                            <code className="text-xs bg-gradient-to-r from-primary/10 to-blue-500/10 border border-dashed border-primary/30 px-2 py-1 rounded text-primary font-mono">
                               {submission.content.accountId}
                             </code>
                           )}
                           {submission.content?.type === 'transaction-id' && (
-                            <code className="text-xs bg-gray-800 border border-gray-600 px-2 py-1 rounded text-green-400">
+                            <code className="text-xs bg-gradient-to-r from-primary/10 to-blue-500/10 border border-dashed border-primary/30 px-2 py-1 rounded text-primary font-mono">
                               {submission.content.transactionId}
                             </code>
                           )}
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-1 text-sm text-gray-400">
+                        <div className="flex items-center gap-1 text-sm text-muted-foreground font-mono">
                           <Calendar className="w-3 h-3" />
                           {formatDistanceToNow(new Date(submission.submittedAt || submission.created_at || Date.now()), { addSuffix: true })}
                         </div>
@@ -635,7 +578,7 @@ export default function SubmissionReview() {
                           <Badge 
                             variant="secondary" 
                             className={cn(
-                              "text-xs bg-gray-800 border border-gray-600",
+                              "text-xs bg-gradient-to-r from-primary/10 to-blue-500/10 border border-dashed font-mono",
                               getStatusColor(submission.status)
                             )}
                           >
@@ -650,50 +593,396 @@ export default function SubmissionReview() {
                             variant="outline"
                             onClick={() => handleStatusUpdate(submission.id, 'approved', 'Submission approved')}
                             disabled={submission.status === 'approved' || loading}
-                            className="bg-green-900/20 border border-green-600 text-green-400 hover:bg-green-800/30 disabled:opacity-50"
+                            className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-dashed border-green-500/30 text-green-500 hover:bg-green-500/20 disabled:opacity-50 font-mono text-xs"
                           >
                             <CheckCircle className="w-3 h-3 mr-1" />
-                            Validate
+                            [VALIDATE]
                           </Button>
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={() => handleStatusUpdate(submission.id, 'rejected', 'Submission rejected')}
                             disabled={submission.status === 'rejected' || loading}
-                            className="bg-red-900/20 border border-red-600 text-red-400 hover:bg-red-800/30 disabled:opacity-50"
+                            className="bg-gradient-to-r from-red-500/10 to-rose-500/10 border border-dashed border-red-500/30 text-red-500 hover:bg-red-500/20 disabled:opacity-50 font-mono text-xs"
                           >
                             <XCircle className="w-3 h-3 mr-1" />
-                            Reject
+                            [REJECT]
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedDetailSubmission(submission);
+                              setIsDetailDialogOpen(true);
+                            }}
+                            className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-dashed border-blue-500/30 text-blue-500 hover:bg-blue-500/20 font-mono text-xs"
+                          >
+                            <Eye className="w-3 h-3 mr-1" />
+                            [DETAILS]
                           </Button>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => {
-                            setSelectedDetailSubmission(submission);
-                            setIsDetailDialogOpen(true);
-                          }}
-                          className="bg-gray-800 border border-gray-600 text-green-400 hover:bg-gray-700"
-                        >
-                          <Eye className="w-3 h-3 mr-1" />
-                          Review
-                        </Button>
+
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
               {questSubmissions.length === 0 && (
-                <div className="text-center py-8 text-gray-400">
-                  No submissions found for this quest.
+                <div className="text-center py-8">
+                  <div className="bg-gradient-to-r from-primary/10 to-blue-500/10 border border-dashed border-primary/20 rounded-lg p-6">
+                    <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="font-mono text-muted-foreground">[NO_SUBMISSIONS_FOUND]</p>
+                    <p className="font-mono text-sm text-muted-foreground/70 mt-2">This quest has no submissions yet.</p>
+                  </div>
                 </div>
               )}
             </div>
           </CardContent>
         </Card>
-      </div>
+        </div>
+
+        {/* Review Dialog */}
+        <Dialog open={isReviewDialogOpen} onOpenChange={setIsReviewDialogOpen}>
+          <DialogContent className="max-w-2xl font-mono border-2 border-dashed border-primary/30">
+            <DialogHeader>
+              <DialogTitle className="bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
+                [REVIEW_SUBMISSION]
+              </DialogTitle>
+              <DialogDescription>
+                Review and provide feedback for this submission.
+              </DialogDescription>
+            </DialogHeader>
+            {selectedSubmission && (
+              <div className="space-y-6">
+                {/* Submission Info */}
+                <div className="p-4 bg-gradient-to-r from-primary/5 to-blue-500/5 rounded-lg border border-dashed border-primary/20">
+                  <h3 className="font-mono font-bold text-primary mb-3">[SUBMISSION_INFO]</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[USER]</label>
+                      <div className="font-mono">{selectedSubmission.userName}</div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[EMAIL]</label>
+                      <div className="font-mono">{selectedSubmission.userEmail}</div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[QUEST]</label>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono">{selectedSubmission.questTitle}</span>
+                        {getDifficultyBadge(selectedSubmission.questDifficulty || 'unknown')}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[SUBMITTED]</label>
+                      <div className="font-mono text-sm">
+                        {format(new Date(selectedSubmission.submittedAt || selectedSubmission.created_at || Date.now()), 'PPp')}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="p-4 bg-gradient-to-r from-blue-500/5 to-cyan-500/5 rounded-lg border border-dashed border-blue-500/20">
+                  <h3 className="font-mono font-bold text-blue-600 mb-3">[SUBMISSION_CONTENT]</h3>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[DESCRIPTION]</label>
+                      <div className="font-mono text-sm p-3 bg-white/50 rounded border border-dashed border-blue-500/20">
+                        {selectedSubmission.description || 'No description provided'}
+                      </div>
+                    </div>
+                    {selectedSubmission.content && (
+                      <div>
+                        <label className="text-sm font-medium font-mono text-muted-foreground">[CONTENT]</label>
+                        <div className="p-3 bg-white/50 rounded border border-dashed border-blue-500/20">
+                          {selectedSubmission.content.type === 'text' && (
+                            <div className="font-mono text-sm whitespace-pre-wrap">{selectedSubmission.content.text}</div>
+                          )}
+                          {selectedSubmission.content.type === 'url' && (
+                            <a 
+                              href={selectedSubmission.content.url} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="text-blue-500 hover:underline font-mono text-sm flex items-center gap-1"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                              {selectedSubmission.content.url}
+                            </a>
+                          )}
+                          {selectedSubmission.content.type === 'account-id' && (
+                            <code className="text-sm bg-gradient-to-r from-primary/10 to-blue-500/10 border border-dashed border-primary/30 px-3 py-2 rounded text-primary font-mono block">
+                              {selectedSubmission.content.accountId}
+                            </code>
+                          )}
+                          {selectedSubmission.content.type === 'transaction-id' && (
+                            <code className="text-sm bg-gradient-to-r from-primary/10 to-blue-500/10 border border-dashed border-primary/30 px-3 py-2 rounded text-primary font-mono block">
+                              {selectedSubmission.content.transactionId}
+                            </code>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Review Form */}
+                <div className="p-4 bg-gradient-to-r from-purple-500/5 to-pink-500/5 rounded-lg border border-dashed border-purple-500/20">
+                  <h3 className="font-mono font-bold text-purple-600 mb-3">[REVIEW_FORM]</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[SCORE] (0-100)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={reviewScore}
+                        onChange={(e) => setReviewScore(Number(e.target.value))}
+                        className="w-full p-2 border border-dashed border-purple-500/30 rounded font-mono text-sm bg-white/50"
+                        placeholder="Enter score (0-100)"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[FEEDBACK]</label>
+                      <textarea
+                        value={reviewFeedback}
+                        onChange={(e) => setReviewFeedback(e.target.value)}
+                        className="w-full p-3 border border-dashed border-purple-500/30 rounded font-mono text-sm bg-white/50 min-h-[100px]"
+                        placeholder="Provide detailed feedback for the submission..."
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            <DialogFooter className="flex gap-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setIsReviewDialogOpen(false)}
+                className="font-mono border-dashed border-primary/30 text-primary hover:bg-primary/10"
+              >
+                [CANCEL]
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => selectedSubmission && handleReviewSubmission(selectedSubmission.id, 'needs_revision', reviewFeedback, reviewScore)}
+                className="font-mono bg-gradient-to-r from-orange-500/10 to-yellow-500/10 border border-dashed border-orange-500/30 text-orange-500 hover:bg-orange-500/20"
+              >
+                [NEEDS_REVISION]
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => selectedSubmission && handleReviewSubmission(selectedSubmission.id, 'rejected', reviewFeedback, reviewScore)}
+                className="font-mono bg-gradient-to-r from-red-500/10 to-rose-500/10 border border-dashed border-red-500/30 text-red-500 hover:bg-red-500/20"
+              >
+                [REJECT]
+              </Button>
+              <Button 
+                onClick={() => selectedSubmission && handleReviewSubmission(selectedSubmission.id, 'approved', reviewFeedback, reviewScore)}
+                className="font-mono bg-gradient-to-r from-green-500 to-emerald-500"
+              >
+                [APPROVE]
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Details Dialog */}
+        <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
+          <DialogContent className="max-w-4xl font-mono border-2 border-dashed border-primary/30">
+            <DialogHeader>
+              <DialogTitle className="bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
+                [SUBMISSION_DETAILS]
+              </DialogTitle>
+              <DialogDescription>
+                View detailed information about this submission.
+              </DialogDescription>
+            </DialogHeader>
+            {selectedDetailSubmission && (
+              <div className="space-y-6 max-h-[70vh] overflow-y-auto">
+                {/* User Information */}
+                <div className="p-4 bg-gradient-to-r from-primary/5 to-blue-500/5 rounded-lg border border-dashed border-primary/20">
+                  <h3 className="font-mono font-bold text-primary mb-3">[USER_INFORMATION]</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[NAME]</label>
+                      <div className="font-mono">{selectedDetailSubmission.userName}</div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[EMAIL]</label>
+                      <div className="font-mono">{selectedDetailSubmission.userEmail}</div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[USER_ID]</label>
+                      <div className="font-mono text-sm text-muted-foreground">{selectedDetailSubmission.userId}</div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[STATUS]</label>
+                      <div className="flex items-center gap-2">
+                        {getStatusIcon(selectedDetailSubmission.status)}
+                        <Badge 
+                          variant="secondary" 
+                          className={cn(
+                            "text-xs bg-gradient-to-r from-primary/10 to-blue-500/10 border border-dashed font-mono",
+                            getStatusColor(selectedDetailSubmission.status)
+                          )}
+                        >
+                          {selectedDetailSubmission.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quest Information */}
+                <div className="p-4 bg-gradient-to-r from-green-500/5 to-emerald-500/5 rounded-lg border border-dashed border-green-500/20">
+                  <h3 className="font-mono font-bold text-green-600 mb-3">[QUEST_INFORMATION]</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[TITLE]</label>
+                      <div className="font-mono">{selectedDetailSubmission.questTitle}</div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[QUEST_ID]</label>
+                      <div className="font-mono text-sm text-muted-foreground">{selectedDetailSubmission.questId}</div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[DIFFICULTY]</label>
+                      <div>{getDifficultyBadge(selectedDetailSubmission.questDifficulty || 'unknown')}</div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[POINTS]</label>
+                      <div className="flex items-center gap-1 font-mono">
+                        <Trophy className="w-4 h-4 text-yellow-500" />
+                        <span className="text-yellow-500 font-bold">{selectedDetailSubmission.questPoints}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Submission Content */}
+                <div className="p-4 bg-gradient-to-r from-blue-500/5 to-cyan-500/5 rounded-lg border border-dashed border-blue-500/20">
+                  <h3 className="font-mono font-bold text-blue-600 mb-3">[SUBMISSION_CONTENT]</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[DESCRIPTION]</label>
+                      <div className="font-mono text-sm p-3 bg-white/50 rounded border border-dashed border-blue-500/20">
+                        {selectedDetailSubmission.description || 'No description provided'}
+                      </div>
+                    </div>
+                    
+                    {selectedDetailSubmission.content && (
+                      <div>
+                        <label className="text-sm font-medium font-mono text-muted-foreground">[CONTENT_TYPE: {selectedDetailSubmission.content.type?.toUpperCase()}]</label>
+                        <div className="p-3 bg-white/50 rounded border border-dashed border-blue-500/20">
+                          {selectedDetailSubmission.content.type === 'text' && (
+                            <div className="font-mono text-sm whitespace-pre-wrap">{selectedDetailSubmission.content.text}</div>
+                          )}
+                          {selectedDetailSubmission.content.type === 'url' && (
+                            <a 
+                              href={selectedDetailSubmission.content.url} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="text-blue-500 hover:underline font-mono text-sm flex items-center gap-1"
+                            >
+                              <ExternalLink className="w-4 h-4" />
+                              {selectedDetailSubmission.content.url}
+                            </a>
+                          )}
+                          {selectedDetailSubmission.content.type === 'account-id' && (
+                            <code className="text-sm bg-gradient-to-r from-primary/10 to-blue-500/10 border border-dashed border-primary/30 px-3 py-2 rounded text-primary font-mono block">
+                              {selectedDetailSubmission.content.accountId}
+                            </code>
+                          )}
+                          {selectedDetailSubmission.content.type === 'transaction-id' && (
+                            <code className="text-sm bg-gradient-to-r from-primary/10 to-blue-500/10 border border-dashed border-primary/30 px-3 py-2 rounded text-primary font-mono block">
+                              {selectedDetailSubmission.content.transactionId}
+                            </code>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {selectedDetailSubmission.submissionUrl && (
+                      <div>
+                        <label className="text-sm font-medium font-mono text-muted-foreground">[SUBMISSION_URL]</label>
+                        <div className="p-3 bg-white/50 rounded border border-dashed border-blue-500/20">
+                          <a 
+                            href={selectedDetailSubmission.submissionUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="text-blue-500 hover:underline font-mono text-sm flex items-center gap-1"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                            {selectedDetailSubmission.submissionUrl}
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Submission Metadata */}
+                <div className="p-4 bg-gradient-to-r from-purple-500/5 to-pink-500/5 rounded-lg border border-dashed border-purple-500/20">
+                  <h3 className="font-mono font-bold text-purple-600 mb-3">[SUBMISSION_METADATA]</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[SUBMISSION_ID]</label>
+                      <div className="font-mono text-sm text-muted-foreground">{selectedDetailSubmission.id}</div>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[SUBMITTED_AT]</label>
+                      <div className="font-mono text-sm">
+                        {format(new Date(selectedDetailSubmission.submittedAt || selectedDetailSubmission.created_at || Date.now()), 'PPpp')}
+                      </div>
+                    </div>
+                    {selectedDetailSubmission.reviewedAt && (
+                      <div>
+                        <label className="text-sm font-medium font-mono text-muted-foreground">[REVIEWED_AT]</label>
+                        <div className="font-mono text-sm">
+                          {format(new Date(selectedDetailSubmission.reviewedAt), 'PPpp')}
+                        </div>
+                      </div>
+                    )}
+                    {selectedDetailSubmission.reviewedBy && (
+                      <div>
+                        <label className="text-sm font-medium font-mono text-muted-foreground">[REVIEWED_BY]</label>
+                        <div className="font-mono text-sm">{selectedDetailSubmission.reviewedBy}</div>
+                      </div>
+                    )}
+                    {selectedDetailSubmission.score !== undefined && (
+                      <div>
+                        <label className="text-sm font-medium font-mono text-muted-foreground">[SCORE]</label>
+                        <div className="font-mono text-sm font-bold text-primary">{selectedDetailSubmission.score}/100</div>
+                      </div>
+                    )}
+                    {selectedDetailSubmission.feedback && (
+                      <div className="col-span-2">
+                        <label className="text-sm font-medium font-mono text-muted-foreground">[FEEDBACK]</label>
+                        <div className="font-mono text-sm p-3 bg-white/50 rounded border border-dashed border-purple-500/20 whitespace-pre-wrap">
+                          {selectedDetailSubmission.feedback}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+            <DialogFooter>
+              <Button 
+                variant="outline" 
+                onClick={() => setIsDetailDialogOpen(false)} 
+                className="font-mono border-dashed border-primary/30 text-primary hover:bg-primary/10"
+              >
+                <ArrowLeft className="w-4 h-4 mr-1" />
+                [CLOSE]
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </>
     );
   }
 
@@ -709,203 +998,198 @@ export default function SubmissionReview() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Filters and Search */}
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder="[SEARCH_SUBMISSIONS]"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 font-mono border-dashed border-primary/30 focus:border-solid"
-              />
+          {/* Filters and Search removed as requested by user */}
+
+          {/* Table removed as requested by user */}
+
+          {/* Quest Selection with Multi-View System */}
+          <div className="flex items-center justify-between mb-6 mt-6">
+            {/* View Toggle Controls */}
+            <div className="flex items-center gap-1 bg-gradient-to-r from-primary/5 to-blue-500/5 rounded-lg p-1 border border-dashed border-primary/20">
+              <Button
+                variant={viewMode === 'card' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('card')}
+                className={cn(
+                  "font-mono text-xs h-8 px-3 transition-all duration-200",
+                  viewMode === 'card' 
+                    ? "bg-gradient-to-r from-primary to-blue-500 text-white shadow-md" 
+                    : "text-primary hover:bg-primary/10 border border-dashed border-primary/20"
+                )}
+              >
+                <Grid3X3 className="w-3 h-3 mr-1" />
+                CARD
+              </Button>
+              <Button
+                variant={viewMode === 'table' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('table')}
+                className={cn(
+                  "font-mono text-xs h-8 px-3 transition-all duration-200",
+                  viewMode === 'table' 
+                    ? "bg-gradient-to-r from-primary to-blue-500 text-white shadow-md" 
+                    : "text-primary hover:bg-primary/10 border border-dashed border-primary/20"
+                )}
+              >
+                <TableIcon className="w-3 h-3 mr-1" />
+                TABLE
+              </Button>
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('list')}
+                className={cn(
+                  "font-mono text-xs h-8 px-3 transition-all duration-200",
+                  viewMode === 'list' 
+                    ? "bg-gradient-to-r from-primary to-blue-500 text-white shadow-md" 
+                    : "text-primary hover:bg-primary/10 border border-dashed border-primary/20"
+                )}
+              >
+                <List className="w-3 h-3 mr-1" />
+                LIST
+              </Button>
             </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-48 font-mono border-dashed border-primary/30">
-                <SelectValue placeholder="[STATUS]" />
-              </SelectTrigger>
-              <SelectContent className="font-mono">
-                <SelectItem value="all">[ALL_STATUS]</SelectItem>
-                <SelectItem value="pending">[PENDING]</SelectItem>
-                <SelectItem value="approved">[APPROVED]</SelectItem>
-                <SelectItem value="needs_revision">[NEEDS_REVISION]</SelectItem>
-                <SelectItem value="rejected">[REJECTED]</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
-              <SelectTrigger className="w-44 font-mono border-dashed border-primary/30">
-                <SelectValue placeholder="[DIFFICULTY]" />
-              </SelectTrigger>
-              <SelectContent className="font-mono">
-                <SelectItem value="all">[ALL_LEVELS]</SelectItem>
-                <SelectItem value="beginner">[BEGINNER]</SelectItem>
-                <SelectItem value="intermediate">[INTERMEDIATE]</SelectItem>
-                <SelectItem value="advanced">[ADVANCED]</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
-
-          {/* Submissions Table */}
-          <div className="border-2 border-dashed border-primary/20 rounded-lg overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-gradient-to-r from-primary/5 to-blue-500/5 border-b border-dashed border-primary/20">
-                  <TableHead className="font-mono">[SUBMISSION]</TableHead>
-                  <TableHead className="font-mono">[USER]</TableHead>
-                  <TableHead className="font-mono">[QUEST]</TableHead>
-                  <TableHead className="font-mono">[STATUS]</TableHead>
-                  <TableHead className="font-mono">[SCORE]</TableHead>
-                  <TableHead className="font-mono">[SUBMITTED]</TableHead>
-                  <TableHead className="font-mono">[ACTIONS]</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredSubmissions.map((submission) => (
-                  <TableRow key={submission.id} className="border-b border-dashed border-primary/10 hover:bg-gradient-to-r hover:from-primary/5 hover:to-blue-500/5">
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="font-medium font-mono text-sm">{submission.id}</div>
-                        <div className="text-xs text-muted-foreground font-mono truncate max-w-xs">
-                          {submission.description}
-                        </div>
-                        {submission.submissionUrl && (
-                          <div className="flex items-center gap-1 text-xs">
-                            <Link className="w-3 h-3 text-blue-500" />
-                            <a href={submission.submissionUrl} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline font-mono">
-                              [VIEW_SUBMISSION]
-                            </a>
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="font-medium font-mono text-sm">{submission.userName}</div>
-                        <div className="text-xs text-muted-foreground font-mono">{submission.userEmail}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="font-medium font-mono text-sm">{submission.questTitle}</div>
-                        <div className="flex items-center gap-2">
-                          {getDifficultyBadge(submission.questDifficulty)}
-                          <div className="flex items-center gap-1 text-xs font-mono">
-                            <Trophy className="w-3 h-3 text-yellow-500" />
-                            <span>{submission.questPoints} pts</span>
-                          </div>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>{getStatusBadge(submission.status)}</TableCell>
-                    <TableCell>
-                      {submission.score !== undefined ? (
-                        <div className="flex items-center gap-1 font-mono">
-                          <Star className="w-3 h-3 text-yellow-500" />
-                          <span className="text-sm font-bold">{submission.score}/100</span>
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground font-mono text-sm">-</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="font-mono text-xs">
-                      <div className="space-y-1">
-                        <div>{formatDate(submission.submittedAt)}</div>
-                        {submission.reviewedAt && (
-                          <div className="text-muted-foreground">
-                            Reviewed: {formatDate(submission.reviewedAt)}
-                          </div>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0 border border-dashed border-purple-500/30 hover:border-solid">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="font-mono border-2 border-dashed border-purple-500/30">
-                          <DropdownMenuLabel>[ACTIONS]</DropdownMenuLabel>
-                          <DropdownMenuSeparator className="border-dashed border-purple-500/20" />
-                          <DropdownMenuItem onClick={() => openReviewDialog(submission)}>
-                            <Eye className="mr-2 h-4 w-4" />
-                            [REVIEW]
-                          </DropdownMenuItem>
-                          {submission.submissionUrl && (
-                            <DropdownMenuItem asChild>
-                              <a href={submission.submissionUrl} target="_blank" rel="noopener noreferrer" className="flex items-center">
-                                <ExternalLink className="mr-2 h-4 w-4" />
-                                [VIEW_CODE]
-                              </a>
-                            </DropdownMenuItem>
-                          )}
-                          {submission.status === 'pending' && (
-                            <>
-                              <DropdownMenuSeparator className="border-dashed border-purple-500/20" />
-                              <DropdownMenuItem onClick={() => handleReviewSubmission(submission.id, 'approved', 'Approved', 100)} className="text-green-600">
-                                <CheckCircle className="mr-2 h-4 w-4" />
-                                [QUICK_APPROVE]
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleReviewSubmission(submission.id, 'rejected', 'Rejected', 0)} className="text-red-600">
-                                <XCircle className="mr-2 h-4 w-4" />
-                                [QUICK_REJECT]
-                              </DropdownMenuItem>
-                            </>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-
-          {/* Quest Selection */}
-          <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-blue-500/5">
-            <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-500/10">
-              <CardTitle className="flex items-center gap-2 font-mono">
-                <div className="p-1 bg-primary/20 rounded border border-dashed border-primary/40">
-                  <Target className="w-4 h-4 text-primary" />
-                </div>
-                🎯 SELECT_QUEST_TO_REVIEW
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
+          {loading ? (
                 <div className="flex flex-col items-center justify-center py-12 text-gray-400">
                   <Loader2 className="w-8 h-8 animate-spin mb-4" />
                   <p className="text-lg font-medium">Loading quests...</p>
                   <p className="text-sm text-gray-500">Please wait while we fetch the available quests</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {quests.map((quest) => (
-                    <Card 
-                      key={quest.id} 
-                      className={cn(
-                        "group relative overflow-hidden border-0 bg-gradient-to-br from-primary/10 to-blue-500/10 hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-105",
-                        loading && "opacity-50 cursor-not-allowed"
-                      )} 
-                      onClick={() => !loading && handleQuestSelect(quest)}
-                    >
-                      <CardContent className="relative p-4">
-                        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-blue-500/5" />
-                        <div className="relative space-y-3">
-                          <h3 className="font-mono font-medium text-primary">{quest.title}</h3>
-                          <p className="text-muted-foreground text-sm font-mono line-clamp-2">{quest.description}</p>
-                          <div className="flex justify-between text-sm font-mono">
-                            <span className="text-muted-foreground">Total: <span className="text-primary font-bold">{quest.completions?.length || 0}</span></span>
-                            <span className="text-muted-foreground">Pending: <span className="text-yellow-500 font-bold">{quest.completions?.filter((c: any) => c.status === 'pending').length || 0}</span></span>
+                <div className="transition-all duration-300">
+                  {/* Card View */}
+                  {viewMode === 'card' && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {quests.map((quest) => (
+                        <Card 
+                          key={quest.id} 
+                          className={cn(
+                            "group relative overflow-hidden border-0 bg-gradient-to-br from-primary/10 to-blue-500/10 hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:scale-105",
+                            loading && "opacity-50 cursor-not-allowed"
+                          )} 
+                          onClick={() => !loading && handleQuestSelect(quest)}
+                        >
+                          <CardContent className="relative p-4">
+                            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-blue-500/5" />
+                            <div className="relative space-y-3">
+                              <h3 className="font-mono font-medium text-primary">{quest.title}</h3>
+                              <p className="text-muted-foreground text-sm font-mono line-clamp-2">{quest.description}</p>
+                              <div className="flex justify-between text-sm font-mono">
+                                <span className="text-muted-foreground">Total: <span className="text-primary font-bold">{quest.completions?.length || 0}</span></span>
+                                <span className="text-muted-foreground">Pending: <span className="text-yellow-500 font-bold">{quest.completions?.filter((c: any) => c.status === 'pending').length || 0}</span></span>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Table View */}
+                  {viewMode === 'table' && (
+                    <div className="border border-dashed border-primary/20 rounded-lg overflow-hidden">
+                      <Table>
+                        <TableHeader>
+                          <TableRow className="bg-gradient-to-r from-primary/10 to-blue-500/10 border-b border-dashed border-primary/20">
+                            <TableHead className="font-mono text-primary font-bold">[QUEST_TITLE]</TableHead>
+                            <TableHead className="font-mono text-primary font-bold">[DESCRIPTION]</TableHead>
+                            <TableHead className="font-mono text-primary font-bold text-center">[TOTAL]</TableHead>
+                            <TableHead className="font-mono text-primary font-bold text-center">[PENDING]</TableHead>
+                            <TableHead className="font-mono text-primary font-bold text-center">[ACTIONS]</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {quests.map((quest) => (
+                            <TableRow 
+                              key={quest.id} 
+                              className="hover:bg-gradient-to-r hover:from-primary/5 hover:to-blue-500/5 cursor-pointer transition-all duration-200 border-b border-dashed border-primary/10"
+                              onClick={() => !loading && handleQuestSelect(quest)}
+                            >
+                              <TableCell className="font-mono font-medium text-primary">{quest.title}</TableCell>
+                              <TableCell className="font-mono text-muted-foreground text-sm max-w-xs truncate">{quest.description}</TableCell>
+                              <TableCell className="font-mono text-center">
+                                <Badge variant="secondary" className="bg-primary/10 text-primary border border-dashed border-primary/20">
+                                  {quest.completions?.length || 0}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="font-mono text-center">
+                                <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600 border border-dashed border-yellow-500/20">
+                                  {quest.completions?.filter((c: any) => c.status === 'pending').length || 0}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="text-center">
+                                <Button 
+                                  size="sm" 
+                                  variant="outline"
+                                  className="font-mono text-xs border-dashed border-primary/30 text-primary hover:bg-primary/10"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    !loading && handleQuestSelect(quest);
+                                  }}
+                                >
+                                  <Eye className="w-3 h-3 mr-1" />
+                                  VIEW
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+
+                  {/* List View */}
+                  {viewMode === 'list' && (
+                    <div className="space-y-2">
+                      {quests.map((quest) => (
+                        <div 
+                          key={quest.id}
+                          className={cn(
+                            "flex items-center justify-between p-4 rounded-lg border border-dashed border-primary/20 bg-gradient-to-r from-primary/5 to-blue-500/5 hover:from-primary/10 hover:to-blue-500/10 cursor-pointer transition-all duration-200",
+                            loading && "opacity-50 cursor-not-allowed"
+                          )}
+                          onClick={() => !loading && handleQuestSelect(quest)}
+                        >
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-3">
+                              <div className="p-2 bg-primary/20 rounded border border-dashed border-primary/40">
+                                <Target className="w-4 h-4 text-primary" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-mono font-medium text-primary truncate">{quest.title}</h3>
+                                <p className="font-mono text-sm text-muted-foreground truncate">{quest.description}</p>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4 ml-4">
+                            <div className="text-center">
+                              <div className="font-mono text-sm font-bold text-primary">{quest.completions?.length || 0}</div>
+                              <div className="font-mono text-xs text-muted-foreground">TOTAL</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="font-mono text-sm font-bold text-yellow-500">{quest.completions?.filter((c: any) => c.status === 'pending').length || 0}</div>
+                              <div className="font-mono text-xs text-muted-foreground">PENDING</div>
+                            </div>
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              className="font-mono text-xs border-dashed border-primary/30 text-primary hover:bg-primary/10"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                !loading && handleQuestSelect(quest);
+                              }}
+                            >
+                              <Eye className="w-3 h-3 mr-1" />
+                              VIEW
+                            </Button>
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
-            </CardContent>
-          </Card>
 
           {/* Stats Summary */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -958,7 +1242,7 @@ export default function SubmissionReview() {
                   <label className="text-sm font-medium font-mono text-muted-foreground">[QUEST]</label>
                   <div className="font-mono">{selectedSubmission.questTitle}</div>
                   <div className="flex items-center gap-2 mt-1">
-                    {getDifficultyBadge(selectedSubmission.questDifficulty)}
+                    {getDifficultyBadge(selectedSubmission.questDifficulty || 'unknown')}
                     <div className="flex items-center gap-1 text-xs font-mono">
                       <Trophy className="w-3 h-3 text-yellow-500" />
                       <span>{selectedSubmission.questPoints} pts</span>
@@ -1044,174 +1328,200 @@ export default function SubmissionReview() {
         </DialogContent>
       </Dialog>
 
-      {/* Detailed Review Dialog */}
+      {/* Details Dialog */}
       <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto font-mono border-2 border-dashed border-primary/30">
+        <DialogContent className="max-w-4xl font-mono border-2 border-dashed border-primary/30">
           <DialogHeader>
             <DialogTitle className="bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
-              [DETAILED_SUBMISSION_REVIEW]
+              [SUBMISSION_DETAILS]
             </DialogTitle>
+            <DialogDescription>
+              View detailed information about this submission.
+            </DialogDescription>
           </DialogHeader>
-          
           {selectedDetailSubmission && (
-            <div className="space-y-6">
+            <div className="space-y-6 max-h-[70vh] overflow-y-auto">
               {/* User Information */}
-              <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-blue-500/5">
-                <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-500/10">
-                  <CardTitle className="font-mono text-primary">[USER_INFORMATION]</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-mono text-muted-foreground">[NAME]</label>
-                      <p className="font-mono text-primary">{selectedDetailSubmission.user?.name || 'Unknown User'}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-mono text-muted-foreground">[USERNAME]</label>
-                      <p className="font-mono text-primary">@{selectedDetailSubmission.user?.username || selectedDetailSubmission.user?.email || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-mono text-muted-foreground">[EMAIL]</label>
-                      <p className="font-mono text-primary">{selectedDetailSubmission.user?.email || 'N/A'}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-mono text-muted-foreground">[USER_ID]</label>
-                      <p className="font-mono text-primary">{selectedDetailSubmission.user?.id || 'N/A'}</p>
+              <div className="p-4 bg-gradient-to-r from-primary/5 to-blue-500/5 rounded-lg border border-dashed border-primary/20">
+                <h3 className="font-mono font-bold text-primary mb-3">[USER_INFORMATION]</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium font-mono text-muted-foreground">[NAME]</label>
+                    <div className="font-mono">{selectedDetailSubmission.userName}</div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium font-mono text-muted-foreground">[EMAIL]</label>
+                    <div className="font-mono">{selectedDetailSubmission.userEmail}</div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium font-mono text-muted-foreground">[USER_ID]</label>
+                    <div className="font-mono text-sm text-muted-foreground">{selectedDetailSubmission.userId}</div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium font-mono text-muted-foreground">[STATUS]</label>
+                    <div className="flex items-center gap-2">
+                      {getStatusIcon(selectedDetailSubmission.status)}
+                      <Badge 
+                        variant="secondary" 
+                        className={cn(
+                          "text-xs bg-gradient-to-r from-primary/10 to-blue-500/10 border border-dashed font-mono",
+                          getStatusColor(selectedDetailSubmission.status)
+                        )}
+                      >
+                        {selectedDetailSubmission.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      </Badge>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
+
+              {/* Quest Information */}
+              <div className="p-4 bg-gradient-to-r from-green-500/5 to-emerald-500/5 rounded-lg border border-dashed border-green-500/20">
+                <h3 className="font-mono font-bold text-green-600 mb-3">[QUEST_INFORMATION]</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium font-mono text-muted-foreground">[TITLE]</label>
+                    <div className="font-mono">{selectedDetailSubmission.questTitle}</div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium font-mono text-muted-foreground">[QUEST_ID]</label>
+                    <div className="font-mono text-sm text-muted-foreground">{selectedDetailSubmission.questId}</div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium font-mono text-muted-foreground">[DIFFICULTY]</label>
+                    <div>{getDifficultyBadge(selectedDetailSubmission.questDifficulty || 'unknown')}</div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium font-mono text-muted-foreground">[POINTS]</label>
+                    <div className="flex items-center gap-1 font-mono">
+                      <Trophy className="w-4 h-4 text-yellow-500" />
+                      <span className="text-yellow-500 font-bold">{selectedDetailSubmission.questPoints}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
               {/* Submission Content */}
-              <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-blue-500/5">
-                <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-500/10">
-                  <CardTitle className="font-mono text-primary">[SUBMISSION_CONTENT]</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {selectedDetailSubmission.content?.type === 'text' && (
-                      <div>
-                        <label className="text-sm font-mono text-muted-foreground">[TEXT_CONTENT]</label>
-                        <div className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-blue-500/5 rounded p-3 mt-1">
-                          <p className="font-mono text-primary whitespace-pre-wrap">{selectedDetailSubmission.content.text}</p>
-                        </div>
-                      </div>
-                    )}
-                    {selectedDetailSubmission.content?.type === 'url' && (
-                      <div>
-                        <label className="text-sm font-mono text-muted-foreground">[URL]</label>
-                        <div className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-blue-500/5 rounded p-3 mt-1">
+              <div className="p-4 bg-gradient-to-r from-blue-500/5 to-cyan-500/5 rounded-lg border border-dashed border-blue-500/20">
+                <h3 className="font-mono font-bold text-blue-600 mb-3">[SUBMISSION_CONTENT]</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium font-mono text-muted-foreground">[DESCRIPTION]</label>
+                    <div className="font-mono text-sm p-3 bg-white/50 rounded border border-dashed border-blue-500/20">
+                      {selectedDetailSubmission.description || 'No description provided'}
+                    </div>
+                  </div>
+                  
+                  {selectedDetailSubmission.content && (
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[CONTENT_TYPE: {selectedDetailSubmission.content.type?.toUpperCase()}]</label>
+                      <div className="p-3 bg-white/50 rounded border border-dashed border-blue-500/20">
+                        {selectedDetailSubmission.content.type === 'text' && (
+                          <div className="font-mono text-sm whitespace-pre-wrap">{selectedDetailSubmission.content.text}</div>
+                        )}
+                        {selectedDetailSubmission.content.type === 'url' && (
                           <a 
                             href={selectedDetailSubmission.content.url} 
                             target="_blank" 
-                            rel="noopener noreferrer"
-                            className="font-mono text-primary hover:text-blue-400 break-all underline"
+                            rel="noopener noreferrer" 
+                            className="text-blue-500 hover:underline font-mono text-sm flex items-center gap-1"
                           >
+                            <ExternalLink className="w-4 h-4" />
                             {selectedDetailSubmission.content.url}
                           </a>
-                        </div>
+                        )}
+                        {selectedDetailSubmission.content.type === 'account-id' && (
+                          <code className="text-sm bg-gradient-to-r from-primary/10 to-blue-500/10 border border-dashed border-primary/30 px-3 py-2 rounded text-primary font-mono block">
+                            {selectedDetailSubmission.content.accountId}
+                          </code>
+                        )}
+                        {selectedDetailSubmission.content.type === 'transaction-id' && (
+                          <code className="text-sm bg-gradient-to-r from-primary/10 to-blue-500/10 border border-dashed border-primary/30 px-3 py-2 rounded text-primary font-mono block">
+                            {selectedDetailSubmission.content.transactionId}
+                          </code>
+                        )}
                       </div>
-                    )}
-                    {selectedDetailSubmission.content?.type === 'account-id' && (
-                      <div>
-                        <label className="text-sm font-mono text-muted-foreground">[ACCOUNT_ID]</label>
-                        <div className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-blue-500/5 rounded p-3 mt-1">
-                          <code className="font-mono text-primary break-all">{selectedDetailSubmission.content.accountId}</code>
-                        </div>
+                    </div>
+                  )}
+
+                  {selectedDetailSubmission.submissionUrl && (
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[SUBMISSION_URL]</label>
+                      <div className="p-3 bg-white/50 rounded border border-dashed border-blue-500/20">
+                        <a 
+                          href={selectedDetailSubmission.submissionUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="text-blue-500 hover:underline font-mono text-sm flex items-center gap-1"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                          {selectedDetailSubmission.submissionUrl}
+                        </a>
                       </div>
-                    )}
-                    {selectedDetailSubmission.content?.type === 'transaction-id' && (
-                      <div>
-                        <label className="text-sm font-mono text-muted-foreground">[TRANSACTION_ID]</label>
-                        <div className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-blue-500/5 rounded p-3 mt-1">
-                          <code className="font-mono text-primary break-all">{selectedDetailSubmission.content.transactionId}</code>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+                    </div>
+                  )}
+                </div>
+              </div>
 
               {/* Submission Metadata */}
-              <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-blue-500/5">
-                <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-500/10">
-                  <CardTitle className="font-mono text-primary">[SUBMISSION_DETAILS]</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-mono text-muted-foreground">[STATUS]</label>
-                      <div className="flex items-center gap-2 mt-1">
-                        {getStatusIcon(selectedDetailSubmission.status)}
-                        <Badge 
-                          variant="secondary" 
-                          className={cn(
-                            "text-xs font-mono border-2 border-dashed",
-                            getStatusColor(selectedDetailSubmission.status)
-                          )}
-                        >
-                          {selectedDetailSubmission.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                        </Badge>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="text-sm font-mono text-muted-foreground">[SUBMITTED_DATE]</label>
-                      <p className="font-mono text-primary">
-                        {format(new Date(selectedDetailSubmission.submittedAt || selectedDetailSubmission.created_at || Date.now()), 'PPP p')}
-                      </p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-mono text-muted-foreground">[SUBMISSION_ID]</label>
-                      <p className="font-mono text-primary">{selectedDetailSubmission.id}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-mono text-muted-foreground">[QUEST_ID]</label>
-                      <p className="font-mono text-primary">{selectedDetailSubmission.questId || 'N/A'}</p>
+              <div className="p-4 bg-gradient-to-r from-purple-500/5 to-pink-500/5 rounded-lg border border-dashed border-purple-500/20">
+                <h3 className="font-mono font-bold text-purple-600 mb-3">[SUBMISSION_METADATA]</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium font-mono text-muted-foreground">[SUBMISSION_ID]</label>
+                    <div className="font-mono text-sm text-muted-foreground">{selectedDetailSubmission.id}</div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium font-mono text-muted-foreground">[SUBMITTED_AT]</label>
+                    <div className="font-mono text-sm">
+                      {format(new Date(selectedDetailSubmission.submittedAt || selectedDetailSubmission.created_at || Date.now()), 'PPpp')}
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-
-              {/* Action Buttons */}
-              <div className="flex justify-end gap-2 pt-4 border-t border-dashed border-primary/30">
-                <Button 
-                  variant="outline" 
-                  onClick={() => setIsDetailDialogOpen(false)}
-                  className="font-mono border-2 border-dashed border-primary/30 text-primary hover:bg-primary/10"
-                >
-                  [CLOSE]
-                </Button>
-                <Button 
-                  onClick={() => handleStatusUpdate(selectedDetailSubmission.id, 'needs-revision', 'Please review and make necessary changes')}
-                  disabled={selectedDetailSubmission.status === 'needs-revision' || loading}
-                  className="font-mono bg-yellow-600 hover:bg-yellow-700 text-white disabled:opacity-50 border-2 border-yellow-500/30"
-                >
-                  <AlertCircle className="w-4 h-4 mr-2" />
-                  [REQUEST_REVISION]
-                </Button>
-                <Button 
-                  onClick={() => handleStatusUpdate(selectedDetailSubmission.id, 'rejected', 'Submission does not meet requirements')}
-                  disabled={selectedDetailSubmission.status === 'rejected' || loading}
-                  className="font-mono bg-red-600 hover:bg-red-700 text-white disabled:opacity-50 border-2 border-red-500/30"
-                >
-                  <XCircle className="w-4 h-4 mr-2" />
-                  [REJECT]
-                </Button>
-                <Button 
-                  onClick={() => handleStatusUpdate(selectedDetailSubmission.id, 'approved', 'Great work! Submission approved.')}
-                  disabled={selectedDetailSubmission.status === 'approved' || loading}
-                  className="font-mono bg-green-600 hover:bg-green-700 text-white disabled:opacity-50 border-2 border-green-500/30"
-                >
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  [APPROVE]
-                </Button>
+                  {selectedDetailSubmission.reviewedAt && (
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[REVIEWED_AT]</label>
+                      <div className="font-mono text-sm">
+                        {format(new Date(selectedDetailSubmission.reviewedAt), 'PPpp')}
+                      </div>
+                    </div>
+                  )}
+                  {selectedDetailSubmission.reviewedBy && (
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[REVIEWED_BY]</label>
+                      <div className="font-mono text-sm">{selectedDetailSubmission.reviewedBy}</div>
+                    </div>
+                  )}
+                  {selectedDetailSubmission.score !== undefined && (
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[SCORE]</label>
+                      <div className="font-mono text-sm font-bold text-primary">{selectedDetailSubmission.score}/100</div>
+                    </div>
+                  )}
+                  {selectedDetailSubmission.feedback && (
+                    <div className="col-span-2">
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[FEEDBACK]</label>
+                      <div className="font-mono text-sm p-3 bg-white/50 rounded border border-dashed border-purple-500/20 whitespace-pre-wrap">
+                        {selectedDetailSubmission.feedback}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsDetailDialogOpen(false)} 
+              className="font-mono border-dashed border-primary/30 text-primary hover:bg-primary/10"
+            >
+              <ArrowLeft className="w-4 h-4 mr-1" />
+              [CLOSE]
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
+
     </div>
   );
 }
-
-export default SubmissionReview;

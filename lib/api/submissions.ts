@@ -3,7 +3,7 @@ import type { Submission, SubmissionContent } from '@/lib/types';
 
 export const SubmissionsApi = {
   async list(params?: { questId?: string; userId?: string }): Promise<Submission[]> {
-    const { data } = await api.get('/submissions', { params });
+    const { data } = await api.get('/quest-completions/submissions', { params });
     return data;
   },
   async getQuestCompletions(): Promise<any> {
@@ -18,8 +18,23 @@ export const SubmissionsApi = {
     submissionId: string,
     payload: { status: 'approved' | 'rejected' | 'needs-revision'; feedback?: string; points?: number }
   ): Promise<Submission> {
-    const { data } = await api.post(`/submissions/${submissionId}/review`, payload);
-    return data;
+    // Use the correct endpoint and HTTP method based on the status
+    let endpoint: string;
+    let response: any;
+    
+    if (payload.status === 'approved') {
+      endpoint = `/quest-completions/completions/${submissionId}/validate`;
+      response = await api.put(endpoint, payload);
+    } else if (payload.status === 'rejected') {
+      endpoint = `/quest-completions/completions/${submissionId}/reject`;
+      response = await api.put(endpoint, payload);
+    } else {
+      // For needs-revision, use the original review endpoint
+      endpoint = `/submissions/${submissionId}/review`;
+      response = await api.post(endpoint, payload);
+    }
+    
+    return response.data;
   }
 };
 
