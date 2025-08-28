@@ -20,6 +20,7 @@ import { Search, Plus, MoreHorizontal, Eye, Edit, Play, Pause, XCircle, Trash2, 
 import { QuestService } from '@/lib/services';
 import { CreateQuestForm } from '@/components/admin/create-quest-form';
 import { EditQuestForm } from '@/components/admin/edit-quest-form';
+import QuestDetailsModal from '@/components/admin/quest-details-modal';
 import type { Quest } from '@/lib/types';
 
 function QuestManagement() {
@@ -31,11 +32,13 @@ function QuestManagement() {
 
   const [selectedDifficulty, setSelectedDifficulty] = useState('all');
   const [selectedQuest, setSelectedQuest] = useState<Quest | null>(null);
+  const [questDetails, setQuestDetails] = useState<any>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [questToDelete, setQuestToDelete] = useState<string | null>(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
 
   useEffect(() => {
     loadQuests();
@@ -115,9 +118,30 @@ function QuestManagement() {
     }
   };
 
-  const handleViewDetails = (quest: Quest) => {
-    setSelectedQuest(quest);
-    setIsDetailsDialogOpen(true);
+  const handleViewDetails = async (quest: Quest) => {
+    try {
+      setLoadingDetails(true);
+      setSelectedQuest(quest);
+      setIsDetailsDialogOpen(true);
+      
+      // Fetch quest details with completions
+      const response = await fetch(`/api/admin/quests/${quest.id}/details`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.quests && data.quests.length > 0) {
+          setQuestDetails(data.quests[0]);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch quest details:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load quest details. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoadingDetails(false);
+    }
   };
 
   const handleEditQuest = (quest: Quest) => {
@@ -585,90 +609,21 @@ function QuestManagement() {
         </DialogContent>
       </Dialog>
 
-      {/* Quest Details Dialog */}
-      <Dialog open={isDetailsDialogOpen} onOpenChange={setIsDetailsDialogOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Quest Details</DialogTitle>
-          </DialogHeader>
-          {selectedQuest && (
-            <ScrollArea className="max-h-[60vh]">
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-semibold mb-2">{selectedQuest.title}</h3>
-                  <p className="text-gray-600 mb-4">{selectedQuest.description}</p>
-                  
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                    <div className="text-center p-3 bg-gray-50 rounded-lg">
-                      <Award className="w-6 h-6 mx-auto mb-1 text-yellow-600" />
-                      <div className="text-sm text-gray-600">Points</div>
-                      <div className="font-semibold">{selectedQuest.points}</div>
-                    </div>
-                    <div className="text-center p-3 bg-gray-50 rounded-lg">
-                      <Clock className="w-6 h-6 mx-auto mb-1 text-blue-600" />
-                      <div className="text-sm text-gray-600">Duration</div>
-                      <div className="font-semibold">{selectedQuest.estimatedTime}m</div>
-                    </div>
-                    <div className="text-center p-3 bg-gray-50 rounded-lg">
-                      <Users className="w-6 h-6 mx-auto mb-1 text-green-600" />
-                      <div className="text-sm text-gray-600">Completions</div>
-                      <div className="font-semibold">{selectedQuest.completions || 0}</div>
-                    </div>
-                    <div className="text-center p-3 bg-gray-50 rounded-lg">
-                      <Calendar className="w-6 h-6 mx-auto mb-1 text-purple-600" />
-                      <div className="text-sm text-gray-600">Updated</div>
-                      <div className="font-semibold text-xs">{selectedQuest.updatedAt ? formatDistanceToNow(new Date(selectedQuest.updatedAt), { addSuffix: true }) : 'N/A'}</div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {getDifficultyBadge(selectedQuest.difficulty)}
-                    {getStatusBadge(selectedQuest.status, selectedQuest)}
-                  </div>
-
-                  {selectedQuest.requirements && selectedQuest.requirements.length > 0 && (
-                    <div>
-                      <h4 className="font-semibold mb-2">Requirements</h4>
-                      <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
-                        {selectedQuest.requirements.map((req, index) => (
-                          <li key={index}>{req}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {(selectedQuest as any).steps && (selectedQuest as any).steps.length > 0 && (
-                    <div>
-                      <h4 className="font-semibold mb-2">Steps</h4>
-                      <ol className="list-decimal list-inside space-y-2">
-                        {(selectedQuest as any).steps.map((step: any, index: number) => (
-                          <li key={index} className="text-sm">
-                            <span className="font-medium">{step.title}</span>
-                            {step.description && (
-                              <p className="text-gray-600 ml-4 mt-1">{step.description}</p>
-                            )}
-                          </li>
-                        ))}
-                      </ol>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </ScrollArea>
-          )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDetailsDialogOpen(false)}>
-              Close
-            </Button>
-            <Button onClick={() => {
-              setIsDetailsDialogOpen(false);
-              handleEditQuest(selectedQuest!);
-            }}>
-              Edit Quest
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Quest Details Modal */}
+      <QuestDetailsModal
+        quest={selectedQuest}
+        questDetails={questDetails}
+        isOpen={isDetailsDialogOpen}
+        onClose={() => {
+          setIsDetailsDialogOpen(false);
+          setQuestDetails(null);
+        }}
+        onEdit={(quest) => {
+          setIsDetailsDialogOpen(false);
+          handleEditQuest(quest);
+        }}
+        loading={loadingDetails}
+      />
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
