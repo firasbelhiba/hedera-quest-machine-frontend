@@ -11,13 +11,16 @@ import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { Badge } from '@/components/ui/badge'
+import { Badge as BadgeUI } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
-import { CalendarIcon, CheckCircle, XCircle } from 'lucide-react'
+import { CalendarIcon, CheckCircle, XCircle, Loader2, Clock, AlertCircle, EyeOff, Eye } from 'lucide-react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { cn } from '@/lib/utils'
 import { format } from 'date-fns'
 import { QuestService } from '@/lib/services'
+import { Badge, Event } from '@/lib/types'
+import { useToast } from '@/hooks/use-toast'
 import DOMPurify from 'dompurify'
 
 // Input sanitization helper
@@ -48,10 +51,10 @@ const createQuestSchema = z.object({
     .max(10000, 'Reward cannot exceed 10,000 points')
     .int('Reward must be a whole number'),
   difficulty: z.enum(['easy', 'medium', 'hard', 'expert'], {
-    errorMap: () => ({ message: 'Please select a valid difficulty level' })
+    message: 'Please select a valid difficulty level'
   }),
   status: z.enum(['draft', 'active', 'completed', 'expired'], {
-    errorMap: () => ({ message: 'Please select a valid status' })
+    message: 'Please select a valid status'
   }),
   startDate: z.string()
     .min(1, 'Start date is required')
@@ -242,7 +245,7 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
     const hasFieldErrors = Object.keys(validationErrors).length > 0;
     const hasDateErrors = dateErrors.length > 0;
     
-    setIsFormValid(isValid && !hasFieldErrors && !hasDateErrors && startDate && endDate);
+    setIsFormValid(isValid && !hasFieldErrors && !hasDateErrors && !!startDate && !!endDate);
   }, [isValid, validationErrors, startDate, endDate, validateDates]);
 
   // Trigger date validation when dates change
@@ -331,12 +334,6 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
         badgeIds: selectedBadges.length > 0 ? selectedBadges : undefined,
         quest_link: data.quest_link ? sanitizeInput(data.quest_link.trim()) : undefined
       };
-
-      // Remove the setValue calls that were added earlier as they're not needed here
-      delete questData.startDate;
-      delete questData.endDate;
-      questData.startDate = formatDateTime(startDate, startTime);
-      questData.endDate = formatDateTime(endDate, endTime);
       
       await QuestService.createQuest(questData);
       console.log('Quest created successfully');

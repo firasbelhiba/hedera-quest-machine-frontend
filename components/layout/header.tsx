@@ -19,22 +19,15 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
 import useStore from '@/lib/store';
-import { UsersApi, type AdminNotification } from '@/lib/api/users';
+import { UsersApi } from '@/lib/api/users';
 import { useWebSocket } from '@/hooks/use-websocket';
 
 interface HeaderProps {
   onMenuClick: () => void;
 }
 
-interface Notification {
-  id: string;
-  type: 'quest_completed' | 'submission_approved' | 'submission_rejected' | 'new_quest' | 'event_reminder' | 'system';
-  title: string;
-  message: string;
-  timestamp: string;
-  read: boolean;
-  actionUrl?: string;
-}
+// Using the Notification interface from users.ts
+import type { Notification, AdminNotification } from '@/lib/api/users';
 
 // Notifications will be loaded from API
 const initialNotifications: Notification[] = [];
@@ -201,8 +194,8 @@ export function Header({ onMenuClick }: HeaderProps) {
     router.push('/');
   };
 
-  const getNotificationIcon = (type: string) => {
-    switch (type) {
+  const getNotificationIcon = (notifType: string) => {
+    switch (notifType) {
       case 'quest_completed':
         return <Trophy className="w-4 h-4 text-yellow-500" />;
       case 'submission_approved':
@@ -288,14 +281,12 @@ export function Header({ onMenuClick }: HeaderProps) {
 
   const handleNotificationClick = (notification: Notification | AdminNotification) => {
     markAsRead(notification.id.toString());
-    if ('actionUrl' in notification && notification.actionUrl) {
-      window.location.href = notification.actionUrl;
-    } else if (notification.quest_id) {
+    if (notification.quest_id) {
       // Navigate to quest details
       if (isAdminPage) {
-        window.location.href = `/admin/quests/${notification.quest_id}`;
+        router.push(`/admin/quests/${notification.quest_id}`);
       } else {
-        window.location.href = `/quests/${notification.quest_id}`;
+        router.push(`/quests/${notification.quest_id}`);
       }
     }
   };
