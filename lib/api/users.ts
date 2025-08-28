@@ -12,6 +12,15 @@ export interface Notification {
   admin_id: number | null;
 }
 
+export interface AdminNotification {
+  id: number;
+  type: 'pending_quest' | 'quest_validated' | 'quest_rejected';
+  message: string;
+  createdAt: string;
+  seen: boolean;
+  quest_id?: number;
+}
+
 export const UsersApi = {
   async get(userId: string): Promise<User> {
     const { data } = await api.get(`/api/users/${userId}`);
@@ -27,6 +36,15 @@ export const UsersApi = {
   },
   async getUnreadNotificationCount(): Promise<{ status: string; unreadCount: number }> {
     const { data } = await api.get('/user/notification/number');
+    return data;
+  },
+  // Admin notification functions
+  async getAdminNotifications(): Promise<{ notifications: AdminNotification[] }> {
+    const { data } = await api.get('/admin/notifications');
+    return data;
+  },
+  async getAdminUnreadNotificationCount(): Promise<{ status: string; unreadCount: number }> {
+    const { data } = await api.get('/admin/notification/number');
     return data;
   }
 };
