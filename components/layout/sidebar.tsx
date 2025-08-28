@@ -17,7 +17,6 @@ import {
   Settings,
   Shield,
   FileText,
-  Calendar,
   ChevronLeft,
   ChevronRight,
   Award,
@@ -37,7 +36,6 @@ const adminNavigation = [
   { name: '[ADMIN_DASHBOARD]', href: '/admin', icon: Shield },
   { name: '[MANAGE_BADGES]', href: '/admin/badges', icon: Award },
   { name: '[REVIEW_SUBMISSIONS]', href: '/admin/submissions', icon: FileText },
-  { name: '[EVENTS]', href: '/admin/events', icon: Calendar },
   { name: '[SETTINGS]', href: '/admin/settings', icon: Settings },
 ];
 
