@@ -10,7 +10,7 @@ let wsReconnectTimeout: NodeJS.Timeout | null = null;
 let wsReconnectAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 5;
 const RECONNECT_INTERVAL = 3000;
-const WEBSOCKET_URL = process.env.NEXT_PUBLIC_WS_URL || 'wss://localhost:8080';
+const WEBSOCKET_URL = process.env.NEXT_PUBLIC_WS_URL || process.env.NEXT_PUBLIC_API_URL?.replace('http', 'ws') || 'wss://localhost:8080';
 
 // WebSocket event handlers
 type WebSocketHandlers = {

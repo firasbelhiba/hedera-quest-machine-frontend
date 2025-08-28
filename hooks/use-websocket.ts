@@ -31,7 +31,9 @@ interface UseWebSocketReturn {
   disconnect: () => void;
 }
 
-const WEBSOCKET_URL = process.env.NEXT_PUBLIC_WS_URL || 'wss://localhost:8080';
+
+
+const WEBSOCKET_URL = process.env.NEXT_PUBLIC_WS_URL || process.env.NEXT_PUBLIC_API_URL?.replace('http', 'ws') || 'wss://hedera-quests.com';
 
 export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketReturn {
   const {
