@@ -1,74 +1,96 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { DollarSign, Star, Eye, EyeOff, Minimize2, Maximize2, Lock } from 'lucide-react';
+import { DollarSign, Star, Eye, EyeOff, Minimize2, Maximize2, Lock, Settings, TrendingUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import useStore from '@/lib/store';
 
 interface BalanceWidgetProps {
   className?: string;
+  conversionRate?: number;
+  showClaimButton?: boolean;
+  enableAnimations?: boolean;
 }
 
-export function BalanceWidget({ className }: BalanceWidgetProps) {
+interface WidgetConfig {
+  isMinimized: boolean;
+  showBalance: boolean;
+}
+
+const STORAGE_KEY = 'balance-widget-config';
+const DEFAULT_CONVERSION_RATE = 0.001; // $0.001 per point
+
+export function BalanceWidget({ 
+  className, 
+  conversionRate = DEFAULT_CONVERSION_RATE,
+  showClaimButton = true,
+  enableAnimations = true 
+}: BalanceWidgetProps) {
   const { user } = useStore();
   const [isMinimized, setIsMinimized] = useState(false);
   const [showBalance, setShowBalance] = useState(true);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
-  // Points conversion rate should be configurable
+  // Enhanced balance calculations
   const pointsBalance = user?.points || 0;
-  const conversionRate = 0; // Will be provided by API/config
-  const dollarBalance = (pointsBalance * conversionRate).toFixed(2);
+  const dollarBalance = (pointsBalance * conversionRate).toFixed(3);
+  const isPositiveBalance = pointsBalance > 0;
 
-  // Set initial position to bottom-right corner
+  // Load saved configuration
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setPosition({
-        x: window.innerWidth - 220,
-        y: window.innerHeight - 120
-      });
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const config = JSON.parse(saved);
+          setIsMinimized(config.isMinimized || false);
+          setShowBalance(config.showBalance !== false);
+        }
+      } catch (error) {
+        console.warn('Failed to load balance widget config:', error);
+      }
     }
   }, []);
 
-  // Handle drag functionality
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    const rect = e.currentTarget.getBoundingClientRect();
-    setDragOffset({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
-    });
-  };
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isDragging) {
-        setPosition({
-          x: Math.max(0, Math.min(window.innerWidth - 200, e.clientX - dragOffset.x)),
-          y: Math.max(0, Math.min(window.innerHeight - 100, e.clientY - dragOffset.y))
-        });
+  // Save configuration to localStorage
+  const saveConfig = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const config = {
+          isMinimized,
+          showBalance
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+      } catch (error) {
+        console.warn('Failed to save balance widget config:', error);
       }
-    };
-
-    const handleMouseUp = () => {
-      setIsDragging(false);
-    };
-
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
     }
+  }, [isMinimized, showBalance]);
 
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging, dragOffset]);
+  // Save config when state changes
+  useEffect(() => {
+    const timeoutId = setTimeout(saveConfig, 500); // Debounce saves
+    return () => clearTimeout(timeoutId);
+  }, [saveConfig]);
+
+
+
+  // Enhanced toggle functions with animations
+  const toggleMinimized = useCallback(() => {
+    setIsMinimized(prev => !prev);
+  }, []);
+
+  const toggleBalance = useCallback(() => {
+    setShowBalance(prev => !prev);
+  }, []);
+
+  const toggleSettings = useCallback(() => {
+    setShowSettings(prev => !prev);
+  }, []);
 
   // Don't show for admin users or if user is not logged in
   if (!user || user.role === 'admin') {
@@ -78,105 +100,211 @@ export function BalanceWidget({ className }: BalanceWidgetProps) {
   return (
     <div
       className={cn(
-        'fixed z-50 transition-all duration-200 select-none',
-        isDragging && 'cursor-grabbing',
+        'fixed top-16 right-4 z-50 select-none group',
+        'transition-all duration-300 ease-out',
+        enableAnimations && 'animate-in fade-in slide-in-from-top-4',
         className
       )}
       style={{
-        left: `${position.x}px`,
-        top: `${position.y}px`,
-        width: isMinimized ? 'auto' : '200px'
+        width: isMinimized ? 'auto' : '220px'
       }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      role="dialog"
+      aria-label="Balance Widget"
+      aria-live="polite"
     >
-      <Card className="border-2 border-dashed border-primary/30 bg-gradient-to-br from-primary/10 to-purple-500/10 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-200">
-        <CardContent className="p-3">
-          {isMinimized ? (
-            // Minimized view
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0 cursor-grab active:cursor-grabbing"
-                onMouseDown={handleMouseDown}
-              >
-                <DollarSign className="w-3 h-3 text-green-500" />
-              </Button>
-              <Badge className="bg-green-500/20 text-green-700 border-green-500/30 font-mono text-xs">
-                ${showBalance ? dollarBalance : '••••'}
-              </Badge>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 w-6 p-0"
-                onClick={() => setIsMinimized(false)}
-              >
-                <Maximize2 className="w-3 h-3" />
-              </Button>
-            </div>
-          ) : (
-            // Full view
-            <div className="space-y-2">
-              {/* Header with drag handle and controls */}
-              <div className="flex items-center justify-between">
-                <div 
-                  className="flex items-center gap-2 cursor-grab active:cursor-grabbing flex-1"
-                  onMouseDown={handleMouseDown}
-                >
-                  <div className="p-1 bg-primary/20 rounded border border-dashed border-primary/40">
-                    <DollarSign className="w-3 h-3 text-primary" />
-                  </div>
-                  <span className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
-                    Balance
-                  </span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 w-6 p-0"
-                    onClick={() => setShowBalance(!showBalance)}
-                  >
-                    {showBalance ? (
-                      <Eye className="w-3 h-3" />
-                    ) : (
-                      <EyeOff className="w-3 h-3" />
-                    )}
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-6 w-6 p-0"
-                    onClick={() => setIsMinimized(true)}
-                  >
-                    <Minimize2 className="w-3 h-3" />
-                  </Button>
-                </div>
-              </div>
-
-              {/* Balance Display */}
-              <div className="space-y-2">
-                <div className="text-lg font-bold font-mono bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                  ${showBalance ? dollarBalance : '••••••'}
-                </div>
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Star className="w-3 h-3 text-purple-500" />
-                  <span className="font-mono">
-                    {showBalance ? pointsBalance.toLocaleString() : '••••'} pts
-                  </span>
+      <Card className={cn(
+        'border-2 border-dashed transition-all duration-300',
+        'backdrop-blur-md shadow-lg',
+        isHovered ? 'shadow-2xl scale-[1.02]' : 'shadow-lg',
+        isPositiveBalance 
+          ? 'border-emerald-400/40 bg-gradient-to-br from-emerald-50/80 to-green-100/60 dark:from-emerald-950/40 dark:to-green-950/30'
+          : 'border-slate-400/40 bg-gradient-to-br from-slate-50/80 to-slate-100/60 dark:from-slate-950/40 dark:to-slate-900/30'
+      )}>
+        <CardContent className="p-3 relative overflow-hidden">
+          {/* Animated background gradient */}
+          <div className={cn(
+            'absolute inset-0 opacity-20 transition-opacity duration-500',
+            isHovered && 'opacity-30',
+            isPositiveBalance 
+              ? 'bg-gradient-to-br from-emerald-400 via-green-400 to-teal-400'
+              : 'bg-gradient-to-br from-slate-400 via-slate-500 to-slate-600'
+          )} />
+          
+          {/* Content */}
+          <div className="relative z-10">
+            {isMinimized ? (
+              // Enhanced Minimized view
+              <div className="flex items-center gap-2 animate-in slide-in-from-left-2">
+                <div className={cn(
+                  'h-7 w-7 p-0 rounded-full transition-all duration-200 flex items-center justify-center',
+                  'hover:scale-110 hover:bg-white/20'
+                )}>
+                  <DollarSign className={cn(
+                    'w-4 h-4 transition-colors duration-200',
+                    isPositiveBalance ? 'text-emerald-600' : 'text-slate-600'
+                  )} />
                 </div>
                 
-                {/* Claim Button */}
-                <Button 
-                  disabled 
-                  size="sm" 
-                  className="w-full h-7 text-xs bg-muted/50 hover:bg-muted/50 cursor-not-allowed"
+                <Badge className={cn(
+                  'font-mono text-xs font-semibold transition-all duration-200',
+                  'border backdrop-blur-sm',
+                  isPositiveBalance 
+                    ? 'bg-emerald-500/20 text-emerald-700 border-emerald-500/30 dark:text-emerald-300'
+                    : 'bg-slate-500/20 text-slate-700 border-slate-500/30 dark:text-slate-300'
+                )}>
+                  {isPositiveBalance && <TrendingUp className="w-3 h-3 inline mr-1" />}
+                  ${showBalance ? dollarBalance : '••••'}
+                </Badge>
+                
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0 rounded-full hover:scale-110 hover:bg-white/20 transition-all duration-200"
+                  onClick={toggleMinimized}
+                  aria-label="Expand widget"
                 >
-                  <Lock className="w-3 h-3 mr-1" />
-                  Claim Locked
+                  <Maximize2 className="w-3 h-3" />
                 </Button>
               </div>
-            </div>
-          )}
+            ) : (
+              // Enhanced Full view
+              <div className="space-y-3 animate-in slide-in-from-right-2">
+                {/* Enhanced Header with drag handle and controls */}
+                <div className="flex items-center justify-between">
+                  <div 
+                    className={cn(
+                      'flex items-center gap-2 flex-1 p-1 rounded-lg transition-all duration-200'
+                    )}
+                  >
+                    <div className={cn(
+                      'p-1.5 rounded-lg border border-dashed transition-all duration-200',
+                      isPositiveBalance 
+                        ? 'bg-emerald-500/20 border-emerald-400/40'
+                        : 'bg-slate-500/20 border-slate-400/40'
+                    )}>
+                      <DollarSign className={cn(
+                        'w-4 h-4 transition-colors duration-200',
+                        isPositiveBalance ? 'text-emerald-600' : 'text-slate-600'
+                      )} />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
+                        Balance
+                      </span>
+                      {isPositiveBalance && (
+                        <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400">
+                          +{((pointsBalance / 1000) * 100).toFixed(1)}%
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 w-7 p-0 rounded-full hover:scale-110 hover:bg-white/20 transition-all duration-200"
+                      onClick={toggleSettings}
+                      aria-label="Widget settings"
+                    >
+                      <Settings className="w-3 h-3" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 w-7 p-0 rounded-full hover:scale-110 hover:bg-white/20 transition-all duration-200"
+                      onClick={toggleBalance}
+                      aria-label={showBalance ? 'Hide balance' : 'Show balance'}
+                    >
+                      {showBalance ? (
+                        <Eye className="w-3 h-3" />
+                      ) : (
+                        <EyeOff className="w-3 h-3" />
+                      )}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 w-7 p-0 rounded-full hover:scale-110 hover:bg-white/20 transition-all duration-200"
+                      onClick={toggleMinimized}
+                      aria-label="Minimize widget"
+                    >
+                      <Minimize2 className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Enhanced Balance Display */}
+                <div className="space-y-3">
+                  {/* Main Balance */}
+                  <div className="text-center">
+                    <div className={cn(
+                      'text-2xl font-bold font-mono transition-all duration-300',
+                      'bg-gradient-to-r bg-clip-text text-transparent',
+                      isPositiveBalance 
+                        ? 'from-emerald-600 via-green-600 to-teal-600'
+                        : 'from-slate-600 via-slate-700 to-slate-800',
+                      isHovered && 'scale-105'
+                    )}>
+                      ${showBalance ? dollarBalance : '••••••'}
+                    </div>
+                    
+                    {/* Points Display */}
+                    <div className="flex items-center justify-center gap-1.5 mt-1">
+                      <Star className={cn(
+                        'w-3 h-3 transition-colors duration-200',
+                        isPositiveBalance ? 'text-emerald-500' : 'text-slate-500'
+                      )} />
+                      <span className={cn(
+                        'font-mono text-sm font-medium transition-colors duration-200',
+                        isPositiveBalance ? 'text-emerald-700 dark:text-emerald-300' : 'text-slate-600 dark:text-slate-400'
+                      )}>
+                        {showBalance ? pointsBalance.toLocaleString() : '••••'} pts
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Settings Panel */}
+                  {showSettings && (
+                    <div className="space-y-2 p-2 bg-black/5 dark:bg-white/5 rounded-lg border border-dashed border-current/20 animate-in slide-in-from-top-2">
+                      <div className="text-xs font-mono text-muted-foreground uppercase tracking-wider text-center">
+                        Settings
+                      </div>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground">Conversion Rate:</span>
+                        <span className="font-mono">${conversionRate.toFixed(4)}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-muted-foreground">Animations:</span>
+                        <span className="font-mono">{enableAnimations ? 'ON' : 'OFF'}</span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Enhanced Claim Button */}
+                  {showClaimButton && (
+                    <Button 
+                      disabled 
+                      size="sm" 
+                      className={cn(
+                        'w-full h-8 text-xs font-mono transition-all duration-200',
+                        'bg-gradient-to-r border border-dashed',
+                        isPositiveBalance
+                          ? 'from-emerald-500/10 to-green-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300'
+                          : 'from-slate-500/10 to-slate-600/10 border-slate-500/30 text-slate-600 dark:text-slate-400',
+                        'cursor-not-allowed opacity-60'
+                      )}
+                    >
+                      <Lock className="w-3 h-3 mr-1.5" />
+                      CLAIM LOCKED
+                    </Button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>
