@@ -80,7 +80,7 @@ interface Submission {
   userId: string;
   userName: string;
   userEmail: string;
-  status: 'pending' | 'approved' | 'rejected' | 'needs_revision';
+  status: 'pending' | 'approved' | 'rejected' | 'needs-revision';
   submittedAt: string;
   reviewedAt?: string;
   reviewedBy?: string;
@@ -246,7 +246,7 @@ export default function SubmissionReview({ className }: SubmissionReviewProps = 
         return <Badge className="bg-green-500/10 text-green-500 border-green-500/20 font-mono"><CheckCircle className="w-3 h-3 mr-1" />APPROVED</Badge>;
       case 'pending':
         return <Badge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20 font-mono"><Clock className="w-3 h-3 mr-1" />PENDING</Badge>;
-      case 'needs_revision':
+      case 'needs-revision':
         return <Badge className="bg-orange-500/10 text-orange-500 border-orange-500/20 font-mono"><AlertCircle className="w-3 h-3 mr-1" />NEEDS_REVISION</Badge>;
       case 'rejected':
         return <Badge className="bg-red-500/10 text-red-500 border-red-500/20 font-mono"><XCircle className="w-3 h-3 mr-1" />REJECTED</Badge>;
@@ -342,11 +342,11 @@ export default function SubmissionReview({ className }: SubmissionReviewProps = 
   };
 
   // Function to handle status updates from quick action buttons
-  const handleStatusUpdate = async (submissionId: string, status: 'approved' | 'rejected' | 'needs_revision', feedback: string) => {
+  const handleStatusUpdate = async (submissionId: string, status: 'approved' | 'rejected' | 'needs-revision', feedback: string) => {
     await handleReviewSubmission(submissionId, status, feedback, status === 'approved' ? 100 : 0);
   };
 
-  const handleReviewSubmission = async (submissionId: string, status: 'approved' | 'rejected' | 'needs_revision', feedback: string, score: number) => {
+  const handleReviewSubmission = async (submissionId: string, status: 'approved' | 'rejected' | 'needs-revision', feedback: string, score: number) => {
     try {
       setLoading(true);
       
@@ -767,7 +767,7 @@ export default function SubmissionReview({ className }: SubmissionReviewProps = 
               </Button>
               <Button 
                 variant="outline"
-                onClick={() => selectedSubmission && handleReviewSubmission(selectedSubmission.id, 'needs_revision', reviewFeedback, reviewScore)}
+                onClick={() => selectedSubmission && handleReviewSubmission(selectedSubmission.id, 'needs-revision', reviewFeedback, reviewScore)}
                 className="font-mono bg-gradient-to-r from-orange-500/10 to-yellow-500/10 border border-dashed border-orange-500/30 text-orange-500 hover:bg-orange-500/20"
               >
                 [NEEDS_REVISION]
@@ -1307,7 +1307,7 @@ export default function SubmissionReview({ className }: SubmissionReviewProps = 
               [CANCEL]
             </Button>
             <Button 
-              onClick={() => selectedSubmission && handleReviewSubmission(selectedSubmission.id, 'needs_revision', reviewFeedback, reviewScore)}
+              onClick={() => selectedSubmission && handleReviewSubmission(selectedSubmission.id, 'needs-revision', reviewFeedback, reviewScore)}
               className="font-mono bg-gradient-to-r from-orange-500 to-yellow-500"
             >
               [NEEDS_REVISION]

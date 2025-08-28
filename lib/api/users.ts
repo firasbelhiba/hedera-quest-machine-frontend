@@ -26,6 +26,10 @@ export interface AdminNotification {
 }
 
 export const UsersApi = {
+  async list(): Promise<User[]> {
+    const { data } = await api.get('/api/users');
+    return data;
+  },
   async get(userId: string): Promise<User> {
     const { data } = await api.get(`/api/users/${userId}`);
     return data;
