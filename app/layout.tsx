@@ -2,13 +2,14 @@
 
 import './globals.css';
 import { Inter } from 'next/font/google';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ThemeProvider } from '@/components/ui/theme-provider';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
 import { ConditionalLayout } from '@/components/layout/conditional-layout';
 import { AuthPage } from '@/components/auth/auth-page';
+import { SocialMediaPromptModal } from '@/components/admin/social-media-prompt-modal';
 import { User } from '@/lib/types';
 import useStore from '@/lib/store';
 import { Suspense } from 'react';
@@ -25,6 +26,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [showSocialMediaPrompt, setShowSocialMediaPrompt] = useState(false);
+  const [hasCheckedSocialMedia, setHasCheckedSocialMedia] = useState(false);
   const { user, isAuthenticated, isLoading, loadCurrentUser, setUser } = useStore();
   const router = useRouter();
 
@@ -37,6 +40,24 @@ export default function RootLayout({
       router.push('/');
     }
   };
+
+  // Check for missing social media connections for admin users
+  useEffect(() => {
+    if (user && user.role === 'admin' && isAuthenticated && !isLoading && !hasCheckedSocialMedia) {
+      const hasMissingSocialMedia = !user.twitterProfile || !user.facebookProfile || !user.discordProfile;
+      
+      if (hasMissingSocialMedia) {
+        // Small delay to ensure the admin interface is fully loaded
+        const timer = setTimeout(() => {
+          setShowSocialMediaPrompt(true);
+        }, 1000);
+        
+        return () => clearTimeout(timer);
+      }
+      
+      setHasCheckedSocialMedia(true);
+    }
+  }, [user, isAuthenticated, isLoading, hasCheckedSocialMedia]);
 
   // Authentication is now handled by ClientProvider
 
@@ -74,6 +95,16 @@ export default function RootLayout({
                         </div>
                       </main>
                     </div>
+                    
+                    {/* Social Media Prompt Modal */}
+                    <SocialMediaPromptModal
+                      user={user}
+                      isOpen={showSocialMediaPrompt}
+                      onClose={() => {
+                        setShowSocialMediaPrompt(false);
+                        setHasCheckedSocialMedia(true);
+                      }}
+                    />
                   </div>
                 ) : (
                   <ConditionalLayout>

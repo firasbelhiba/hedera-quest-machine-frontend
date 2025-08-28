@@ -16,11 +16,13 @@ export interface Notification {
 
 export interface AdminNotification {
   id: number;
-  type: 'pending_quest' | 'quest_validated' | 'quest_rejected';
-  message: string;
-  createdAt: string;
+  notif_type: 'pending_quest' | 'quest_validated' | 'quest_rejected';
+  created_at: string;
+  updated_at: string;
   seen: boolean;
-  quest_id?: number;
+  quest_id: number;
+  to_user: number | null;
+  admin_id: number;
 }
 
 export const UsersApi = {

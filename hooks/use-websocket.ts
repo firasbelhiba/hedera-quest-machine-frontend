@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { getToken } from '../lib/api/client';
+import { tokenStorage } from '../lib/api/client';
 
 interface WebSocketMessage {
   type: string;
@@ -69,7 +69,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}): UseWebSocketRet
     setError(null);
 
     try {
-      const token = getToken();
+      const token = tokenStorage.getAccessToken();
       if (!token) {
         throw new Error('No authentication token available');
       }

@@ -84,6 +84,37 @@ export function Header({ onMenuClick }: HeaderProps) {
     return { title, message };
   };
 
+  // Helper function to generate admin notification title and message
+  const generateAdminNotificationContent = (notification: AdminNotification) => {
+    const title = (() => {
+      switch (notification.notif_type) {
+        case 'pending_quest':
+          return '[PENDING_QUEST]';
+        case 'quest_validated':
+          return '[QUEST_VALIDATED]';
+        case 'quest_rejected':
+          return '[QUEST_REJECTED]';
+        default:
+          return '[ADMIN_NOTIFICATION]';
+      }
+    })();
+
+    const message = (() => {
+      switch (notification.notif_type) {
+        case 'pending_quest':
+          return `A quest submission is pending review. Quest ID: ${notification.quest_id}`;
+        case 'quest_validated':
+          return `Quest submission has been validated. Quest ID: ${notification.quest_id}`;
+        case 'quest_rejected':
+          return `Quest submission has been rejected. Quest ID: ${notification.quest_id}`;
+        default:
+          return 'You have a new admin notification';
+      }
+    })();
+
+    return { title, message };
+  };
+
   // Load current user on component mount
   useEffect(() => {
     loadCurrentUser();
@@ -170,16 +201,20 @@ export function Header({ onMenuClick }: HeaderProps) {
     router.push('/');
   };
 
-  const getNotificationIcon = (type: Notification['type']) => {
+  const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'quest_completed':
         return <Trophy className="w-4 h-4 text-yellow-500" />;
       case 'submission_approved':
+      case 'quest_validated':
         return <Check className="w-4 h-4 text-green-500" />;
       case 'submission_rejected':
+      case 'quest_rejected':
         return <X className="w-4 h-4 text-red-500" />;
       case 'new_quest':
         return <Bell className="w-4 h-4 text-blue-500" />;
+      case 'pending_quest':
+        return <Clock className="w-4 h-4 text-orange-500" />;
       case 'event_reminder':
         return <Users className="w-4 h-4 text-purple-500" />;
       case 'system':
@@ -255,9 +290,13 @@ export function Header({ onMenuClick }: HeaderProps) {
     markAsRead(notification.id.toString());
     if ('actionUrl' in notification && notification.actionUrl) {
       window.location.href = notification.actionUrl;
-    } else if ('quest_id' in notification && notification.quest_id) {
-      // Navigate to quest details for admin notifications
-      window.location.href = `/admin/quests/${notification.quest_id}`;
+    } else if (notification.quest_id) {
+      // Navigate to quest details
+      if (isAdminPage) {
+        window.location.href = `/admin/quests/${notification.quest_id}`;
+      } else {
+        window.location.href = `/quests/${notification.quest_id}`;
+      }
     }
   };
 
@@ -343,23 +382,23 @@ export function Header({ onMenuClick }: HeaderProps) {
                       onClick={() => handleNotificationClick(notification)}
                     >
                       <div className="flex-shrink-0 mt-0.5">
-                        {getNotificationIcon(isAdminPage ? (notification as AdminNotification).type : (notification as Notification).notif_type)}
+                        {getNotificationIcon(isAdminPage ? (notification as AdminNotification).notif_type : (notification as Notification).notif_type)}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <p className="text-sm font-medium truncate">
-                              {isAdminPage ? `[${(notification as AdminNotification).type?.toUpperCase() || 'NOTIFICATION'}]` : generateNotificationContent(notification as Notification).title}
+                              {isAdminPage ? generateAdminNotificationContent(notification as AdminNotification).title : generateNotificationContent(notification as Notification).title}
                             </p>
                            {!(isAdminPage ? (notification as AdminNotification).seen : (notification as Notification).seen) && (
                              <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
                            )}
                         </div>
                         <p className="text-xs text-muted-foreground line-clamp-2 mb-1">
-                            {isAdminPage ? (notification as AdminNotification).message : generateNotificationContent(notification as Notification).message}
+                            {isAdminPage ? generateAdminNotificationContent(notification as AdminNotification).message : generateNotificationContent(notification as Notification).message}
                           </p>
                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
                            <Clock className="w-3 h-3" />
-                           {formatTimestamp(isAdminPage ? (notification as AdminNotification).createdAt : (notification as Notification).created_at)}
+                           {formatTimestamp((notification as AdminNotification | Notification).created_at)}
                          </div>
                       </div>
                     </DropdownMenuItem>
