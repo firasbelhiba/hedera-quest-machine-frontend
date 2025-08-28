@@ -497,7 +497,20 @@ export default function ProfilePage() {
                     </div>
                   </div>
 
-              
+                  <div className="space-y-2">
+                    <Label className="font-mono text-sm text-primary">MEMBER_SINCE</Label>
+                    <div className="p-3 border-2 border-dashed border-primary/20 bg-gradient-to-r from-primary/5 to-purple-500/5 rounded-md">
+                      <p className="font-mono text-sm">
+                        {profileData?.user?.created_at 
+                          ? new Date(profileData.user.created_at).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            })
+                          : 'Unknown'}
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
                 {profileData?.user?.role && (

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useTheme } from '@/components/ui/theme-provider';
+import { UsersApi, type Notification } from '@/lib/api/users';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -69,6 +70,35 @@ export function Navbar({ className }: NavbarProps) {
   const { theme, setTheme } = useTheme();
   const { user, logout } = useStore();
   const [isOpen, setIsOpen] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [isLoadingNotifications, setIsLoadingNotifications] = useState(false);
+
+  const fetchUnreadCount = async () => {
+    try {
+      const response = await UsersApi.getUnreadNotificationCount();
+      setUnreadCount(response.unreadCount);
+    } catch (error) {
+      console.error('Failed to fetch unread count:', error);
+    }
+  };
+
+  const fetchNotifications = async () => {
+    try {
+      setIsLoadingNotifications(true);
+      const response = await UsersApi.getNotifications();
+      setNotifications(response.notifications);
+    } catch (error) {
+      console.error('Failed to fetch notifications:', error);
+    } finally {
+      setIsLoadingNotifications(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUnreadCount();
+    fetchNotifications();
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -140,17 +170,86 @@ export function Navbar({ className }: NavbarProps) {
             </Button>
 
             {/* Notifications */}
-            <Button
-              variant="ghost"
-              size="sm"
-              className="relative border-2 border-dashed border-purple-500/50 hover:border-cyan-500/50 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-cyan-500/20 font-mono text-slate-300 hover:text-slate-100"
-              title="[NOTIFICATIONS]"
-            >
-              <Bell className="h-4 w-4" />
-              <Badge className="absolute -top-1 -right-1 px-1 py-0 text-xs min-w-[1rem] h-5 flex items-center justify-center bg-red-500 hover:bg-red-600 border border-dashed border-red-700 font-mono">
-                0
-              </Badge>
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="relative border-2 border-dashed border-purple-500/50 hover:border-cyan-500/50 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-cyan-500/20 font-mono text-slate-300 hover:text-slate-100"
+                  title="[NOTIFICATIONS]"
+                >
+                  <Bell className="h-4 w-4" />
+                  {unreadCount > 0 && (
+                    <Badge className="absolute -top-1 -right-1 px-1 py-0 text-xs min-w-[1rem] h-5 flex items-center justify-center bg-red-500 hover:bg-red-600 border border-dashed border-red-700 font-mono">
+                      {unreadCount}
+                    </Badge>
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-80 border-2 border-dashed border-purple-500/50 bg-gradient-to-br from-purple-500/5 to-cyan-500/5 font-mono">
+                <div className="flex items-center justify-between p-2 border-b border-dashed border-purple-500/30">
+                  <DropdownMenuLabel className="p-0 font-mono text-purple-600">[NOTIFICATIONS]</DropdownMenuLabel>
+                  {isLoadingNotifications && (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                  )}
+                </div>
+                <DropdownMenuSeparator />
+                {notifications.length === 0 ? (
+                  <div className="p-4 text-center text-sm text-muted-foreground font-mono">
+                    [NO_NOTIFICATIONS_YET]
+                  </div>
+                ) : (
+                  <div className="max-h-96 overflow-y-auto">
+                    {notifications.slice(0, 5).map((notification) => (
+                      <DropdownMenuItem 
+                        key={notification.id} 
+                        className={`flex-col items-start p-3 cursor-pointer transition-all duration-200 ${
+                          !notification.seen 
+                            ? 'bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border-l-4 border-purple-500 hover:from-purple-500/20 hover:to-cyan-500/20' 
+                            : 'opacity-70 hover:opacity-90 border-l-4 border-transparent'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <span className={`text-sm font-medium flex items-center gap-2 ${
+                            notification.seen ? 'text-muted-foreground' : 'text-foreground font-semibold'
+                          }`}>
+                            {notification.notif_type === 'new_quest' && '🎯 New Quest'}
+                            {notification.notif_type === 'quest_validated' && '✅ Quest Validated'}
+                            {notification.notif_type === 'quest_rejected' && '❌ Quest Rejected'}
+                            {!notification.seen && (
+                              <span className="text-xs bg-purple-500 text-white px-1.5 py-0.5 rounded-full font-mono">
+                                NEW
+                              </span>
+                            )}
+                          </span>
+                          {!notification.seen && (
+                            <div className="w-3 h-3 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-full animate-pulse"></div>
+                          )}
+                        </div>
+                        <p className={`text-xs mt-1 line-clamp-2 ${
+                          notification.seen ? 'text-muted-foreground' : 'text-slate-300'
+                        }`}>
+                          {notification.notif_type === 'new_quest' && `A new quest is available (Quest #${notification.quest_id})`}
+                          {notification.notif_type === 'quest_validated' && `Your quest submission has been validated (Quest #${notification.quest_id})`}
+                          {notification.notif_type === 'quest_rejected' && `Your quest submission has been rejected (Quest #${notification.quest_id})`}
+                        </p>
+                        <span className={`text-xs mt-1 ${
+                          notification.seen ? 'text-muted-foreground' : 'text-slate-400 font-medium'
+                        }`}>
+                          {new Date(notification.created_at).toLocaleDateString()}
+                        </span>
+                      </DropdownMenuItem>
+                    ))}
+                  </div>
+                )}
+                <DropdownMenuSeparator className="border-dashed border-purple-500/30" />
+                <DropdownMenuItem className="justify-center">
+                  <Button variant="ghost" size="sm" className="w-full border border-dashed border-purple-500/50 hover:border-cyan-500/50 hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-cyan-500/20 font-mono" onClick={() => { fetchNotifications(); fetchUnreadCount(); }}>
+                     {notifications.length > 5 ? '[VIEW_ALL_NOTIFICATIONS]' : '[REFRESH]'}
+                   </Button>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             {/* User Menu */}
             <DropdownMenu>
