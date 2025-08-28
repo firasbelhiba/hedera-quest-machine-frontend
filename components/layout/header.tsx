@@ -18,9 +18,8 @@ import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
-import useStore from '@/lib/store';
+import useStore, { WebSocketHandlers } from '@/lib/store';
 import { UsersApi } from '@/lib/api/users';
-import { useWebSocket } from '@/hooks/use-websocket';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -40,7 +39,7 @@ export function Header({ onMenuClick }: HeaderProps) {
   const [unreadCount, setUnreadCount] = useState(0);
   const [adminUnreadCount, setAdminUnreadCount] = useState(0);
   const [isLoadingNotifications, setIsLoadingNotifications] = useState(false);
-  const { user: currentUser, loadCurrentUser, logout } = useStore();
+  const { user: currentUser, loadCurrentUser, logout, setWebSocketHandlers, getWebSocketStatus } = useStore();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -149,34 +148,38 @@ export function Header({ onMenuClick }: HeaderProps) {
     }
   };
 
-  // WebSocket integration for real-time notifications
-  const { isConnected, error: wsError } = useWebSocket({
-    onNotification: (data) => {
-      console.log('Received WebSocket notification:', data);
-      
-      // Refresh notifications when we receive a WebSocket notification
-      if (isAdminPage) {
-        fetchAdminNotifications();
-      } else {
-        fetchNotifications();
+  // Set up WebSocket handlers for real-time notifications
+  useEffect(() => {
+    const handlers: WebSocketHandlers = {
+      onNotification: (data) => {
+        console.log('Received WebSocket notification:', data);
+        
+        // Refresh notifications when we receive a WebSocket notification
+        if (isAdminPage) {
+          fetchAdminNotifications();
+        } else {
+          fetchNotifications();
+        }
+      },
+      onConnect: () => {
+        console.log('WebSocket connected, fetching initial notifications');
+        // Fetch initial notifications on connection
+        if (isAdminPage) {
+          fetchAdminNotifications();
+        } else {
+          fetchNotifications();
+        }
+      },
+      onError: (error) => {
+        console.error('WebSocket error:', error);
       }
-    },
-    onConnect: () => {
-      console.log('WebSocket connected, fetching initial notifications');
-      // Fetch initial notifications on connection
-      if (isAdminPage) {
-        fetchAdminNotifications();
-      } else {
-        fetchNotifications();
-      }
-    },
-    onError: (error) => {
-      console.error('WebSocket error:', error);
-    },
-    autoReconnect: true,
-    reconnectInterval: 3000,
-    maxReconnectAttempts: 5
-  });
+    };
+    
+    setWebSocketHandlers(handlers);
+  }, [isAdminPage, setWebSocketHandlers]);
+  
+  // Get WebSocket status
+  const { isConnected, reconnectAttempts } = getWebSocketStatus();
 
   // Initial load and page context changes
   useEffect(() => {

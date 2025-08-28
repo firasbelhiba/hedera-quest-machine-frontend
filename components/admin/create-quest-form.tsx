@@ -166,13 +166,18 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
     }
   }, []);
 
+  // Track if fields have been touched by user
+  const [touchedDateFields, setTouchedDateFields] = useState<Record<string, boolean>>({});
+
   // Custom date validation
-  const validateDates = useCallback(() => {
+  const validateDates = useCallback((showErrors = true) => {
     const errors: string[] = [];
     
     if (!startDate) {
       errors.push('Start date is required');
-      setValidationErrors(prev => ({ ...prev, startDate: 'Start date is required' }));
+      if (showErrors && touchedDateFields.startDate) {
+        setValidationErrors(prev => ({ ...prev, startDate: 'Start date is required' }));
+      }
     } else {
       setValidationErrors(prev => {
         const newErrors = { ...prev };
@@ -183,7 +188,9 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
     
     if (!endDate) {
       errors.push('End date is required');
-      setValidationErrors(prev => ({ ...prev, endDate: 'End date is required' }));
+      if (showErrors && touchedDateFields.endDate) {
+        setValidationErrors(prev => ({ ...prev, endDate: 'End date is required' }));
+      }
     } else {
       setValidationErrors(prev => {
         const newErrors = { ...prev };
@@ -237,7 +244,7 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
     }
     
     return errors;
-  }, [startDate, endDate, startTime, endTime]);
+  }, [startDate, endDate, startTime, endTime, touchedDateFields]);
 
   // Update form validity
   useEffect(() => {
@@ -248,9 +255,9 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
     setIsFormValid(isValid && !hasFieldErrors && !hasDateErrors && !!startDate && !!endDate);
   }, [isValid, validationErrors, startDate, endDate, validateDates]);
 
-  // Trigger date validation when dates change
+  // Trigger date validation when dates change (without showing errors on initial load)
   useEffect(() => {
-    validateDates();
+    validateDates(false);
   }, [startDate, endDate, startTime, endTime, validateDates]);
 
   // Fetch badges and events when component mounts
@@ -769,6 +776,7 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
                      <Popover>
                        <PopoverTrigger asChild>
                          <Button
+                           type="button"
                            variant="outline"
                            className={cn(
                              "w-[200px] justify-start text-left font-normal",
@@ -784,10 +792,17 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
                            mode="single"
                            selected={startDate}
                            onSelect={(date) => {
-                             setStartDate(date);
+                             console.log('Start date selected:', date);
+                             setTouchedDateFields(prev => ({ ...prev, startDate: true }));
                              if (date) {
+                               setStartDate(date);
                                setValue('startDate', date.toISOString().split('T')[0]);
                                validateField('startDate', date.toISOString().split('T')[0]);
+                               validateDates(true);
+                             } else {
+                               setStartDate(undefined);
+                               setValue('startDate', '');
+                               validateDates(true);
                              }
                            }}
                            initialFocus
@@ -796,6 +811,7 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
                              today.setHours(0, 0, 0, 0);
                              return date < today;
                            }}
+                           className="rounded-md border"
                          />
                        </PopoverContent>
                      </Popover>
@@ -806,7 +822,8 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
                          value={startTime}
                          onChange={(e) => {
                            setStartTime(e.target.value);
-                           validateDates();
+                           setTouchedDateFields(prev => ({ ...prev, startDate: true }));
+                           validateDates(true);
                          }}
                          className="w-[120px]"
                        />
@@ -823,6 +840,7 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
                      <Popover>
                        <PopoverTrigger asChild>
                          <Button
+                           type="button"
                            variant="outline"
                            className={cn(
                              "w-[200px] justify-start text-left font-normal",
@@ -838,10 +856,17 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
                            mode="single"
                            selected={endDate}
                            onSelect={(date) => {
-                             setEndDate(date);
+                             console.log('End date selected:', date);
+                             setTouchedDateFields(prev => ({ ...prev, endDate: true }));
                              if (date) {
+                               setEndDate(date);
                                setValue('endDate', date.toISOString().split('T')[0]);
                                validateField('endDate', date.toISOString().split('T')[0]);
+                               validateDates(true);
+                             } else {
+                               setEndDate(undefined);
+                               setValue('endDate', '');
+                               validateDates(true);
                              }
                            }}
                            initialFocus
@@ -850,6 +875,7 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
                              today.setHours(0, 0, 0, 0);
                              return date < today || (startDate ? date < startDate : false);
                            }}
+                           className="rounded-md border"
                          />
                        </PopoverContent>
                      </Popover>
@@ -860,7 +886,8 @@ export function CreateQuestForm({ onSuccess, onCancel }: CreateQuestFormProps) {
                          value={endTime}
                          onChange={(e) => {
                            setEndTime(e.target.value);
-                           validateDates();
+                           setTouchedDateFields(prev => ({ ...prev, endDate: true }));
+                           validateDates(true);
                          }}
                          className="w-[120px]"
                        />

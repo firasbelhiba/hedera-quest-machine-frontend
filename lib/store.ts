@@ -4,6 +4,104 @@ import { QuestService } from './services';
 import { AuthService } from './api/auth';
 import { tokenStorage } from './api/client';
 
+// WebSocket connection management
+let wsConnection: WebSocket | null = null;
+let wsReconnectTimeout: NodeJS.Timeout | null = null;
+let wsReconnectAttempts = 0;
+const MAX_RECONNECT_ATTEMPTS = 5;
+const RECONNECT_INTERVAL = 3000;
+const WEBSOCKET_URL = process.env.NEXT_PUBLIC_WS_URL || 'wss://localhost:8080';
+
+// WebSocket event handlers
+type WebSocketHandlers = {
+  onNotification?: (data: any) => void;
+  onConnect?: () => void;
+  onDisconnect?: () => void;
+  onError?: (error: Event) => void;
+};
+
+let wsHandlers: WebSocketHandlers = {};
+
+// WebSocket connection functions
+const connectWebSocket = (token: string) => {
+  if (wsConnection?.readyState === WebSocket.OPEN) {
+    return;
+  }
+
+  try {
+    const wsUrl = `${WEBSOCKET_URL}/?token=${encodeURIComponent(token)}`;
+    wsConnection = new WebSocket(wsUrl);
+
+    wsConnection.onopen = () => {
+      console.log('WebSocket connected on user login');
+      wsReconnectAttempts = 0;
+      wsHandlers.onConnect?.();
+    };
+
+    wsConnection.onmessage = (event) => {
+      try {
+        const message = JSON.parse(event.data);
+        if (message.type === 'notification') {
+          wsHandlers.onNotification?.(message.data);
+        }
+      } catch (err) {
+        console.error('Failed to parse WebSocket message:', err);
+      }
+    };
+
+    wsConnection.onerror = (error) => {
+      console.error('WebSocket error:', error);
+      wsHandlers.onError?.(error);
+    };
+
+    wsConnection.onclose = (event) => {
+      console.log('WebSocket disconnected:', event.code, event.reason);
+      wsConnection = null;
+      wsHandlers.onDisconnect?.();
+
+      // Auto-reconnect if we have a token and haven't exceeded max attempts
+      const token = tokenStorage.getAccessToken();
+      if (token && wsReconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
+        wsReconnectAttempts++;
+        console.log(`Attempting WebSocket reconnect (${wsReconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
+        wsReconnectTimeout = setTimeout(() => {
+          connectWebSocket(token);
+        }, RECONNECT_INTERVAL);
+      }
+    };
+  } catch (err) {
+    console.error('Failed to create WebSocket connection:', err);
+  }
+};
+
+const disconnectWebSocket = () => {
+  if (wsReconnectTimeout) {
+    clearTimeout(wsReconnectTimeout);
+    wsReconnectTimeout = null;
+  }
+  
+  if (wsConnection) {
+    wsConnection.close(1000, 'User logout');
+    wsConnection = null;
+  }
+  
+  wsReconnectAttempts = 0;
+};
+
+// Function to set WebSocket event handlers
+const setWebSocketHandlers = (handlers: WebSocketHandlers) => {
+  wsHandlers = { ...wsHandlers, ...handlers };
+};
+
+// Function to get WebSocket connection status
+const getWebSocketStatus = () => {
+  return {
+    isConnected: wsConnection?.readyState === WebSocket.OPEN,
+    isConnecting: wsConnection?.readyState === WebSocket.CONNECTING,
+    reconnectAttempts: wsReconnectAttempts
+  };
+};
+
 interface AppState {
   // Auth
   user: User | null;
@@ -35,6 +133,10 @@ interface AppState {
   loadSubmissions: () => Promise<void>;
   toggleTheme: () => void;
   setSidebarOpen: (open: boolean) => void;
+  
+  // WebSocket management
+  setWebSocketHandlers: (handlers: WebSocketHandlers) => void;
+  getWebSocketStatus: () => { isConnected: boolean; isConnecting: boolean; reconnectAttempts: number };
 }
 
 type Theme = 'light' | 'dark';
@@ -63,6 +165,12 @@ const useStore = create<AppState>((set, get) => ({
       const authResult = await AuthService.login({ email, password });
       // AuthService.login already returns complete user data
       set({ user: authResult.user, isAuthenticated: true, isLoading: false });
+      
+      // Connect WebSocket after successful login
+      const token = tokenStorage.getAccessToken();
+      if (token) {
+        connectWebSocket(token);
+      }
     } catch (error) {
       set({ isLoading: false });
       throw error;
@@ -88,6 +196,8 @@ const useStore = create<AppState>((set, get) => ({
   },
 
   logout: () => {
+    // Disconnect WebSocket before clearing tokens
+    disconnectWebSocket();
     // Clear token storage immediately
     tokenStorage.clearAll();
     // Clear store state
@@ -136,6 +246,12 @@ const useStore = create<AppState>((set, get) => ({
       
       if (currentUser) {
         set({ user: currentUser, isAuthenticated: true, isLoading: false });
+        
+        // Connect WebSocket after loading current user
+        const token = tokenStorage.getAccessToken();
+        if (token) {
+          connectWebSocket(token);
+        }
       } else {
         // Token was invalid, clear it
         tokenStorage.clearAll();
@@ -158,6 +274,12 @@ const useStore = create<AppState>((set, get) => ({
 
   setUser: (user: User) => {
     set({ user, isAuthenticated: true, isLoading: false });
+    
+    // Connect WebSocket when user is set
+    const token = tokenStorage.getAccessToken();
+    if (token) {
+      connectWebSocket(token);
+    }
   },
 
   // Quest actions
@@ -217,7 +339,17 @@ const useStore = create<AppState>((set, get) => ({
 
   setSidebarOpen: (open: boolean) => {
     set({ sidebarOpen: open });
+  },
+  
+  // WebSocket management
+  setWebSocketHandlers: (handlers: WebSocketHandlers) => {
+    setWebSocketHandlers(handlers);
+  },
+  
+  getWebSocketStatus: () => {
+    return getWebSocketStatus();
   }
 }));
 
 export default useStore;
+export type { WebSocketHandlers };
