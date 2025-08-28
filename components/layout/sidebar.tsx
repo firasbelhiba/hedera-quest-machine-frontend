@@ -35,7 +35,6 @@ const navigation = [
 
 const adminNavigation = [
   { name: '[ADMIN_DASHBOARD]', href: '/admin', icon: Shield },
-  { name: '[MANAGE_QUESTS]', href: '/admin/quests', icon: FileText },
   { name: '[MANAGE_BADGES]', href: '/admin/badges', icon: Award },
   { name: '[REVIEW_SUBMISSIONS]', href: '/admin/submissions', icon: FileText },
   { name: '[EVENTS]', href: '/admin/events', icon: Calendar },

@@ -1,6 +1,6 @@
 import { 
   User, Quest, Submission, Badge, Event, LeaderboardEntry, LeaderboardResponse,
-  DashboardStats, FilterOptions, SubmissionContent, QuestCategory 
+  FilterOptions, SubmissionContent, QuestCategory 
 } from './types';
 import { AuthService as ApiAuth } from './api/auth';
 import { QuestsApi } from './api/quests';
@@ -316,50 +316,30 @@ export class QuestService {
   }
 
   // Dashboard methods
-  static async getDashboardStats(): Promise<DashboardStats> {
+  static async getDashboardStats(): Promise<any> {
     try {
-      // Since there's no dedicated dashboard stats API, we'll aggregate data from existing APIs
-      const [quests, submissions] = await Promise.all([
-        QuestService.getQuests(),
-        QuestService.getSubmissions()
-      ]);
-
-      // Calculate basic stats
-      const totalQuests = quests.length;
-      const totalSubmissions = submissions.length;
-      const activeQuests = quests.filter(q => q.isActive).length;
-      
-      // Calculate popular categories
-      const categoryCount: Record<string, number> = {};
-      quests.forEach(quest => {
-        if (quest.category) {
-          categoryCount[quest.category] = (categoryCount[quest.category] || 0) + 1;
-        }
-      });
-      
-      const popularCategories = Object.entries(categoryCount)
-        .map(([category, count]) => ({ category: category as QuestCategory, count }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 5);
-
-      return {
-        totalUsers: 0, // This would need a users API endpoint
-        activeQuests,
-        totalSubmissions,
-        approvalRate: 0, // This would need approval tracking
-        avgCompletionTime: 0, // This would need completion time tracking
-        popularCategories
-      };
+      const { api } = await import('./api/client');
+      const response = await api.get('/admin/dashboard');
+      return response.data;
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);
       // Return default stats on error
       return {
-        totalUsers: 0,
-        activeQuests: 0,
-        totalSubmissions: 0,
-        approvalRate: 0,
-        avgCompletionTime: 0,
-        popularCategories: []
+        success: false,
+        data: {
+          userData: {
+            count: 0,
+            lastWeek: 0
+          },
+          approvalRate: {
+            count: 0,
+            lastWeek: 0
+          },
+          questSubmissionData: {
+            count: 0,
+            lastWeek: 0
+          }
+        }
       };
     }
   }
