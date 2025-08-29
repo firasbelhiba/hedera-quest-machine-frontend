@@ -19,7 +19,6 @@ import {
   FileText,
   ChevronLeft,
   ChevronRight,
-  Award,
   Star,
   Zap
 } from 'lucide-react';
@@ -34,7 +33,6 @@ const navigation = [
 
 const adminNavigation = [
   { name: '[ADMIN_DASHBOARD]', href: '/admin', icon: Shield },
-  { name: '[MANAGE_BADGES]', href: '/admin/badges', icon: Award },
   { name: '[REVIEW_SUBMISSIONS]', href: '/admin/submissions', icon: FileText },
   { name: '[SETTINGS]', href: '/admin/settings', icon: Settings },
 ];
