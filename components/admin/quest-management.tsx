@@ -439,7 +439,7 @@ function QuestManagement() {
                   <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4">[QUEST]</TableHead>
                   <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4">[DIFFICULTY]</TableHead>
                   <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4 min-w-[140px] bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border-2 border-dashed border-cyan-500/40">[STATUS]</TableHead>
-                  <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4">[STATS]</TableHead>
+                  <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4">[REWARDS]</TableHead>
                   <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4">[UPDATED]</TableHead>
                   <TableHead className="font-mono font-semibold text-cyan-700 dark:text-cyan-300 py-4 text-center">[ACTIONS]</TableHead>
                 </TableRow>
@@ -458,23 +458,21 @@ function QuestManagement() {
                     <TableCell className="py-4">{getDifficultyBadge(quest.difficulty)}</TableCell>
                     <TableCell className="py-4 min-w-[140px]">{getStatusBadge(quest.status, quest)}</TableCell>
                     <TableCell className="py-4">
-                      <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                        <div className="flex items-center gap-1.5 bg-yellow-50 dark:bg-yellow-900/20 px-2 py-1 rounded border border-dashed border-yellow-300/50">
-                          <Trophy className="w-3 h-3 text-yellow-600" />
-                          <span className="font-semibold">{quest.reward || 'No reward'}</span>
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 px-3 py-2 rounded-lg border border-dashed border-yellow-300/50">
+                          <Trophy className="w-4 h-4 text-yellow-600" />
+                          <span className="font-mono font-semibold text-yellow-700 dark:text-yellow-300">
+                            {quest.reward ? `${quest.reward} Points` : 'No reward set'}
+                          </span>
                         </div>
-                        <div className="flex items-center gap-1.5 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded border border-dashed border-blue-300/50">
-                          <Users className="w-3 h-3 text-blue-600" />
-                          <span className="font-semibold">{quest.completions || 0}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded border border-dashed border-green-300/50">
-                          <Clock className="w-3 h-3 text-green-600" />
-                          <span className="font-semibold">{quest.estimatedTime || 0}m</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 bg-purple-50 dark:bg-purple-900/20 px-2 py-1 rounded border border-dashed border-purple-300/50">
-                          <Calendar className="w-3 h-3 text-purple-600" />
-                          <span className="font-semibold">{quest.updatedAt ? formatDistanceToNow(new Date(quest.updatedAt), { addSuffix: true }) : 'N/A'}</span>
-                        </div>
+                        {quest.points && (
+                          <div className="flex items-center gap-2 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 px-3 py-2 rounded-lg border border-dashed border-purple-300/50">
+                            <Award className="w-4 h-4 text-purple-600" />
+                            <span className="font-mono font-semibold text-purple-700 dark:text-purple-300">
+                              {quest.points} XP
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell className="font-mono text-sm py-4 text-muted-foreground">{quest.updatedAt ? formatDistanceToNow(new Date(quest.updatedAt), { addSuffix: true }) : 'N/A'}</TableCell>
