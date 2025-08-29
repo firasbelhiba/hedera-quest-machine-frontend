@@ -22,16 +22,27 @@ import {
   Link,
   Twitter,
   Facebook,
-  MessageSquare
+  MessageSquare,
+  Award,
+  Clock,
+  XCircle
 } from 'lucide-react';
 import { SiDiscord } from 'react-icons/si';
 import { formatDistanceToNow } from 'date-fns';
 
 
 
+interface UserStats {
+  numberOfBadges: number;
+  numberOfquestCompleted: number;
+  numberOfquestRejected: number;
+  numberOfquestPending: number;
+}
+
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [profileData, setProfileData] = useState<any>(null);
+  const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [isVerifyingEmail, setIsVerifyingEmail] = useState(false);
@@ -132,8 +143,38 @@ export default function ProfilePage() {
     }
   };
 
+  const fetchUserStats = async () => {
+    try {
+      const response = await fetch('/api/user/stats', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch user stats');
+      }
+      
+      const data = await response.json();
+      if (data.success) {
+        setUserStats(data.stats);
+      }
+    } catch (error) {
+      console.error('Failed to load user stats:', error);
+      // Set default stats on error
+      setUserStats({
+        numberOfBadges: 0,
+        numberOfquestCompleted: 0,
+        numberOfquestRejected: 0,
+        numberOfquestPending: 0
+      });
+    }
+  };
+
   useEffect(() => {
     loadUser();
+    fetchUserStats();
   }, []);
 
 
@@ -535,26 +576,56 @@ export default function ProfilePage() {
           </Card>
 
           {/* Stats Overview */}
-          <div className={`grid grid-cols-1 md:grid-cols-2 gap-6`}>
-            {profileData?.user?.role !== 'admin' && (
-              <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5 hover:border-solid transition-all duration-200">
-                <CardContent className="p-6 text-center">
-                  <div className="p-2 bg-primary/10 rounded-lg border border-dashed border-primary/30 w-fit mx-auto mb-2">
-                    <UserIcon className="w-4 h-4 text-primary" />
-                  </div>
-                  <div className="text-2xl font-bold font-mono bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">{profileData?.user?.points?.toLocaleString() || '0'}</div>
-                  <div className="text-xs text-muted-foreground font-mono uppercase tracking-wider">TOTAL_POINTS</div>
-                </CardContent>
-              </Card>
-            )}
+          <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6`}>
+            {/* Badges */}
+            <Card className="border-2 border-dashed border-yellow-500/20 bg-gradient-to-br from-yellow-500/5 to-orange-500/5 hover:border-solid transition-all duration-200">
+              <CardContent className="p-6 text-center">
+                <div className="p-2 bg-yellow-500/10 rounded-lg border border-dashed border-yellow-500/30 w-fit mx-auto mb-2">
+                  <Award className="w-4 h-4 text-yellow-500" />
+                </div>
+                <div className="text-2xl font-bold font-mono bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
+                  {userStats?.numberOfBadges ?? '0'}
+                </div>
+                <div className="text-xs text-muted-foreground font-mono uppercase tracking-wider">BADGES_EARNED</div>
+              </CardContent>
+            </Card>
 
+            {/* Completed Quests */}
+            <Card className="border-2 border-dashed border-green-500/20 bg-gradient-to-br from-green-500/5 to-emerald-500/5 hover:border-solid transition-all duration-200">
+              <CardContent className="p-6 text-center">
+                <div className="p-2 bg-green-500/10 rounded-lg border border-dashed border-green-500/30 w-fit mx-auto mb-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                </div>
+                <div className="text-2xl font-bold font-mono bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">
+                  {userStats?.numberOfquestCompleted ?? '0'}
+                </div>
+                <div className="text-xs text-muted-foreground font-mono uppercase tracking-wider">QUESTS_COMPLETED</div>
+              </CardContent>
+            </Card>
+
+            {/* Pending Quests */}
             <Card className="border-2 border-dashed border-blue-500/20 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 hover:border-solid transition-all duration-200">
               <CardContent className="p-6 text-center">
                 <div className="p-2 bg-blue-500/10 rounded-lg border border-dashed border-blue-500/30 w-fit mx-auto mb-2">
-                  <CheckCircle className="w-4 h-4 text-blue-500" />
+                  <Clock className="w-4 h-4 text-blue-500" />
                 </div>
-                <div className="text-2xl font-bold font-mono bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">{profileData?.user?.completedQuests?.length || '0'}</div>
-                <div className="text-xs text-muted-foreground font-mono uppercase tracking-wider">QUESTS_COMPLETED</div>
+                <div className="text-2xl font-bold font-mono bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
+                  {userStats?.numberOfquestPending ?? '0'}
+                </div>
+                <div className="text-xs text-muted-foreground font-mono uppercase tracking-wider">QUESTS_PENDING</div>
+              </CardContent>
+            </Card>
+
+            {/* Rejected Quests */}
+            <Card className="border-2 border-dashed border-red-500/20 bg-gradient-to-br from-red-500/5 to-pink-500/5 hover:border-solid transition-all duration-200">
+              <CardContent className="p-6 text-center">
+                <div className="p-2 bg-red-500/10 rounded-lg border border-dashed border-red-500/30 w-fit mx-auto mb-2">
+                  <XCircle className="w-4 h-4 text-red-500" />
+                </div>
+                <div className="text-2xl font-bold font-mono bg-gradient-to-r from-red-500 to-pink-500 bg-clip-text text-transparent">
+                  {userStats?.numberOfquestRejected ?? '0'}
+                </div>
+                <div className="text-xs text-muted-foreground font-mono uppercase tracking-wider">QUESTS_REJECTED</div>
               </CardContent>
             </Card>
           </div>
