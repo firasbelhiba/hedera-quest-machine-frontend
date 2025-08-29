@@ -609,18 +609,12 @@ function QuestManagement() {
 
       {/* Quest Details Modal */}
       <QuestDetailsModal
-        quest={selectedQuest}
-        questDetails={questDetails}
+        quest={questDetails}
         isOpen={isDetailsDialogOpen}
         onClose={() => {
           setIsDetailsDialogOpen(false);
           setQuestDetails(null);
         }}
-        onEdit={(quest) => {
-          setIsDetailsDialogOpen(false);
-          handleEditQuest(quest);
-        }}
-        loading={loadingDetails}
       />
 
       {/* Delete Confirmation Dialog */}

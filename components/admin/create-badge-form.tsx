@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { BadgesApi } from '@/lib/api/badges';
-import { BadgeRarity, Badge } from '@/lib/types';
+import { BadgeRarity, Badge, CreateBadgeResponse } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { tokenStorage } from '@/lib/api/client';
 import { Input } from '@/components/ui/input';
@@ -70,7 +70,7 @@ export function CreateBadgeForm({ onBadgeCreated, badge, isEditing = false }: Cr
       setValue('name', badge.name);
       setValue('description', badge.description);
       setValue('maxToObtain', badge.maxToObtain || 1);
-      setValue('points', badge.points);
+      setValue('points', badge.points || 0);
       setValue('rarity', badge.rarity);
       setValue('image', badge.image || '');
       setValue('isActive', badge.isActive);
@@ -102,7 +102,7 @@ export function CreateBadgeForm({ onBadgeCreated, badge, isEditing = false }: Cr
       
       toast({
         title: 'Success!',
-        description: response.message || (isEditing ? 'Badge updated successfully' : 'Badge created successfully'),
+        description: isEditing ? 'Badge updated successfully' : (response as CreateBadgeResponse).message || 'Badge created successfully',
       });
 
       // Reset form
