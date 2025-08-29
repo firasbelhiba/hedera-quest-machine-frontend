@@ -200,7 +200,7 @@ export interface CreateBadgeRequest {
   maxToObtain: number;
   rarity: BadgeRarity;
   points: number;
-  image?: string;
+  image?: string | File;
   isActive?: boolean;
 }
 

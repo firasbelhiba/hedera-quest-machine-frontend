@@ -20,8 +20,31 @@ export const BadgesApi = {
   },
 
   async create(badgeData: CreateBadgeRequest): Promise<CreateBadgeResponse> {
-    const { data } = await api.post('/badges', badgeData);
-    return data;
+    // Check if image is a File object (for file uploads) or string (for URL)
+    if (badgeData.image && typeof badgeData.image !== 'string') {
+      // Handle file upload with FormData
+      const formData = new FormData();
+      formData.append('name', badgeData.name);
+      formData.append('description', badgeData.description);
+      formData.append('maxToObtain', badgeData.maxToObtain.toString());
+      formData.append('rarity', badgeData.rarity);
+      formData.append('points', badgeData.points.toString());
+      formData.append('image', badgeData.image as File);
+      if (badgeData.isActive !== undefined) {
+        formData.append('isActive', badgeData.isActive.toString());
+      }
+      
+      const { data } = await api.post('/badges', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      });
+      return data;
+    } else {
+      // Handle regular JSON payload
+      const { data } = await api.post('/badges', badgeData);
+      return data;
+    }
   },
 
   async list(filters?: BadgeFilters): Promise<ListBadgesResponse> {
@@ -50,8 +73,31 @@ export const BadgesApi = {
   },
 
   async update(id: string | number, badgeData: Partial<CreateBadgeRequest>): Promise<Badge> {
-    const { data } = await api.put(`/badges/${id}`, badgeData);
-    return data;
+    // Check if image is a File object (for file uploads) or string (for URL)
+    if (badgeData.image && typeof badgeData.image !== 'string') {
+      // Handle file upload with FormData
+      const formData = new FormData();
+      if (badgeData.name) formData.append('name', badgeData.name);
+      if (badgeData.description) formData.append('description', badgeData.description);
+      if (badgeData.maxToObtain) formData.append('maxToObtain', badgeData.maxToObtain.toString());
+      if (badgeData.rarity) formData.append('rarity', badgeData.rarity);
+      if (badgeData.points !== undefined) formData.append('points', badgeData.points.toString());
+      formData.append('image', badgeData.image as File);
+      if (badgeData.isActive !== undefined) {
+        formData.append('isActive', badgeData.isActive.toString());
+      }
+      
+      const { data } = await api.put(`/badges/${id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      });
+      return data;
+    } else {
+      // Handle regular JSON payload
+      const { data } = await api.put(`/badges/${id}`, badgeData);
+      return data;
+    }
   },
 
   async delete(id: string | number): Promise<void> {

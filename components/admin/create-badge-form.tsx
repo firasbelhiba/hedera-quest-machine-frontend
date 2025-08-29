@@ -23,7 +23,11 @@ const createBadgeSchema = z.object({
   maxToObtain: z.number().min(1, 'Max to obtain must be at least 1').max(1000, 'Max to obtain must be less than 1000'),
   rarity: z.enum(['common', 'rare', 'epic', 'legendary'] as const),
   points: z.number().min(0, 'Points must be at least 0').max(10000, 'Points must be less than 10000'),
-  image: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+  image: z.union([
+    z.string().url('Must be a valid URL'),
+    z.instanceof(File),
+    z.literal('')
+  ]).optional(),
   isActive: z.boolean().optional(),
 });
 
@@ -229,17 +233,44 @@ export function CreateBadgeForm({ onBadgeCreated, badge, isEditing = false }: Cr
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="image">Image URL (Optional)</Label>
-            <Input
-              id="image"
-              type="url"
-              {...register('image')}
-              placeholder="https://example.com/badge-image.png"
-              className={errors.image ? 'border-red-500' : ''}
-            />
+            <Label htmlFor="image">Badge Image (Optional)</Label>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Input
+                  id="image-url"
+                  type="url"
+                  placeholder="https://example.com/badge-image.png"
+                  className={errors.image ? 'border-red-500' : ''}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setValue('image', value || undefined);
+                  }}
+                  defaultValue={isEditing && badge && typeof badge.image === 'string' ? badge.image : ''}
+                />
+                <span className="text-sm text-muted-foreground">or</span>
+              </div>
+              <Input
+                id="image-file"
+                type="file"
+                accept="image/*"
+                className={errors.image ? 'border-red-500' : ''}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    setValue('image', file);
+                    // Clear the URL input when file is selected
+                    const urlInput = document.getElementById('image-url') as HTMLInputElement;
+                    if (urlInput) urlInput.value = '';
+                  }
+                }}
+              />
+            </div>
             {errors.image && (
               <p className="text-sm text-red-500">{errors.image.message}</p>
             )}
+            <p className="text-sm text-muted-foreground">
+              Upload an image file or provide a URL to an existing image.
+            </p>
           </div>
 
           <div className="flex items-center space-x-2">
