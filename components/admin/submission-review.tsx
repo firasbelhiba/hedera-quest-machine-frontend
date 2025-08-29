@@ -501,7 +501,7 @@ export default function SubmissionReview({ className }: SubmissionReviewProps = 
                 <div className="p-1 bg-primary/20 rounded border border-dashed border-primary/40">
                   <Target className="w-4 h-4 text-primary" />
                 </div>
-                🎯 QUEST_SUBMISSIONS_REVIEW
+                QUEST_SUBMISSIONS_REVIEW
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -516,7 +516,7 @@ export default function SubmissionReview({ className }: SubmissionReviewProps = 
               <div className="p-1 bg-cyan-500/20 rounded border border-dashed border-cyan-500/40">
                 <FileText className="w-4 h-4 text-cyan-500" />
               </div>
-              📋 QUEST_INFO
+              QUEST_INFO
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -549,7 +549,7 @@ export default function SubmissionReview({ className }: SubmissionReviewProps = 
               <div className="p-1 bg-purple-500/20 rounded border border-dashed border-purple-500/40">
                 <FileText className="w-4 h-4 text-purple-500" />
               </div>
-              📝 SUBMISSIONS_TABLE ({questSubmissions.length})
+              SUBMISSIONS_TABLE ({questSubmissions.length})
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -907,7 +907,7 @@ export default function SubmissionReview({ className }: SubmissionReviewProps = 
                       {selectedDetailSubmission.user?.twitterProfile && (
                         <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-dashed border-blue-200">
                           <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                            🐦
+                            T
                           </div>
                           <div className="flex-1">
                             <div className="font-mono text-sm font-bold text-blue-700">
@@ -930,7 +930,7 @@ export default function SubmissionReview({ className }: SubmissionReviewProps = 
                       {selectedDetailSubmission.user?.facebookProfile && (
                         <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-dashed border-blue-200">
                           <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                            📘
+                            F
                           </div>
                           <div className="flex-1">
                             <div className="font-mono text-sm font-bold text-blue-700">
@@ -949,7 +949,7 @@ export default function SubmissionReview({ className }: SubmissionReviewProps = 
                       {selectedDetailSubmission.user?.discordProfile && (
                         <div className="flex items-center gap-3 p-3 bg-indigo-50 rounded-lg border border-dashed border-indigo-200">
                           <div className="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                            💬
+                            D
                           </div>
                           <div className="flex-1">
                             <div className="font-mono text-sm font-bold text-indigo-700">
@@ -1132,7 +1132,7 @@ export default function SubmissionReview({ className }: SubmissionReviewProps = 
             <div className="p-1 bg-primary/20 rounded border border-dashed border-primary/40">
               <FileText className="w-4 h-4 text-primary" />
             </div>
-            📝 SUBMISSION_REVIEW
+            SUBMISSION_REVIEW
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
