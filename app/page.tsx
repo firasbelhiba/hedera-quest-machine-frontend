@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Trophy, Target, Users, TrendingUp, Clock, Zap, Star, ArrowRight, Flame, Award, CheckCircle, XCircle, AlertCircle, Calendar, BookOpen, Sparkles } from 'lucide-react';
 import { QuestCard } from '@/components/quests/quest-card';
+import { FeaturedQuestsSection } from '@/components/quests/featured-quests-section';
 import { HeroCarousel } from '@/components/landing/hero-carousel';
 import { FeatureHighlights } from '@/components/landing/feature-highlights';
 import { StatsOverview } from '@/components/landing/stats-overview';
@@ -379,32 +380,11 @@ export default function Dashboard() {
           </Card> */}
 
           {/* Featured Quests */}
-          <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-blue-500/5 hover:border-solid transition-all duration-200">
-            <CardHeader className="bg-gradient-to-r from-primary/10 to-blue-500/10">
-              <div className="flex items-center justify-between">
-                <CardTitle className="font-mono bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
-                  FEATURED_QUESTS
-                </CardTitle>
-                <Link href="/quests">
-                  <Button variant="outline" size="sm" className="font-mono border-dashed hover:border-solid transition-all duration-200">
-                    View All <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-                {featuredQuests.map((quest) => (
-                  <QuestCard 
-                    key={quest.id} 
-                    quest={quest} 
-                    isCompleted={completedQuestIds.includes(String(quest.id))} 
-                    onSelect={() => handleQuestSelect(String(quest.id))}
-                  />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <FeaturedQuestsSection
+            quests={featuredQuests}
+            completedQuestIds={completedQuestIds}
+            onQuestSelect={(questId) => router.push(`/quests/${questId}`)}
+          />
 
 
         </TabsContent>

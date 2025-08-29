@@ -496,21 +496,6 @@ export default function ProfilePage() {
                       <p className="font-mono text-sm">{profileData?.user?.username || 'Not provided'}</p>
                     </div>
                   </div>
-
-                  <div className="space-y-2">
-                    <Label className="font-mono text-sm text-primary">MEMBER_SINCE</Label>
-                    <div className="p-3 border-2 border-dashed border-primary/20 bg-gradient-to-r from-primary/5 to-purple-500/5 rounded-md">
-                      <p className="font-mono text-sm">
-                        {profileData?.user?.created_at 
-                          ? new Date(profileData.user.created_at).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric'
-                            })
-                          : 'Unknown'}
-                      </p>
-                    </div>
-                  </div>
                 </div>
 
                 {profileData?.user?.role && (
@@ -550,7 +535,7 @@ export default function ProfilePage() {
           </Card>
 
           {/* Stats Overview */}
-          <div className={`grid grid-cols-1 ${profileData?.user?.role === 'admin' ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-6`}>
+          <div className={`grid grid-cols-1 md:grid-cols-2 gap-6`}>
             {profileData?.user?.role !== 'admin' && (
               <Card className="border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-purple-500/5 hover:border-solid transition-all duration-200">
                 <CardContent className="p-6 text-center">
@@ -562,15 +547,7 @@ export default function ProfilePage() {
                 </CardContent>
               </Card>
             )}
-            <Card className="border-2 border-dashed border-green-500/20 bg-gradient-to-br from-green-500/5 to-emerald-500/5 hover:border-solid transition-all duration-200">
-              <CardContent className="p-6 text-center">
-                <div className="p-2 bg-green-500/10 rounded-lg border border-dashed border-green-500/30 w-fit mx-auto mb-2">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
-                </div>
-                <div className="text-2xl font-bold font-mono bg-gradient-to-r from-green-500 to-emerald-500 bg-clip-text text-transparent">{profileData?.user?.level || '1'}</div>
-                <div className="text-xs text-muted-foreground font-mono uppercase tracking-wider">CURRENT_LEVEL</div>
-              </CardContent>
-            </Card>
+
             <Card className="border-2 border-dashed border-blue-500/20 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 hover:border-solid transition-all duration-200">
               <CardContent className="p-6 text-center">
                 <div className="p-2 bg-blue-500/10 rounded-lg border border-dashed border-blue-500/30 w-fit mx-auto mb-2">
