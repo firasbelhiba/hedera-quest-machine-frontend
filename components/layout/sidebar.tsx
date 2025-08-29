@@ -16,7 +16,6 @@ import {
   Users,
   Settings,
   Shield,
-  FileText,
   ChevronLeft,
   ChevronRight,
   Star,
@@ -33,7 +32,6 @@ const navigation = [
 
 const adminNavigation = [
   { name: '[ADMIN_DASHBOARD]', href: '/admin', icon: Shield },
-  { name: '[REVIEW_SUBMISSIONS]', href: '/admin/submissions', icon: FileText },
   { name: '[SETTINGS]', href: '/admin/settings', icon: Settings },
 ];
 
