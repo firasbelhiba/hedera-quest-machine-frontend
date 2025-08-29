@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { BadgesApi } from '@/lib/api/badges';
-import { BadgeRarity } from '@/lib/types';
+import { BadgeRarity, Badge } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { tokenStorage } from '@/lib/api/client';
 import { Input } from '@/components/ui/input';
@@ -38,9 +38,11 @@ const rarityOptions: { value: BadgeRarity; label: string; description: string }[
 
 interface CreateBadgeFormProps {
   onBadgeCreated?: () => void;
+  badge?: Badge;
+  isEditing?: boolean;
 }
 
-export function CreateBadgeForm({ onBadgeCreated }: CreateBadgeFormProps) {
+export function CreateBadgeForm({ onBadgeCreated, badge, isEditing = false }: CreateBadgeFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
@@ -62,6 +64,19 @@ export function CreateBadgeForm({ onBadgeCreated }: CreateBadgeFormProps) {
     },
   });
 
+  // Populate form with badge data when editing
+  useEffect(() => {
+    if (isEditing && badge) {
+      setValue('name', badge.name);
+      setValue('description', badge.description);
+      setValue('maxToObtain', badge.maxToObtain || 1);
+      setValue('points', badge.points);
+      setValue('rarity', badge.rarity);
+      setValue('image', badge.image || '');
+      setValue('isActive', badge.isActive);
+    }
+  }, [isEditing, badge, setValue]);
+
   const isActive = watch('isActive');
 
   const onSubmit = async (data: CreateBadgeFormData) => {
@@ -72,7 +87,7 @@ export function CreateBadgeForm({ onBadgeCreated }: CreateBadgeFormProps) {
       // Check if user is authenticated
       const token = tokenStorage.getAccessToken();
       if (!token) {
-        throw new Error('Authentication required. Please log in to create badges.');
+        throw new Error(`Authentication required. Please log in to ${isEditing ? 'update' : 'create'} badges.`);
       }
 
       // Remove empty image field if not provided
@@ -81,11 +96,13 @@ export function CreateBadgeForm({ onBadgeCreated }: CreateBadgeFormProps) {
         image: data.image || undefined,
       };
 
-      const response = await BadgesApi.create(payload);
+      const response = isEditing && badge
+        ? await BadgesApi.update(badge.id, payload)
+        : await BadgesApi.create(payload);
       
       toast({
         title: 'Success!',
-        description: response.message || 'Badge created successfully',
+        description: response.message || (isEditing ? 'Badge updated successfully' : 'Badge created successfully'),
       });
 
       // Reset form
@@ -96,7 +113,7 @@ export function CreateBadgeForm({ onBadgeCreated }: CreateBadgeFormProps) {
         onBadgeCreated();
       }
     } catch (err: any) {
-      const errorMessage = err.message || 'Failed to create badge';
+      const errorMessage = err.message || `Failed to ${isEditing ? 'update' : 'create'} badge`;
       setError(errorMessage);
       toast({
         title: 'Error',
@@ -111,9 +128,12 @@ export function CreateBadgeForm({ onBadgeCreated }: CreateBadgeFormProps) {
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>Create New Badge</CardTitle>
+        <CardTitle>{isEditing ? 'Edit Badge' : 'Create New Badge'}</CardTitle>
         <CardDescription>
-          Create a new badge that users can earn by completing quests and challenges.
+          {isEditing 
+            ? 'Update the badge information and settings.'
+            : 'Create a new badge that users can earn by completing quests and challenges.'
+          }
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -187,7 +207,7 @@ export function CreateBadgeForm({ onBadgeCreated }: CreateBadgeFormProps) {
             <Label htmlFor="rarity">Rarity *</Label>
             <Select
               onValueChange={(value: BadgeRarity) => setValue('rarity', value)}
-              defaultValue="common"
+              defaultValue={isEditing && badge ? badge.rarity : 'common'}
             >
               <SelectTrigger className={errors.rarity ? 'border-red-500' : ''}>
                 <SelectValue placeholder="Select rarity" />
@@ -237,7 +257,7 @@ export function CreateBadgeForm({ onBadgeCreated }: CreateBadgeFormProps) {
               disabled={isLoading}
               className="flex-1"
             >
-              {isLoading ? 'Creating...' : 'Create Badge'}
+              {isLoading ? (isEditing ? 'Updating...' : 'Creating...') : (isEditing ? 'Update Badge' : 'Create Badge')}
             </Button>
             <Button
               type="button"

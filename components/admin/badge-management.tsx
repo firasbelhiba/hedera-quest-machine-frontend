@@ -27,6 +27,7 @@ export default function BadgeManagement() {
   const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [editingBadge, setEditingBadge] = useState<Badge | null>(null);
   const [filters, setFilters] = useState<BadgeFilters>({});
   const { toast } = useToast();
 
@@ -61,6 +62,15 @@ export default function BadgeManagement() {
   const handleBadgeCreated = () => {
     setShowCreateForm(false);
     loadBadges();
+  };
+
+  const handleBadgeUpdated = () => {
+    setEditingBadge(null);
+    loadBadges();
+  };
+
+  const handleEditBadge = (badge: Badge) => {
+    setEditingBadge(badge);
   };
 
   const handleFilterChange = (key: keyof BadgeFilters, value: any) => {
@@ -277,7 +287,7 @@ export default function BadgeManagement() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => {/* TODO: Edit badge */}}
+                          onClick={() => handleEditBadge(badge)}
                           className="bg-yellow-500/10 border border-yellow-500/20 text-yellow-600 hover:bg-yellow-500/20"
                         >
                           <Edit className="h-4 w-4" />
@@ -349,6 +359,31 @@ export default function BadgeManagement() {
                 </Button>
               </div>
               <CreateBadgeForm onBadgeCreated={handleBadgeCreated} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {editingBadge && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-background border rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold font-mono">Edit Badge</h2>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setEditingBadge(null)}
+                  className="bg-red-500/10 border border-red-500/20 text-red-600 hover:bg-red-500/20"
+                >
+                  ×
+                </Button>
+              </div>
+              <CreateBadgeForm 
+                badge={editingBadge} 
+                onBadgeCreated={handleBadgeUpdated} 
+                isEditing={true}
+              />
             </div>
           </div>
         </div>
