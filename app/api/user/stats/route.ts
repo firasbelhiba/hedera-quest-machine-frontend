@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     // Calculate quest statistics
     const completedQuests = submissions.filter(sub => sub.status === 'approved');
     const rejectedQuests = submissions.filter(sub => sub.status === 'rejected');
-    const pendingQuests = submissions.filter(sub => sub.status === 'pending' || sub.status === 'submitted');
+    const pendingQuests = submissions.filter(sub => sub.status === 'pending' || sub.status === 'needs-revision');
 
     const stats = {
       numberOfBadges: badges.length,

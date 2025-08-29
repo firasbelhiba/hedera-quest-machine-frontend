@@ -76,7 +76,8 @@ export default function LeaderboardPage() {
         // Find the current user's rank in the sorted leaderboard
         const currentUser = await QuestService.getCurrentUser();
         if (currentUser) {
-          const userRankInSortedList = sortedUsers.findIndex(user => user.id === parseInt(currentUser.id)) + 1;
+          const userId = typeof currentUser.id === 'string' ? parseInt(currentUser.id) : currentUser.id;
+          const userRankInSortedList = sortedUsers.findIndex(user => user.id === userId) + 1;
           setUserRank(userRankInSortedList > 0 ? userRankInSortedList : response.data.rank);
         } else {
           setUserRank(response.data.rank);
