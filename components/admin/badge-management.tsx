@@ -28,6 +28,7 @@ export default function BadgeManagement() {
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingBadge, setEditingBadge] = useState<Badge | null>(null);
+  const [deletingBadge, setDeletingBadge] = useState<{ id: string | number; name: string } | null>(null);
   const [filters, setFilters] = useState<BadgeFilters>({});
   const { toast } = useToast();
 
@@ -86,8 +87,12 @@ export default function BadgeManagement() {
 
   const hasActiveFilters = Object.keys(filters).length > 0;
 
-  const handleDeleteBadge = async (id: string | number) => {
-    if (!confirm('Are you sure you want to delete this badge?')) return;
+  const handleDeleteBadge = (badge: Badge) => {
+    setDeletingBadge({ id: badge.id, name: badge.name });
+  };
+
+  const confirmDeleteBadge = async () => {
+    if (!deletingBadge) return;
 
     try {
       // Check if user is authenticated
@@ -96,7 +101,7 @@ export default function BadgeManagement() {
         throw new Error('Authentication required. Please log in to manage badges.');
       }
       
-      await BadgesApi.delete(id);
+      await BadgesApi.delete(deletingBadge.id);
       toast({
         title: 'Success',
         description: 'Badge deleted successfully',
@@ -108,6 +113,8 @@ export default function BadgeManagement() {
         description: error.message || 'Failed to delete badge',
         variant: 'destructive',
       });
+    } finally {
+      setDeletingBadge(null);
     }
   };
 
@@ -295,7 +302,7 @@ export default function BadgeManagement() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDeleteBadge(badge.id)}
+                          onClick={() => handleDeleteBadge(badge)}
                           className="bg-red-500/10 border border-red-500/20 text-red-600 hover:bg-red-500/20"
                         >
                           <Trash2 className="h-4 w-4" />
@@ -384,6 +391,47 @@ export default function BadgeManagement() {
                 onBadgeCreated={handleBadgeUpdated} 
                 isEditing={true}
               />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deletingBadge && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-background border rounded-lg max-w-md w-full">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-red-500/10 rounded-lg border border-red-500/20">
+                  <Trash2 className="w-5 h-5 text-red-600" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold font-mono text-red-600">Delete Badge</h2>
+                  <p className="text-sm text-muted-foreground">This action cannot be undone</p>
+                </div>
+              </div>
+              
+              <div className="mb-6">
+                <p className="text-sm font-mono mb-2">Are you sure you want to delete this badge?</p>
+                <div className="p-3 bg-red-500/5 border border-red-500/20 rounded-lg">
+                  <p className="font-semibold text-red-700">{deletingBadge.name}</p>
+                </div>
+              </div>
+              
+              <div className="flex gap-3 justify-end">
+                <Button
+                  variant="outline"
+                  onClick={() => setDeletingBadge(null)}
+                  className="font-mono"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={confirmDeleteBadge}
+                  className="bg-red-500 hover:bg-red-600 text-white font-mono"
+                >
+                  Delete Badge
+                </Button>
+              </div>
             </div>
           </div>
         </div>
