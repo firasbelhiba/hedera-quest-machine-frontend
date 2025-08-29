@@ -9,7 +9,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Trophy, Target, Users, TrendingUp, Clock, Zap, Star, ArrowRight, Flame, Award, CheckCircle, XCircle, AlertCircle, Calendar, BookOpen, Sparkles } from 'lucide-react';
+import { Trophy, Users, TrendingUp, Clock, Zap, ArrowRight, Award, CheckCircle, XCircle, AlertCircle, Calendar, BookOpen, Sparkles } from 'lucide-react';
 import { QuestCard } from '@/components/quests/quest-card';
 import { FeaturedQuestsSection } from '@/components/quests/featured-quests-section';
 import { HeroCarousel } from '@/components/landing/hero-carousel';
@@ -274,51 +274,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-        <Card className="border-2 border-dashed border-red-500/20 bg-gradient-to-br from-red-500/5 to-pink-500/5 hover:border-solid transition-all duration-200">
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-red-500/10 rounded-lg border border-dashed border-red-500/30">
-                <Flame className="h-6 w-6 text-red-500" />
-              </div>
-              <div className="ml-4">
-                <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">STREAK</p>
-                <p className="text-2xl font-bold font-mono">{user?.streak || 0}<span className="text-sm ml-1">days</span></p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-2 border-dashed border-green-500/20 bg-gradient-to-br from-green-500/5 to-emerald-500/5 hover:border-solid transition-all duration-200">
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-green-500/10 rounded-lg border border-dashed border-green-500/30">
-                <Target className="h-6 w-6 text-green-500" />
-              </div>
-              <div className="ml-4">
-                <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">COMPLETED</p>
-                <p className="text-2xl font-bold font-mono">{completedQuestIds.length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-2 border-dashed border-purple-500/20 bg-gradient-to-br from-purple-500/5 to-indigo-500/5 hover:border-solid transition-all duration-200">
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-purple-500/10 rounded-lg border border-dashed border-purple-500/30">
-                <Star className="h-6 w-6 text-purple-500" />
-              </div>
-              <div className="ml-4">
-                <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">BADGES</p>
-                <p className="text-2xl font-bold font-mono">{badges.length}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
