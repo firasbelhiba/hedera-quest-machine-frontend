@@ -98,6 +98,46 @@ interface Submission {
     username?: string;
     firstName?: string;
     lastName?: string;
+    twitterProfile?: {
+      id: number;
+      twitter_id: string;
+      twitter_username: string;
+      twitter_profile_picture?: string;
+      access_token: string;
+      refresh_token: string;
+      expires_at?: string;
+      user_id: number;
+      admin_id?: number;
+      created_at: string;
+      updated_at: string;
+    };
+    facebookProfile?: {
+      id: number;
+      facebook_id: string;
+      firstname: string;
+      lastname: string;
+      email: string;
+      access_token: string;
+      refresh_token: string;
+      expires_at?: string;
+      user_id: number;
+      admin_id?: number;
+      created_at: string;
+      updated_at: string;
+    };
+    discordProfile?: {
+      id: number;
+      discord_id: string;
+      discord_username: string;
+      discord_picture?: string;
+      access_token: string;
+      refresh_token: string;
+      expires_at?: string;
+      user_id: number;
+      admin_id?: number;
+      created_at: string;
+      updated_at: string;
+    };
   };
   quest?: {
     title: string;
@@ -534,7 +574,7 @@ export default function SubmissionReview({ className }: SubmissionReviewProps = 
                             <User className="w-4 h-4 text-primary" />
                           </div>
                           <div>
-                            <div className="font-mono font-medium text-foreground">{submission.user?.name || 'Unknown User'}</div>
+                            <div className="font-mono font-medium text-foreground">{submission.user?.firstName && submission.user?.lastName ? `${submission.user.firstName} ${submission.user.lastName}` : submission.user?.name || 'Unknown User'}</div>
                             <div className="text-xs text-muted-foreground font-mono">@{submission.user?.username || submission.user?.email}</div>
                           </div>
                         </div>
@@ -612,8 +652,12 @@ export default function SubmissionReview({ className }: SubmissionReviewProps = 
                             size="sm"
                             variant="outline"
                             onClick={() => {
+                              console.log('DETAILS button clicked!');
+                              console.log('Setting selectedDetailSubmission:', submission);
                               setSelectedDetailSubmission(submission);
+                              console.log('Setting isDetailDialogOpen to true');
                               setIsDetailDialogOpen(true);
+                              console.log('Dialog state should be open now');
                             }}
                             className="bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-dashed border-blue-500/30 text-blue-500 hover:bg-blue-500/20 font-mono text-xs"
                           >
@@ -659,7 +703,7 @@ export default function SubmissionReview({ className }: SubmissionReviewProps = 
                 {/* Submission Info */}
                 <div className="p-4 bg-gradient-to-r from-primary/5 to-blue-500/5 rounded-lg border border-dashed border-primary/20">
                   <h3 className="font-mono font-bold text-primary mb-3">[SUBMISSION_INFO]</h3>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-3 gap-4">
                     <div>
                       <label className="text-sm font-medium font-mono text-muted-foreground">[USER]</label>
                       <div className="font-mono">{selectedSubmission.userName}</div>
@@ -789,199 +833,293 @@ export default function SubmissionReview({ className }: SubmissionReviewProps = 
           </DialogContent>
         </Dialog>
 
-        {/* Details Dialog */}
-        <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
-          <DialogContent className="max-w-4xl font-mono border-2 border-dashed border-primary/30">
-            <DialogHeader>
-              <DialogTitle className="bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
-                [SUBMISSION_DETAILS]
-              </DialogTitle>
-              <DialogDescription>
-                View detailed information about this submission.
-              </DialogDescription>
-            </DialogHeader>
-            {selectedDetailSubmission && (
-              <div className="space-y-6 max-h-[70vh] overflow-y-auto">
-                {/* User Information */}
-                <div className="p-4 bg-gradient-to-r from-primary/5 to-blue-500/5 rounded-lg border border-dashed border-primary/20">
-                  <h3 className="font-mono font-bold text-primary mb-3">[USER_INFORMATION]</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium font-mono text-muted-foreground">[NAME]</label>
-                      <div className="font-mono">{selectedDetailSubmission.userName}</div>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium font-mono text-muted-foreground">[EMAIL]</label>
-                      <div className="font-mono">{selectedDetailSubmission.userEmail}</div>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium font-mono text-muted-foreground">[USER_ID]</label>
-                      <div className="font-mono text-sm text-muted-foreground">{selectedDetailSubmission.userId}</div>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium font-mono text-muted-foreground">[STATUS]</label>
-                      <div className="flex items-center gap-2">
-                        {getStatusIcon(selectedDetailSubmission.status)}
-                        <Badge 
-                          variant="secondary" 
-                          className={cn(
-                            "text-xs bg-gradient-to-r from-primary/10 to-blue-500/10 border border-dashed font-mono",
-                            getStatusColor(selectedDetailSubmission.status)
-                          )}
-                        >
-                          {selectedDetailSubmission.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                        </Badge>
-                      </div>
+
+      {/* Details Dialog */}
+      {(() => {
+        console.log('Details Dialog render - isDetailDialogOpen:', isDetailDialogOpen);
+        console.log('Details Dialog render - selectedDetailSubmission:', selectedDetailSubmission);
+        return null;
+      })()}
+      <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
+        <DialogContent className="max-w-4xl font-mono border-2 border-dashed border-primary/30">
+          <DialogHeader>
+            <DialogTitle className="bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
+              [SUBMISSION_DETAILS]
+            </DialogTitle>
+            <DialogDescription>
+              View detailed information about this submission.
+            </DialogDescription>
+          </DialogHeader>
+          {selectedDetailSubmission && (
+            <div className="space-y-6 max-h-[70vh] overflow-y-auto">
+              {/* User Information */}
+              <div className="p-4 bg-gradient-to-r from-primary/5 to-blue-500/5 rounded-lg border border-dashed border-primary/20">
+                <h3 className="font-mono font-bold text-primary mb-3">[USER_INFORMATION]</h3>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="text-sm font-medium font-mono text-muted-foreground">[FIRST_NAME]</label>
+                    <div className="font-mono">{selectedDetailSubmission.user?.firstName || 'N/A'}</div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium font-mono text-muted-foreground">[LAST_NAME]</label>
+                    <div className="font-mono">{selectedDetailSubmission.user?.lastName || 'N/A'}</div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium font-mono text-muted-foreground">[USERNAME]</label>
+                    <div className="font-mono">{selectedDetailSubmission.user?.username || 'N/A'}</div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium font-mono text-muted-foreground">[USER_ID]</label>
+                    <div className="font-mono text-sm text-muted-foreground">{selectedDetailSubmission.userId}</div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium font-mono text-muted-foreground">[STATUS]</label>
+                    <div className="flex items-center gap-2">
+                      {getStatusIcon(selectedDetailSubmission.status)}
+                      <Badge 
+                        variant="secondary" 
+                        className={cn(
+                          "text-xs bg-gradient-to-r from-primary/10 to-blue-500/10 border border-dashed font-mono",
+                          getStatusColor(selectedDetailSubmission.status)
+                        )}
+                      >
+                        {selectedDetailSubmission.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      </Badge>
                     </div>
                   </div>
                 </div>
-
-                {/* Quest Information */}
-                <div className="p-4 bg-gradient-to-r from-green-500/5 to-emerald-500/5 rounded-lg border border-dashed border-green-500/20">
-                  <h3 className="font-mono font-bold text-green-600 mb-3">[QUEST_INFORMATION]</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-medium font-mono text-muted-foreground">[TITLE]</label>
-                      <div className="font-mono">{selectedDetailSubmission.questTitle}</div>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium font-mono text-muted-foreground">[QUEST_ID]</label>
-                      <div className="font-mono text-sm text-muted-foreground">{selectedDetailSubmission.questId}</div>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium font-mono text-muted-foreground">[DIFFICULTY]</label>
-                      <div>{getDifficultyBadge(selectedDetailSubmission.questDifficulty || 'unknown')}</div>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium font-mono text-muted-foreground">[POINTS]</label>
-                      <div className="flex items-center gap-1 font-mono">
-                        <Trophy className="w-4 h-4 text-yellow-500" />
-                        <span className="text-yellow-500 font-bold">{selectedDetailSubmission.questPoints}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Submission Content */}
-                <div className="p-4 bg-gradient-to-r from-blue-500/5 to-cyan-500/5 rounded-lg border border-dashed border-blue-500/20">
-                  <h3 className="font-mono font-bold text-blue-600 mb-3">[SUBMISSION_CONTENT]</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium font-mono text-muted-foreground">[DESCRIPTION]</label>
-                      <div className="font-mono text-sm p-3 bg-white/50 rounded border border-dashed border-blue-500/20">
-                        {selectedDetailSubmission.description || 'No description provided'}
-                      </div>
-                    </div>
-                    
-                    {selectedDetailSubmission.content && (
-                      <div>
-                        <label className="text-sm font-medium font-mono text-muted-foreground">[CONTENT_TYPE: {selectedDetailSubmission.content.type?.toUpperCase()}]</label>
-                        <div className="p-3 bg-white/50 rounded border border-dashed border-blue-500/20">
-                          {selectedDetailSubmission.content.type === 'text' && (
-                            <div className="font-mono text-sm whitespace-pre-wrap">{selectedDetailSubmission.content.text}</div>
-                          )}
-                          {selectedDetailSubmission.content.type === 'url' && (
-                            <a 
-                              href={selectedDetailSubmission.content.url} 
-                              target="_blank" 
-                              rel="noopener noreferrer" 
-                              className="text-blue-500 hover:underline font-mono text-sm flex items-center gap-1"
-                            >
-                              <ExternalLink className="w-4 h-4" />
-                              {selectedDetailSubmission.content.url}
-                            </a>
-                          )}
-                          {selectedDetailSubmission.content.type === 'account-id' && (
-                            <code className="text-sm bg-gradient-to-r from-primary/10 to-blue-500/10 border border-dashed border-primary/30 px-3 py-2 rounded text-primary font-mono block">
-                              {selectedDetailSubmission.content.accountId}
-                            </code>
-                          )}
-                          {selectedDetailSubmission.content.type === 'transaction-id' && (
-                            <code className="text-sm bg-gradient-to-r from-primary/10 to-blue-500/10 border border-dashed border-primary/30 px-3 py-2 rounded text-primary font-mono block">
-                              {selectedDetailSubmission.content.transactionId}
-                            </code>
+                
+                {/* Social Media Profiles */}
+                {(() => {
+                  console.log('=== SOCIAL MEDIA DEBUG ===');
+                  console.log('selectedDetailSubmission:', selectedDetailSubmission);
+                  console.log('user object:', selectedDetailSubmission?.user);
+                  console.log('twitterProfile:', selectedDetailSubmission?.user?.twitterProfile);
+                  console.log('facebookProfile:', selectedDetailSubmission?.user?.facebookProfile);
+                  console.log('discordProfile:', selectedDetailSubmission?.user?.discordProfile);
+                  console.log('=== END DEBUG ===');
+                  return null;
+                })()}
+                {(selectedDetailSubmission.user?.twitterProfile || selectedDetailSubmission.user?.facebookProfile || selectedDetailSubmission.user?.discordProfile) && (
+                  <div className="mt-4 pt-4 border-t border-dashed border-primary/20">
+                    <h4 className="font-mono font-bold text-primary mb-3">[SOCIAL_MEDIA_PROFILES]</h4>
+                    <div className="space-y-3">
+                      {selectedDetailSubmission.user?.twitterProfile && (
+                        <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-dashed border-blue-200">
+                          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                            🐦
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-mono text-sm font-bold text-blue-700">
+                              @{selectedDetailSubmission.user.twitterProfile.twitter_username}
+                            </div>
+                            <div className="font-mono text-xs text-blue-600">
+                              ID: {selectedDetailSubmission.user.twitterProfile.twitter_id}
+                            </div>
+                          </div>
+                          {selectedDetailSubmission.user.twitterProfile.twitter_profile_picture && (
+                            <img 
+                              src={selectedDetailSubmission.user.twitterProfile.twitter_profile_picture.trim()} 
+                              alt="Twitter Profile" 
+                              className="w-8 h-8 rounded-full border border-blue-300"
+                            />
                           )}
                         </div>
-                      </div>
-                    )}
+                      )}
+                      
+                      {selectedDetailSubmission.user?.facebookProfile && (
+                        <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-dashed border-blue-200">
+                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                            📘
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-mono text-sm font-bold text-blue-700">
+                              {selectedDetailSubmission.user.facebookProfile.firstname} {selectedDetailSubmission.user.facebookProfile.lastname}
+                            </div>
+                            <div className="font-mono text-xs text-blue-600">
+                              ID: {selectedDetailSubmission.user.facebookProfile.facebook_id}
+                            </div>
+                            <div className="font-mono text-xs text-blue-600">
+                              Email: {selectedDetailSubmission.user.facebookProfile.email}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {selectedDetailSubmission.user?.discordProfile && (
+                        <div className="flex items-center gap-3 p-3 bg-indigo-50 rounded-lg border border-dashed border-indigo-200">
+                          <div className="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                            💬
+                          </div>
+                          <div className="flex-1">
+                            <div className="font-mono text-sm font-bold text-indigo-700">
+                              {selectedDetailSubmission.user.discordProfile.discord_username}
+                            </div>
+                            <div className="font-mono text-xs text-indigo-600">
+                              ID: {selectedDetailSubmission.user.discordProfile.discord_id}
+                            </div>
+                          </div>
+                          {selectedDetailSubmission.user.discordProfile.discord_picture && (
+                            <img 
+                              src={selectedDetailSubmission.user.discordProfile.discord_picture} 
+                              alt="Discord Profile" 
+                              className="w-8 h-8 rounded-full border border-indigo-300"
+                            />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
 
-                    {selectedDetailSubmission.submissionUrl && (
-                      <div>
-                        <label className="text-sm font-medium font-mono text-muted-foreground">[SUBMISSION_URL]</label>
-                        <div className="p-3 bg-white/50 rounded border border-dashed border-blue-500/20">
+              {/* Quest Information */}
+              <div className="p-4 bg-gradient-to-r from-green-500/5 to-emerald-500/5 rounded-lg border border-dashed border-green-500/20">
+                <h3 className="font-mono font-bold text-green-600 mb-3">[QUEST_INFORMATION]</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium font-mono text-muted-foreground">[TITLE]</label>
+                    <div className="font-mono">{selectedDetailSubmission.questTitle}</div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium font-mono text-muted-foreground">[QUEST_ID]</label>
+                    <div className="font-mono text-sm text-muted-foreground">{selectedDetailSubmission.questId}</div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium font-mono text-muted-foreground">[DIFFICULTY]</label>
+                    <div>{getDifficultyBadge(selectedDetailSubmission.questDifficulty || 'unknown')}</div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium font-mono text-muted-foreground">[POINTS]</label>
+                    <div className="flex items-center gap-1 font-mono">
+                      <Trophy className="w-4 h-4 text-yellow-500" />
+                      <span className="text-yellow-500 font-bold">{selectedDetailSubmission.questPoints}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Submission Content */}
+              <div className="p-4 bg-gradient-to-r from-blue-500/5 to-cyan-500/5 rounded-lg border border-dashed border-blue-500/20">
+                <h3 className="font-mono font-bold text-blue-600 mb-3">[SUBMISSION_CONTENT]</h3>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium font-mono text-muted-foreground">[DESCRIPTION]</label>
+                    <div className="font-mono text-sm p-3 bg-white/50 rounded border border-dashed border-blue-500/20">
+                      {selectedDetailSubmission.description || 'No description provided'}
+                    </div>
+                  </div>
+                  
+                  {selectedDetailSubmission.content && (
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[CONTENT_TYPE: {selectedDetailSubmission.content.type?.toUpperCase()}]</label>
+                      <div className="p-3 bg-white/50 rounded border border-dashed border-blue-500/20">
+                        {selectedDetailSubmission.content.type === 'text' && (
+                          <div className="font-mono text-sm whitespace-pre-wrap">{selectedDetailSubmission.content.text}</div>
+                        )}
+                        {selectedDetailSubmission.content.type === 'url' && (
                           <a 
-                            href={selectedDetailSubmission.submissionUrl} 
+                            href={selectedDetailSubmission.content.url} 
                             target="_blank" 
                             rel="noopener noreferrer" 
                             className="text-blue-500 hover:underline font-mono text-sm flex items-center gap-1"
                           >
                             <ExternalLink className="w-4 h-4" />
-                            {selectedDetailSubmission.submissionUrl}
+                            {selectedDetailSubmission.content.url}
                           </a>
-                        </div>
+                        )}
+                        {selectedDetailSubmission.content.type === 'account-id' && (
+                          <code className="text-sm bg-gradient-to-r from-primary/10 to-blue-500/10 border border-dashed border-primary/30 px-3 py-2 rounded text-primary font-mono block">
+                            {selectedDetailSubmission.content.accountId}
+                          </code>
+                        )}
+                        {selectedDetailSubmission.content.type === 'transaction-id' && (
+                          <code className="text-sm bg-gradient-to-r from-primary/10 to-blue-500/10 border border-dashed border-primary/30 px-3 py-2 rounded text-primary font-mono block">
+                            {selectedDetailSubmission.content.transactionId}
+                          </code>
+                        )}
                       </div>
-                    )}
-                  </div>
-                </div>
+                    </div>
+                  )}
 
-                {/* Submission Metadata */}
-                <div className="p-4 bg-gradient-to-r from-purple-500/5 to-pink-500/5 rounded-lg border border-dashed border-purple-500/20">
-                  <h3 className="font-mono font-bold text-purple-600 mb-3">[SUBMISSION_METADATA]</h3>
-                  <div className="grid grid-cols-2 gap-4">
+                  {selectedDetailSubmission.submissionUrl && (
                     <div>
-                      <label className="text-sm font-medium font-mono text-muted-foreground">[SUBMISSION_ID]</label>
-                      <div className="font-mono text-sm text-muted-foreground">{selectedDetailSubmission.id}</div>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium font-mono text-muted-foreground">[SUBMITTED_AT]</label>
-                      <div className="font-mono text-sm">
-                        {format(new Date(selectedDetailSubmission.submittedAt || selectedDetailSubmission.created_at || Date.now()), 'PPpp')}
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[SUBMISSION_URL]</label>
+                      <div className="p-3 bg-white/50 rounded border border-dashed border-blue-500/20">
+                        <a 
+                          href={selectedDetailSubmission.submissionUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="text-blue-500 hover:underline font-mono text-sm flex items-center gap-1"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                          {selectedDetailSubmission.submissionUrl}
+                        </a>
                       </div>
                     </div>
-                    {selectedDetailSubmission.reviewedAt && (
-                      <div>
-                        <label className="text-sm font-medium font-mono text-muted-foreground">[REVIEWED_AT]</label>
-                        <div className="font-mono text-sm">
-                          {format(new Date(selectedDetailSubmission.reviewedAt), 'PPpp')}
-                        </div>
-                      </div>
-                    )}
-                    {selectedDetailSubmission.reviewedBy && (
-                      <div>
-                        <label className="text-sm font-medium font-mono text-muted-foreground">[REVIEWED_BY]</label>
-                        <div className="font-mono text-sm">{selectedDetailSubmission.reviewedBy}</div>
-                      </div>
-                    )}
-                    {selectedDetailSubmission.score !== undefined && (
-                      <div>
-                        <label className="text-sm font-medium font-mono text-muted-foreground">[SCORE]</label>
-                        <div className="font-mono text-sm font-bold text-primary">{selectedDetailSubmission.score}/100</div>
-                      </div>
-                    )}
-                    {selectedDetailSubmission.feedback && (
-                      <div className="col-span-2">
-                        <label className="text-sm font-medium font-mono text-muted-foreground">[FEEDBACK]</label>
-                        <div className="font-mono text-sm p-3 bg-white/50 rounded border border-dashed border-purple-500/20 whitespace-pre-wrap">
-                          {selectedDetailSubmission.feedback}
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  )}
                 </div>
               </div>
-            )}
-            <DialogFooter>
-              <Button 
-                variant="outline" 
-                onClick={() => setIsDetailDialogOpen(false)} 
-                className="font-mono border-dashed border-primary/30 text-primary hover:bg-primary/10"
-              >
-                <ArrowLeft className="w-4 h-4 mr-1" />
-                [CLOSE]
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+
+              {/* Submission Metadata */}
+              <div className="p-4 bg-gradient-to-r from-purple-500/5 to-pink-500/5 rounded-lg border border-dashed border-purple-500/20">
+                <h3 className="font-mono font-bold text-purple-600 mb-3">[SUBMISSION_METADATA]</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium font-mono text-muted-foreground">[SUBMISSION_ID]</label>
+                    <div className="font-mono text-sm text-muted-foreground">{selectedDetailSubmission.id}</div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium font-mono text-muted-foreground">[SUBMITTED_AT]</label>
+                    <div className="font-mono text-sm">
+                      {format(new Date(selectedDetailSubmission.submittedAt || selectedDetailSubmission.created_at || Date.now()), 'PPpp')}
+                    </div>
+                  </div>
+                  {selectedDetailSubmission.reviewedAt && (
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[REVIEWED_AT]</label>
+                      <div className="font-mono text-sm">
+                        {format(new Date(selectedDetailSubmission.reviewedAt), 'PPpp')}
+                      </div>
+                    </div>
+                  )}
+                  {selectedDetailSubmission.reviewedBy && (
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[REVIEWED_BY]</label>
+                      <div className="font-mono text-sm">{selectedDetailSubmission.reviewedBy}</div>
+                    </div>
+                  )}
+                  {selectedDetailSubmission.score !== undefined && (
+                    <div>
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[SCORE]</label>
+                      <div className="font-mono text-sm font-bold text-primary">{selectedDetailSubmission.score}/100</div>
+                    </div>
+                  )}
+                  {selectedDetailSubmission.feedback && (
+                    <div className="col-span-2">
+                      <label className="text-sm font-medium font-mono text-muted-foreground">[FEEDBACK]</label>
+                      <div className="font-mono text-sm p-3 bg-white/50 rounded border border-dashed border-purple-500/20 whitespace-pre-wrap">
+                        {selectedDetailSubmission.feedback}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsDetailDialogOpen(false)} 
+              className="font-mono border-dashed border-primary/30 text-primary hover:bg-primary/10"
+            >
+              <ArrowLeft className="w-4 h-4 mr-1" />
+              [CLOSE]
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       </>
     );
   }
@@ -1323,200 +1461,6 @@ export default function SubmissionReview({ className }: SubmissionReviewProps = 
               className="font-mono bg-gradient-to-r from-green-500 to-emerald-500"
             >
               [APPROVE]
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Details Dialog */}
-      <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
-        <DialogContent className="max-w-4xl font-mono border-2 border-dashed border-primary/30">
-          <DialogHeader>
-            <DialogTitle className="bg-gradient-to-r from-primary to-blue-500 bg-clip-text text-transparent">
-              [SUBMISSION_DETAILS]
-            </DialogTitle>
-            <DialogDescription>
-              View detailed information about this submission.
-            </DialogDescription>
-          </DialogHeader>
-          {selectedDetailSubmission && (
-            <div className="space-y-6 max-h-[70vh] overflow-y-auto">
-              {/* User Information */}
-              <div className="p-4 bg-gradient-to-r from-primary/5 to-blue-500/5 rounded-lg border border-dashed border-primary/20">
-                <h3 className="font-mono font-bold text-primary mb-3">[USER_INFORMATION]</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium font-mono text-muted-foreground">[NAME]</label>
-                    <div className="font-mono">{selectedDetailSubmission.userName}</div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium font-mono text-muted-foreground">[EMAIL]</label>
-                    <div className="font-mono">{selectedDetailSubmission.userEmail}</div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium font-mono text-muted-foreground">[USER_ID]</label>
-                    <div className="font-mono text-sm text-muted-foreground">{selectedDetailSubmission.userId}</div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium font-mono text-muted-foreground">[STATUS]</label>
-                    <div className="flex items-center gap-2">
-                      {getStatusIcon(selectedDetailSubmission.status)}
-                      <Badge 
-                        variant="secondary" 
-                        className={cn(
-                          "text-xs bg-gradient-to-r from-primary/10 to-blue-500/10 border border-dashed font-mono",
-                          getStatusColor(selectedDetailSubmission.status)
-                        )}
-                      >
-                        {selectedDetailSubmission.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Quest Information */}
-              <div className="p-4 bg-gradient-to-r from-green-500/5 to-emerald-500/5 rounded-lg border border-dashed border-green-500/20">
-                <h3 className="font-mono font-bold text-green-600 mb-3">[QUEST_INFORMATION]</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium font-mono text-muted-foreground">[TITLE]</label>
-                    <div className="font-mono">{selectedDetailSubmission.questTitle}</div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium font-mono text-muted-foreground">[QUEST_ID]</label>
-                    <div className="font-mono text-sm text-muted-foreground">{selectedDetailSubmission.questId}</div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium font-mono text-muted-foreground">[DIFFICULTY]</label>
-                    <div>{getDifficultyBadge(selectedDetailSubmission.questDifficulty || 'unknown')}</div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium font-mono text-muted-foreground">[POINTS]</label>
-                    <div className="flex items-center gap-1 font-mono">
-                      <Trophy className="w-4 h-4 text-yellow-500" />
-                      <span className="text-yellow-500 font-bold">{selectedDetailSubmission.questPoints}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Submission Content */}
-              <div className="p-4 bg-gradient-to-r from-blue-500/5 to-cyan-500/5 rounded-lg border border-dashed border-blue-500/20">
-                <h3 className="font-mono font-bold text-blue-600 mb-3">[SUBMISSION_CONTENT]</h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium font-mono text-muted-foreground">[DESCRIPTION]</label>
-                    <div className="font-mono text-sm p-3 bg-white/50 rounded border border-dashed border-blue-500/20">
-                      {selectedDetailSubmission.description || 'No description provided'}
-                    </div>
-                  </div>
-                  
-                  {selectedDetailSubmission.content && (
-                    <div>
-                      <label className="text-sm font-medium font-mono text-muted-foreground">[CONTENT_TYPE: {selectedDetailSubmission.content.type?.toUpperCase()}]</label>
-                      <div className="p-3 bg-white/50 rounded border border-dashed border-blue-500/20">
-                        {selectedDetailSubmission.content.type === 'text' && (
-                          <div className="font-mono text-sm whitespace-pre-wrap">{selectedDetailSubmission.content.text}</div>
-                        )}
-                        {selectedDetailSubmission.content.type === 'url' && (
-                          <a 
-                            href={selectedDetailSubmission.content.url} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            className="text-blue-500 hover:underline font-mono text-sm flex items-center gap-1"
-                          >
-                            <ExternalLink className="w-4 h-4" />
-                            {selectedDetailSubmission.content.url}
-                          </a>
-                        )}
-                        {selectedDetailSubmission.content.type === 'account-id' && (
-                          <code className="text-sm bg-gradient-to-r from-primary/10 to-blue-500/10 border border-dashed border-primary/30 px-3 py-2 rounded text-primary font-mono block">
-                            {selectedDetailSubmission.content.accountId}
-                          </code>
-                        )}
-                        {selectedDetailSubmission.content.type === 'transaction-id' && (
-                          <code className="text-sm bg-gradient-to-r from-primary/10 to-blue-500/10 border border-dashed border-primary/30 px-3 py-2 rounded text-primary font-mono block">
-                            {selectedDetailSubmission.content.transactionId}
-                          </code>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {selectedDetailSubmission.submissionUrl && (
-                    <div>
-                      <label className="text-sm font-medium font-mono text-muted-foreground">[SUBMISSION_URL]</label>
-                      <div className="p-3 bg-white/50 rounded border border-dashed border-blue-500/20">
-                        <a 
-                          href={selectedDetailSubmission.submissionUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          className="text-blue-500 hover:underline font-mono text-sm flex items-center gap-1"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                          {selectedDetailSubmission.submissionUrl}
-                        </a>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Submission Metadata */}
-              <div className="p-4 bg-gradient-to-r from-purple-500/5 to-pink-500/5 rounded-lg border border-dashed border-purple-500/20">
-                <h3 className="font-mono font-bold text-purple-600 mb-3">[SUBMISSION_METADATA]</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium font-mono text-muted-foreground">[SUBMISSION_ID]</label>
-                    <div className="font-mono text-sm text-muted-foreground">{selectedDetailSubmission.id}</div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium font-mono text-muted-foreground">[SUBMITTED_AT]</label>
-                    <div className="font-mono text-sm">
-                      {format(new Date(selectedDetailSubmission.submittedAt || selectedDetailSubmission.created_at || Date.now()), 'PPpp')}
-                    </div>
-                  </div>
-                  {selectedDetailSubmission.reviewedAt && (
-                    <div>
-                      <label className="text-sm font-medium font-mono text-muted-foreground">[REVIEWED_AT]</label>
-                      <div className="font-mono text-sm">
-                        {format(new Date(selectedDetailSubmission.reviewedAt), 'PPpp')}
-                      </div>
-                    </div>
-                  )}
-                  {selectedDetailSubmission.reviewedBy && (
-                    <div>
-                      <label className="text-sm font-medium font-mono text-muted-foreground">[REVIEWED_BY]</label>
-                      <div className="font-mono text-sm">{selectedDetailSubmission.reviewedBy}</div>
-                    </div>
-                  )}
-                  {selectedDetailSubmission.score !== undefined && (
-                    <div>
-                      <label className="text-sm font-medium font-mono text-muted-foreground">[SCORE]</label>
-                      <div className="font-mono text-sm font-bold text-primary">{selectedDetailSubmission.score}/100</div>
-                    </div>
-                  )}
-                  {selectedDetailSubmission.feedback && (
-                    <div className="col-span-2">
-                      <label className="text-sm font-medium font-mono text-muted-foreground">[FEEDBACK]</label>
-                      <div className="font-mono text-sm p-3 bg-white/50 rounded border border-dashed border-purple-500/20 whitespace-pre-wrap">
-                        {selectedDetailSubmission.feedback}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-          <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => setIsDetailDialogOpen(false)} 
-              className="font-mono border-dashed border-primary/30 text-primary hover:bg-primary/10"
-            >
-              <ArrowLeft className="w-4 h-4 mr-1" />
-              [CLOSE]
             </Button>
           </DialogFooter>
         </DialogContent>

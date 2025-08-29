@@ -12,6 +12,8 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { AlertCircle, Twitter, Facebook, MessageSquare } from 'lucide-react';
 import { User } from '@/lib/types';
 
@@ -24,6 +26,7 @@ interface SocialMediaPromptModalProps {
 export function SocialMediaPromptModal({ user, isOpen, onClose }: SocialMediaPromptModalProps) {
   const router = useRouter();
   const [missingConnections, setMissingConnections] = useState<string[]>([]);
+  const [neverShowAgain, setNeverShowAgain] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -49,7 +52,17 @@ export function SocialMediaPromptModal({ user, isOpen, onClose }: SocialMediaPro
   };
 
   const handleDoItLater = () => {
+    if (neverShowAgain) {
+      localStorage.setItem('socialMediaPromptDismissed', 'true');
+    }
     onClose();
+  };
+
+  const handleConnectAccountsClick = () => {
+    if (neverShowAgain) {
+      localStorage.setItem('socialMediaPromptDismissed', 'true');
+    }
+    handleConnectAccounts();
   };
 
   const getSocialIcon = (platform: string) => {
@@ -83,7 +96,7 @@ export function SocialMediaPromptModal({ user, isOpen, onClose }: SocialMediaPro
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={() => {}} modal>
+    <Dialog open={isOpen} onOpenChange={onClose} modal>
       <DialogContent className="sm:max-w-md font-mono border-2 border-dashed border-orange-500/30 bg-gradient-to-br from-orange-50/50 to-red-50/50 dark:from-orange-950/20 dark:to-red-950/20">
         <DialogHeader className="text-center space-y-4">
           <div className="mx-auto w-12 h-12 bg-orange-500/10 rounded-full flex items-center justify-center border border-dashed border-orange-500/30">
@@ -117,21 +130,38 @@ export function SocialMediaPromptModal({ user, isOpen, onClose }: SocialMediaPro
           </DialogDescription>
         </DialogHeader>
         
-        <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-          <Button
-            variant="outline"
-            onClick={handleDoItLater}
-            className="font-mono border-dashed border-gray-500/50 hover:border-solid transition-all duration-200"
-          >
-            DO_IT_LATER
-          </Button>
-          <Button
-            onClick={handleConnectAccounts}
-            className="font-mono bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-200"
-          >
-            CONNECT_ACCOUNTS
-          </Button>
-        </DialogFooter>
+        <div className="space-y-4">
+          <div className="flex items-center space-x-2 px-1">
+            <Checkbox
+              id="never-show-again"
+              checked={neverShowAgain}
+              onCheckedChange={(checked) => setNeverShowAgain(checked as boolean)}
+              className="border-dashed border-orange-500/50 data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500"
+            />
+            <Label
+              htmlFor="never-show-again"
+              className="text-sm font-mono text-muted-foreground cursor-pointer hover:text-orange-600 transition-colors"
+            >
+              Never show this again
+            </Label>
+          </div>
+          
+          <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+            <Button
+              variant="outline"
+              onClick={handleDoItLater}
+              className="font-mono border-dashed border-gray-500/50 hover:border-solid transition-all duration-200"
+            >
+              DO_IT_LATER
+            </Button>
+            <Button
+              onClick={handleConnectAccountsClick}
+              className="font-mono bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-200"
+            >
+              CONNECT_ACCOUNTS
+            </Button>
+          </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );

@@ -45,8 +45,9 @@ export default function RootLayout({
   useEffect(() => {
     if (user && user.role === 'admin' && isAuthenticated && !isLoading && !hasCheckedSocialMedia) {
       const hasMissingSocialMedia = !user.twitterProfile || !user.facebookProfile || !user.discordProfile;
+      const isDismissed = localStorage.getItem('socialMediaPromptDismissed') === 'true';
       
-      if (hasMissingSocialMedia) {
+      if (hasMissingSocialMedia && !isDismissed) {
         // Small delay to ensure the admin interface is fully loaded
         const timer = setTimeout(() => {
           setShowSocialMediaPrompt(true);
