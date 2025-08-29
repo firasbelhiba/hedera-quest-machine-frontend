@@ -24,7 +24,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 import { 
   Trophy, 
   Medal, 
@@ -38,18 +38,13 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const LEADERBOARD_PERIODS = [
-  { value: 'all-time', label: 'All Time' },
-  { value: 'this-month', label: 'This Month' },
-  { value: 'this-week', label: 'This Week' },
-  { value: 'today', label: 'Today' }
-];
+
 
 export default function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardDisplayEntry[]>([]);
   const [userRank, setUserRank] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedPeriod, setSelectedPeriod] = useState('all-time');
+
 
   useEffect(() => {
     const loadLeaderboard = async () => {
@@ -57,8 +52,11 @@ export default function LeaderboardPage() {
       try {
         const response = await QuestService.getLeaderboard();
         // Transform API response to match component expectations
-        const transformedData: LeaderboardDisplayEntry[] = response.data.users.map((user, index) => ({
-          rank: index + 1,
+        // Sort users by total_points in descending order to ensure correct ranking
+        const sortedUsers = response.data.users.sort((a, b) => b.total_points - a.total_points);
+        
+        const transformedData: LeaderboardDisplayEntry[] = sortedUsers.map((user, index) => ({
+          rank: index + 1, // This will now be consistent with the sorted order
           user: {
             id: user.id,
             name: `${user.firstName} ${user.lastName}`,
@@ -73,7 +71,16 @@ export default function LeaderboardPage() {
           previousRank: null // Will be provided by API
         }));
         setLeaderboard(transformedData);
-        setUserRank(response.data.rank);
+        
+        // Calculate user rank based on the sorted data to ensure consistency
+        // Find the current user's rank in the sorted leaderboard
+        const currentUser = await QuestService.getCurrentUser();
+        if (currentUser) {
+          const userRankInSortedList = sortedUsers.findIndex(user => user.id === parseInt(currentUser.id)) + 1;
+          setUserRank(userRankInSortedList > 0 ? userRankInSortedList : response.data.rank);
+        } else {
+          setUserRank(response.data.rank);
+        }
       } catch (error) {
         console.error('Failed to load leaderboard:', error);
       } finally {
@@ -82,7 +89,7 @@ export default function LeaderboardPage() {
     };
 
     loadLeaderboard();
-  }, [selectedPeriod]);
+  }, []);
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
@@ -144,18 +151,8 @@ export default function LeaderboardPage() {
         )}
       </div>
 
-      {/* Period Selection */}
-      <Tabs value={selectedPeriod} onValueChange={setSelectedPeriod} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          {LEADERBOARD_PERIODS.map((period) => (
-            <TabsTrigger key={period.value} value={period.value}>
-              {period.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-
-        {LEADERBOARD_PERIODS.map((period) => (
-          <TabsContent key={period.value} value={period.value} className="space-y-6">
+      {/* Leaderboard Content */}
+      <div className="space-y-6">
             {/* Top 3 Podium */}
             {leaderboard.length >= 3 && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
@@ -241,7 +238,7 @@ export default function LeaderboardPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Users className="w-5 h-5" />
-                  All Rankings - {period.label}
+                  All Rankings
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -322,9 +319,7 @@ export default function LeaderboardPage() {
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
-        ))}
-      </Tabs>
+      </div>
     </div>
   );
 }
