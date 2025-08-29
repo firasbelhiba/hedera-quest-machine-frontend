@@ -29,6 +29,7 @@ export default function BadgeManagement() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingBadge, setEditingBadge] = useState<Badge | null>(null);
   const [deletingBadge, setDeletingBadge] = useState<{ id: string | number; name: string } | null>(null);
+  const [viewingBadge, setViewingBadge] = useState<Badge | null>(null);
   const [filters, setFilters] = useState<BadgeFilters>({});
   const { toast } = useToast();
 
@@ -286,7 +287,7 @@ export default function BadgeManagement() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => {/* TODO: View badge details */}}
+                          onClick={() => setViewingBadge(badge)}
                           className="bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 hover:bg-cyan-500/20"
                         >
                           <Eye className="h-4 w-4" />
@@ -430,6 +431,83 @@ export default function BadgeManagement() {
                   className="bg-red-500 hover:bg-red-600 text-white font-mono"
                 >
                   Delete Badge
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {viewingBadge && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-background border rounded-lg max-w-lg w-full">
+            <div className="p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="p-2 bg-cyan-500/10 rounded-lg border border-cyan-500/20">
+                  <Eye className="w-5 h-5 text-cyan-600" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-lg font-semibold font-mono text-cyan-600">Badge Details</h2>
+                  <p className="text-sm text-muted-foreground">View badge information</p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setViewingBadge(null)}
+                  className="bg-red-500/10 border border-red-500/20 text-red-600 hover:bg-red-500/20"
+                >
+                  ×
+                </Button>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="p-4 bg-gradient-to-br from-cyan-500/5 to-blue-500/5 border border-cyan-500/20 rounded-lg">
+                  <h3 className="text-xl font-bold font-mono mb-2">{viewingBadge.name}</h3>
+                  <p className="text-muted-foreground text-sm">{viewingBadge.description}</p>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                    <p className="text-xs font-mono text-muted-foreground mb-1">RARITY</p>
+                    <p className="font-semibold text-sm capitalize">{viewingBadge.rarity}</p>
+                  </div>
+                  <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                    <p className="text-xs font-mono text-muted-foreground mb-1">POINTS</p>
+                    <p className="font-semibold text-sm">{viewingBadge.points} PTS</p>
+                  </div>
+                  <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                    <p className="text-xs font-mono text-muted-foreground mb-1">STATUS</p>
+                    <p className={`font-semibold text-sm ${viewingBadge.isActive ? 'text-green-600' : 'text-red-600'}`}>
+                      {viewingBadge.isActive ? 'ACTIVE' : 'INACTIVE'}
+                    </p>
+                  </div>
+                  <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                    <p className="text-xs font-mono text-muted-foreground mb-1">MAX TO OBTAIN</p>
+                    <p className="font-semibold text-sm">{viewingBadge.maxToObtain || 'Unlimited'}</p>
+                  </div>
+                </div>
+                
+                {viewingBadge.image && (
+                  <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                    <p className="text-xs font-mono text-muted-foreground mb-2">IMAGE URL</p>
+                    <p className="text-sm break-all">{viewingBadge.image}</p>
+                  </div>
+                )}
+                
+                {viewingBadge.created_at && (
+                  <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                    <p className="text-xs font-mono text-muted-foreground mb-1">CREATED</p>
+                    <p className="text-sm">{formatDistanceToNow(new Date(viewingBadge.created_at), { addSuffix: true })}</p>
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex justify-end mt-6">
+                <Button
+                  onClick={() => setViewingBadge(null)}
+                  className="font-mono"
+                >
+                  Close
                 </Button>
               </div>
             </div>
