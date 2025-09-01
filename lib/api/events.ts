@@ -39,17 +39,12 @@ export const EventsApi = {
 
   async create(eventData: CreateEventData): Promise<Event> {
     const formData = new FormData();
-    
     formData.append('title', eventData.title);
     formData.append('description', eventData.description);
     formData.append('reward', eventData.reward.toString());
     formData.append('reward_image', eventData.reward_image);
 
-    const { data } = await api.post('/events/create', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      }
-    });
+    const { data } = await api.post('/events/create', formData); // <-- enlever headers
     
     if (data.success) {
       return data.event;
@@ -59,17 +54,12 @@ export const EventsApi = {
 
   async update(id: number, eventData: UpdateEventData): Promise<void> {
     const formData = new FormData();
-    
     if (eventData.title) formData.append('title', eventData.title);
     if (eventData.description) formData.append('description', eventData.description);
     if (eventData.reward) formData.append('reward', eventData.reward.toString());
     if (eventData.reward_image) formData.append('reward_image', eventData.reward_image);
 
-    const { data } = await api.post(`/events/update/${id}`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      }
-    });
+    const { data } = await api.post(`/events/update/${id}`, formData); // <-- enlever headers
     
     if (!data.success) {
       throw new Error(data.message || 'Failed to update event');
@@ -93,5 +83,6 @@ export const EventsApi = {
     throw new Error(data.message || 'Failed to fetch event');
   }
 };
+
 
 
