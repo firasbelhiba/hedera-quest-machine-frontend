@@ -26,51 +26,98 @@ export default function QuestsPage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
 
-  useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true);
-      try {
-        const [questsData, userData] = await Promise.all([
-          QuestService.getQuests(filters),
-          QuestService.getCurrentUser()
-        ]);
-        // Ensure questsData is always an array
-        setQuests(Array.isArray(questsData) ? questsData : []);
-        setUser(userData);
-      } catch (error) {
-        console.error('Failed to load quests:', error);
-        // Set empty array on error to prevent filter issues
-        setQuests([]);
-        setUser(null);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  // useEffect(() => {
+  //   const loadData = async () => {
+  //     setIsLoading(true);
+  //     try {
+  //       const [questsData, userData] = await Promise.all([
+  //         QuestService.getQuests(filters),
+  //         QuestService.getCurrentUser()
+  //       ]);
+  //       setQuests(Array.isArray(questsData) ? questsData : []);
+  //       setUser(userData);
+  //     } catch (error) {
+  //       console.error('Failed to load quests:', error);
+  //       setQuests([]);
+  //       setUser(null);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
 
-    loadData();
-  }, [filters]);
+  //   loadData();
+  // }, [filters]);
+
+  
+useEffect(() => {
+  const loadData = async () => {
+    setIsLoading(true);
+    try {
+      const [questsData, userData] = await Promise.all([
+        QuestService.getQuests({
+          categories: [],
+          difficulties: [],
+          search: '',
+          showCompleted: false
+        }), // charge TOUTES les quêtes une seule fois
+        QuestService.getCurrentUser()
+      ]);
+      setQuests(Array.isArray(questsData) ? questsData : []);
+      setUser(userData);
+    } catch (error) {
+      console.error('Failed to load quests:', error);
+      setQuests([]);
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  loadData();
+}, []); // ⬅️ uniquement au montage
+
 
   const handleFiltersChange = (newFilters: FilterOptions) => {
     setFilters(newFilters);
   };
 
   const handleQuestSelect = (quest: Quest) => {
-    // Navigate to quest details
     router.push(`/quests/${quest.id}`);
   };
 
-  const filteredQuests = (quests || []).filter(quest => {
-    // Filter by quest status - only show active or published quests
-    const isActive = quest.status === 'active' || quest.status === 'published';
-    if (!isActive) {
-      return false;
-    }
-    
-    if (!filters.showCompleted && user?.completedQuests?.includes(String(quest.id))) {
-      return false;
-    }
-    return true;
-  });
+  // ✅ Filtrage global (status, complété, recherche, catégorie, difficulté)
+const filteredQuests = quests.filter(quest => {
+  const isActive = quest.status === 'active' || quest.status === 'published';
+  if (!isActive) return false;
+
+  if (!filters.showCompleted && user?.completedQuests?.includes(String(quest.id))) {
+    return false;
+  }
+
+  if (
+    filters.search &&
+    !(
+      quest.title.toLowerCase().includes(filters.search.toLowerCase()) ||
+      quest.description?.toLowerCase().includes(filters.search.toLowerCase())
+    )
+  ) {
+    return false;
+  }
+
+  if (
+    filters.categories.length > 0 &&
+    (!quest.category || !filters.categories.includes(quest.category))
+  ) {
+    return false;
+  }
+
+  if (filters.difficulties.length > 0 && !filters.difficulties.includes(quest.difficulty)) {
+    return false;
+  }
+
+  return true;
+});
+
 
   if (isLoading) {
     return (
@@ -141,12 +188,18 @@ export default function QuestsPage() {
         <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-blue-500/5 rounded-lg" />
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="> Type to search quests..."
-            className="pl-10 border-2 border-dashed hover:border-solid transition-all duration-200 font-mono bg-background/50 backdrop-blur-sm"
-            value={filters.search}
-            onChange={(e) => handleFiltersChange({ ...filters, search: e.target.value })}
-          />
+         <Input
+  placeholder="> Type to search quests..."
+  className="pl-10 border-2 border-dashed hover:border-solid transition-all duration-200 font-mono bg-background/50 backdrop-blur-sm"
+  value={filters.search}
+  onChange={(e) => handleFiltersChange({ ...filters, search: e.target.value })}
+  onKeyDown={(e) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // empêche le refresh
+    }
+  }}
+/>
+
         </div>
       </div>
 

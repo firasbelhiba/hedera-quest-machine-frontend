@@ -31,7 +31,8 @@ export function SocialMediaPromptModal({ user, isOpen, onClose }: SocialMediaPro
   useEffect(() => {
     if (user) {
       const missing: string[] = [];
-      
+      console.log("user",user);
+
       if (!user.twitterProfile) {
         missing.push('Twitter');
       }
@@ -41,10 +42,11 @@ export function SocialMediaPromptModal({ user, isOpen, onClose }: SocialMediaPro
       if (!user.discordProfile) {
         missing.push('Discord');
       }
-      
+
       setMissingConnections(missing);
     }
   }, [user]);
+  
 
   const handleConnectAccounts = () => {
     onClose();
@@ -91,6 +93,7 @@ export function SocialMediaPromptModal({ user, isOpen, onClose }: SocialMediaPro
     }
   };
 
+
   if (missingConnections.length === 0) {
     return null;
   }
@@ -105,31 +108,35 @@ export function SocialMediaPromptModal({ user, isOpen, onClose }: SocialMediaPro
           <DialogTitle className="text-xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
             [SOCIAL_MEDIA_REQUIRED]
           </DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground space-y-3">
-            <p>
-              To access all admin features and manage social media quests effectively, 
-              you need to connect at least one social media account.
-            </p>
-            <div className="space-y-2">
-              <p className="font-semibold text-orange-600 dark:text-orange-400">
-                Missing connections:
+
+          {/* Correction : utilisation de asChild pour remplacer <p> par <div> */}
+          <DialogDescription asChild>
+            <div className="text-sm text-muted-foreground space-y-3">
+              <p>
+                To access all admin features and manage social media quests effectively,
+                you need to connect at least one social media account.
               </p>
-              <div className="flex flex-wrap gap-2 justify-center">
-                {missingConnections.map((platform) => (
-                  <Badge
-                    key={platform}
-                    variant="outline"
-                    className={`${getSocialColor(platform)} font-mono text-xs`}
-                  >
-                    {getSocialIcon(platform)}
-                    <span className="ml-1">{platform.toUpperCase()}</span>
-                  </Badge>
-                ))}
+              <div className="space-y-2">
+                <div className="font-semibold text-orange-600 dark:text-orange-400">
+                  Missing connections:
+                </div>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  {missingConnections.map((platform) => (
+                    <Badge
+                      key={platform}
+                      variant="outline"
+                      className={`${getSocialColor(platform)} font-mono text-xs`}
+                    >
+                      {getSocialIcon(platform)}
+                      <span className="ml-1">{platform.toUpperCase()}</span>
+                    </Badge>
+                  ))}
+                </div>
               </div>
             </div>
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           <div className="flex items-center space-x-2 px-1">
             <Checkbox
@@ -145,7 +152,7 @@ export function SocialMediaPromptModal({ user, isOpen, onClose }: SocialMediaPro
               Never show this again
             </Label>
           </div>
-          
+
           <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <Button
               variant="outline"
