@@ -14,6 +14,7 @@ interface QuestCardProps {
   isCompleted?: boolean;
   isRejected?: boolean;
   isPending?: boolean;
+  isExpired?: boolean;
   progress?: number;
   onSelect: () => void;
 }
@@ -41,7 +42,7 @@ const difficultyConfig = {
   master: { color: 'text-indigo-600', bgColor: 'bg-indigo-50', borderColor: 'border-indigo-200', stars: 5 },
 };
 
-export function QuestCard({ quest, isCompleted = false, isRejected = false, isPending = false, progress = 0, onSelect }: QuestCardProps) {
+export function QuestCard({ quest, isCompleted = false, isRejected = false, isPending = false, isExpired = false, progress = 0, onSelect }: QuestCardProps) {
   const categoryColor = quest.category ? categoryColors[quest.category] : '';
   const difficultyInfo = difficultyConfig[quest.difficulty] || { color: 'text-gray-600', stars: 1 };
 
@@ -57,6 +58,7 @@ export function QuestCard({ quest, isCompleted = false, isRejected = false, isPe
       isCompleted && 'ring-2 ring-green-500/20 bg-gradient-to-br from-green-50/50 via-background to-green-50/20 dark:from-green-950/20 dark:to-green-950/10 border-green-300 dark:border-green-700',
       isRejected && 'ring-2 ring-red-500/20 bg-gradient-to-br from-red-50/50 via-background to-red-50/20 dark:from-red-950/20 dark:to-red-950/10 border-red-300 dark:border-red-700',
       isPending && 'ring-2 ring-yellow-500/20 bg-gradient-to-br from-yellow-50/50 via-background to-yellow-50/20 dark:from-yellow-950/20 dark:to-yellow-950/10 border-yellow-300 dark:border-yellow-700',
+      isExpired && 'ring-2 ring-gray-500/20 bg-gradient-to-br from-gray-50/50 via-background to-gray-50/20 dark:from-gray-950/20 dark:to-gray-950/10 border-gray-300 dark:border-gray-700',
     )}>
       <div className="relative p-4">
         {isCompleted && (
@@ -72,6 +74,11 @@ export function QuestCard({ quest, isCompleted = false, isRejected = false, isPe
         {isPending && (
           <div className="absolute top-2 left-2 px-2 py-1 bg-yellow-400 text-yellow-900 text-xs rounded shadow z-10 animate-pulse">
             Pending
+          </div>
+        )}
+        {isExpired && (
+          <div className="absolute top-2 left-2 px-2 py-1 bg-gray-600 text-white text-xs rounded shadow z-10 animate-pulse">
+            Expired
           </div>
         )}
       </div>
@@ -94,8 +101,14 @@ export function QuestCard({ quest, isCompleted = false, isRejected = false, isPe
               {quest.title}
             </h3>
           )}
-          {!isCompleted && !isRejected && !isPending && (
+
+          {!isCompleted && !isRejected && !isPending && !isExpired && (
             <h3 className="font-semibold text-lg leading-tight group-hover:text-blue-500 transition-colors font-mono">
+              {quest.title}
+            </h3>
+          )}
+          {isExpired && (
+            <h3 className="font-semibold text-lg leading-tight group-hover:text-gray-500 transition-colors font-mono">
               {quest.title}
             </h3>
           )}
@@ -151,14 +164,15 @@ export function QuestCard({ quest, isCompleted = false, isRejected = false, isPe
       </CardContent>
       
       <CardFooter className="p-4 pt-0">
-        {(isCompleted || isRejected || isPending) ? (
+        {(isCompleted || isRejected || isPending || isExpired) ? (
           <Button 
             className={cn(
               "w-full font-mono border-2 border-dashed hover:border-solid transition-all duration-200",
               "hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:translate-x-[-1px] hover:translate-y-[-1px]",
               isCompleted && "bg-gradient-to-r from-green-500/10 to-green-600/10 hover:from-green-500/20 hover:to-green-600/20",
               isRejected && "bg-gradient-to-r from-red-500/10 to-red-600/10 hover:from-red-500/20 hover:to-red-600/20",
-              isPending && "bg-gradient-to-r from-yellow-400/10 to-yellow-500/10 hover:from-yellow-400/20 hover:to-yellow-500/20"
+              isPending && "bg-gradient-to-r from-yellow-400/10 to-yellow-500/10 hover:from-yellow-400/20 hover:to-yellow-500/20",
+              isExpired && "bg-gradient-to-r from-gray-500/10 to-gray-600/10 hover:from-gray-500/20 hover:to-gray-600/20"
             )}
             variant="outline"
             onClick={onSelect}

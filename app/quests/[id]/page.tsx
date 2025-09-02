@@ -89,6 +89,8 @@ export default function QuestDetailPage() {
           QuestService.getCurrentUser(),
         ]);
 
+        console.log('Quest and user data loaded:', questData);
+
         const questDetails =
           questData && (questData as any).success ? (questData as any).data : questData;
 
@@ -460,7 +462,7 @@ export default function QuestDetailPage() {
 
                     <AlertDialog open={showVerifyDialog} onOpenChange={setShowVerifyDialog}>
                       <AlertDialogTrigger asChild>
-                        <Button
+                        {quest.user_status === "unstarted" && <Button
                           size="lg"
                           variant="outline"
                           className="w-full border-2 border-green-500 text-green-600 hover:bg-green-50 dark:hover:bg-green-950/20 font-semibold py-3 sm:py-4 px-6 sm:px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 text-sm sm:text-base"
@@ -489,7 +491,8 @@ export default function QuestDetailPage() {
                               Verify Completion
                             </span>
                           )}
-                        </Button>
+                        </Button>}
+                        
                       </AlertDialogTrigger>
                       <AlertDialogContent className="sm:max-w-md" aria-labelledby="verify-dialog-title" aria-describedby="verify-dialog-description">
                         <AlertDialogHeader>

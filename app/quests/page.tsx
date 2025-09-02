@@ -88,8 +88,23 @@ useEffect(() => {
   // ✅ Filtrage global (status, complété, recherche, catégorie, difficulté)
 // ✅ Vérifie si la quête est complétée via user_status
 // Vérifie si la quête est complétée via user_status
+
+
+const now = new Date();
+
+// const activeQuests = enhancedQuests.filter(quest =>
+//   (quest.status === 'active' || quest.status === 'published') &&
+//   quest.user_status === 'unstarted' &&
+//   quest.endDate && new Date(quest.endDate) > now
+// );
+
+const isExpired = (quest: Quest): boolean => {
+  return !!quest.endDate && new Date(quest.endDate) < now;
+};
+
+
 const isQuestCompleted = (quest: Quest) =>
-  quest.user_status === "validated" ;
+  quest.user_status === "validated";
 
 // ✅ Vérifie si la quête est rejetée via user_status
 const isQuestRejected = (quest: Quest) =>
@@ -287,7 +302,7 @@ const filteredQuests = quests.filter((quest) => {
                 value="available"
                 className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[inset_2px_2px_0px_0px_rgba(0,0,0,0.1)] transition-all duration-200"
               >
-                Available ({baseFilteredQuests.filter((q) => !isQuestCompleted(q) && !isQuestRejected(q)).length})
+                Available ({baseFilteredQuests.filter((q) => !isQuestCompleted(q) && !isQuestRejected(q) && !isExpired(q)).length})
               </TabsTrigger>
               <TabsTrigger 
                 value="completed"
@@ -321,6 +336,7 @@ const filteredQuests = quests.filter((quest) => {
       isCompleted={isQuestCompleted(quest)}
       isPending={isQuestPending(quest)}
       isRejected={isQuestRejected(quest)}
+      isExpired={isExpired(quest)}
       onSelect={() => handleQuestSelect(quest)}
     />
                   ))}
@@ -386,7 +402,7 @@ const filteredQuests = quests.filter((quest) => {
                   : 'space-y-4'
               )}>
                 {baseFilteredQuests
-                 .filter((q) => !isQuestCompleted(q))
+                 .filter((q) => !isQuestCompleted(q) && !isQuestRejected(q) && !isExpired(q))
     .map((quest) => (
                     <QuestCard
                       key={quest.id}
