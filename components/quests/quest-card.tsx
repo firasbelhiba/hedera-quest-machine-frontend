@@ -12,6 +12,8 @@ import Image from 'next/image';
 interface QuestCardProps {
   quest: Quest;
   isCompleted?: boolean;
+  isRejected?: boolean;
+  isPending?: boolean;
   progress?: number;
   onSelect: () => void;
 }
@@ -39,7 +41,7 @@ const difficultyConfig = {
   master: { color: 'text-indigo-600', bgColor: 'bg-indigo-50', borderColor: 'border-indigo-200', stars: 5 },
 };
 
-export function QuestCard({ quest, isCompleted = false, progress = 0, onSelect }: QuestCardProps) {
+export function QuestCard({ quest, isCompleted = false, isRejected = false, isPending = false, progress = 0, onSelect }: QuestCardProps) {
   const categoryColor = quest.category ? categoryColors[quest.category] : '';
   const difficultyInfo = difficultyConfig[quest.difficulty] || { color: 'text-gray-600', stars: 1 };
 
@@ -51,7 +53,10 @@ export function QuestCard({ quest, isCompleted = false, progress = 0, onSelect }
     <Card className={cn(
       'group cursor-pointer transition-all duration-200 hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)] hover:translate-x-[-2px] hover:translate-y-[-2px] border-2 border-dashed hover:border-solid',
       'bg-gradient-to-br from-background via-background to-muted/20',
-      isCompleted && 'ring-2 ring-green-500/20 bg-gradient-to-br from-green-50/50 via-background to-green-50/20 dark:from-green-950/20 dark:to-green-950/10 border-green-300 dark:border-green-700'
+      'ring-2 ring-green-500/20 bg-gradient-to-br from-green-50/50 via-background to-green-50/20 dark:from-blue-950/20 dark:to-blue-950/10 border-blue-300 dark:border-blue-700',
+      isCompleted && 'ring-2 ring-green-500/20 bg-gradient-to-br from-green-50/50 via-background to-green-50/20 dark:from-green-950/20 dark:to-green-950/10 border-green-300 dark:border-green-700',
+      isRejected && 'ring-2 ring-red-500/20 bg-gradient-to-br from-red-50/50 via-background to-red-50/20 dark:from-red-950/20 dark:to-red-950/10 border-red-300 dark:border-red-700',
+      isPending && 'ring-2 ring-yellow-500/20 bg-gradient-to-br from-yellow-50/50 via-background to-yellow-50/20 dark:from-yellow-950/20 dark:to-yellow-950/10 border-yellow-300 dark:border-yellow-700',
     )}>
       <div className="relative p-4">
         {isCompleted && (
@@ -59,14 +64,42 @@ export function QuestCard({ quest, isCompleted = false, progress = 0, onSelect }
             <Trophy className="w-4 h-4 text-white" />
           </div>
         )}
+        {isRejected && (
+          <div className="absolute top-2 left-2 px-2 py-1 bg-red-600 text-white text-xs rounded shadow z-10 animate-pulse">
+            Rejected
+          </div>
+        )}
+        {isPending && (
+          <div className="absolute top-2 left-2 px-2 py-1 bg-yellow-400 text-yellow-900 text-xs rounded shadow z-10 animate-pulse">
+            Pending
+          </div>
+        )}
       </div>
       
       <CardContent className="p-4 relative bg-gradient-to-b from-transparent to-primary/5">
         
         <div className="flex items-start justify-between mb-2">
-          <h3 className="font-semibold text-lg leading-tight group-hover:text-primary transition-colors font-mono">
+           {isCompleted && 
+          <h3 className="font-semibold text-lg leading-tight group-hover:text-green-500 transition-colors font-mono">
             {quest.title}
           </h3>
+          }
+          {isRejected && (
+            <h3 className="font-semibold text-lg leading-tight group-hover:text-red-500 transition-colors font-mono">
+              {quest.title}
+            </h3>
+          )}
+          {isPending && (
+            <h3 className="font-semibold text-lg leading-tight group-hover:text-yellow-500 transition-colors font-mono">
+              {quest.title}
+            </h3>
+          )}
+          {!isCompleted && !isRejected && !isPending && (
+            <h3 className="font-semibold text-lg leading-tight group-hover:text-blue-500 transition-colors font-mono">
+              {quest.title}
+            </h3>
+          )}
+
           <div className="flex items-center text-sm text-muted-foreground ml-2 bg-muted/30 px-2 py-1 rounded border border-dashed font-mono">
             <Trophy className="w-4 h-4 mr-1" />
 {quest.reward || quest.points || (quest as any).points || 'TBD'} pts
@@ -118,17 +151,32 @@ export function QuestCard({ quest, isCompleted = false, progress = 0, onSelect }
       </CardContent>
       
       <CardFooter className="p-4 pt-0">
-        <Button 
-          className={cn(
-            "w-full font-mono border-2 border-dashed hover:border-solid transition-all duration-200",
-            "hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:translate-x-[-1px] hover:translate-y-[-1px]",
-            isCompleted && "bg-gradient-to-r from-green-500/10 to-green-600/10 hover:from-green-500/20 hover:to-green-600/20"
-          )}
-          variant={isCompleted ? "outline" : "default"}
-          onClick={onSelect}
-        >
-          {isCompleted ? 'View Details' : 'Start Quest'}
-        </Button>
+        {(isCompleted || isRejected || isPending) ? (
+          <Button 
+            className={cn(
+              "w-full font-mono border-2 border-dashed hover:border-solid transition-all duration-200",
+              "hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:translate-x-[-1px] hover:translate-y-[-1px]",
+              isCompleted && "bg-gradient-to-r from-green-500/10 to-green-600/10 hover:from-green-500/20 hover:to-green-600/20",
+              isRejected && "bg-gradient-to-r from-red-500/10 to-red-600/10 hover:from-red-500/20 hover:to-red-600/20",
+              isPending && "bg-gradient-to-r from-yellow-400/10 to-yellow-500/10 hover:from-yellow-400/20 hover:to-yellow-500/20"
+            )}
+            variant="outline"
+            onClick={onSelect}
+          >
+            View Details
+          </Button>
+        ) : (
+          <Button 
+            className={cn(
+              "w-full font-mono border-2 border-dashed hover:border-solid transition-all duration-200",
+              "hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:translate-x-[-1px] hover:translate-y-[-1px]"
+            )}
+            variant="default"
+            onClick={onSelect}
+          >
+            Start Quest
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );

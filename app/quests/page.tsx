@@ -86,12 +86,65 @@ useEffect(() => {
   };
 
   // ✅ Filtrage global (status, complété, recherche, catégorie, difficulté)
-const filteredQuests = quests.filter(quest => {
-  const isActive = quest.status === 'active' || quest.status === 'published';
+// ✅ Vérifie si la quête est complétée via user_status
+// Vérifie si la quête est complétée via user_status
+const isQuestCompleted = (quest: Quest) =>
+  quest.user_status === "validated" ;
+
+// ✅ Vérifie si la quête est rejetée via user_status
+const isQuestRejected = (quest: Quest) =>
+  quest.user_status === "rejected";
+
+// ✅ Vérifie si la quête est en attente via user_status
+const isQuestPending = (quest: Quest) =>
+  quest.user_status === "pending";
+
+// ✅ Filtrage global (hors complété)
+const baseFilteredQuests = quests.filter((quest) => {
+  const isActive = quest.status === "active" || quest.status === "published";
   if (!isActive) return false;
 
-  if (!filters.showCompleted && user?.completedQuests?.includes(String(quest.id))) {
+  if (
+    filters.search &&
+    !(
+      quest.title.toLowerCase().includes(filters.search.toLowerCase()) ||
+      quest.description?.toLowerCase().includes(filters.search.toLowerCase())
+    )
+  ) {
     return false;
+  }
+
+  if (
+    filters.categories.length > 0 &&
+    (!quest.category || !filters.categories.includes(quest.category))
+  ) {
+    return false;
+  }
+
+  if (
+    filters.difficulties.length > 0 &&
+    !filters.difficulties.includes(quest.difficulty)
+  ) {
+    return false;
+  }
+
+  return true;
+});
+
+
+// ✅ Filtrage global
+const filteredQuests = quests.filter((quest) => {
+  const isActive = quest.status === "active" || quest.status === "published";
+  if (!isActive) return false;
+
+  const isCompleted = isQuestCompleted(quest);
+
+  if (filters.showCompleted) {
+    // si on veut voir uniquement les complétées
+    if (!isCompleted) return false;
+  } else {
+    // si on veut cacher les complétées
+    if (isCompleted) return false;
   }
 
   if (
@@ -111,12 +164,16 @@ const filteredQuests = quests.filter(quest => {
     return false;
   }
 
-  if (filters.difficulties.length > 0 && !filters.difficulties.includes(quest.difficulty)) {
+  if (
+    filters.difficulties.length > 0 &&
+    !filters.difficulties.includes(quest.difficulty)
+  ) {
     return false;
   }
 
   return true;
 });
+
 
 
   if (isLoading) {
@@ -219,41 +276,58 @@ const filteredQuests = quests.filter(quest => {
         <div className="flex-1">
           <Tabs defaultValue="all" className="space-y-6">
             <TabsList className="bg-gradient-to-r from-background via-muted/50 to-background border-2 border-dashed border-muted p-1">
+             
               <TabsTrigger 
                 value="all"
-                className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[inset_2px_2px_0px_0px_rgba(0,0,0,0.1)] transition-all duration-200"
+                className="font-mono data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=active]:shadow-[inset_2px_2px_0px_0px_rgba(0,0,0,0.1)] transition-all duration-200"
               >
-                All Quests ({filteredQuests.length})
+                All Quests ({baseFilteredQuests.length})
               </TabsTrigger>
               <TabsTrigger 
                 value="available"
                 className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[inset_2px_2px_0px_0px_rgba(0,0,0,0.1)] transition-all duration-200"
               >
-                Available ({filteredQuests.filter(q => !user?.completedQuests?.includes(String(q.id))).length})
+                Available ({baseFilteredQuests.filter((q) => !isQuestCompleted(q) && !isQuestRejected(q)).length})
               </TabsTrigger>
               <TabsTrigger 
                 value="completed"
-                className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[inset_2px_2px_0px_0px_rgba(0,0,0,0.1)] transition-all duration-200"
+                className="font-mono data-[state=active]:bg-green-500 data-[state=active]:text-green-900 data-[state=active]:shadow-[inset_2px_2px_0px_0px_rgba(0,255,0,0.1)] transition-all duration-200"
               >
-                Completed ({filteredQuests.filter(q => user?.completedQuests?.includes(String(q.id))).length})
+                Completed ({baseFilteredQuests.filter((q) => isQuestCompleted(q)).length})
               </TabsTrigger>
+               <TabsTrigger 
+                value="pending"
+                className="font-mono data-[state=active]:bg-yellow-400 data-[state=active]:text-yellow-900 data-[state=active]:shadow-[inset_2px_2px_0px_0px_rgba(255,255,0,0.1)] transition-all duration-200"
+              >
+                Pending ({baseFilteredQuests.filter((q) => isQuestPending(q)).length})
+              </TabsTrigger>
+         
+              <TabsTrigger 
+                value="rejected"
+                className="font-mono data-[state=active]:bg-destructive data-[state=active]:text-destructive-foreground data-[state=active]:shadow-[inset_2px_2px_0px_0px_rgba(255,0,0,0.1)] transition-all duration-200"
+              >
+                Rejected ({baseFilteredQuests.filter((q) => isQuestRejected(q)).length})
+              </TabsTrigger>
+           
             </TabsList>
 
             <TabsContent value="all" className="space-y-6">
               {viewMode === 'grid' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-                  {filteredQuests.map((quest) => (
-                    <QuestCard
-                      key={quest.id}
-                      quest={quest}
-                      isCompleted={user?.completedQuests?.includes(String(quest.id))}
-                      onSelect={() => handleQuestSelect(quest)}
-                    />
+                  {baseFilteredQuests.map((quest) => (
+                   <QuestCard
+      key={quest.id}
+      quest={quest}
+      isCompleted={isQuestCompleted(quest)}
+      isPending={isQuestPending(quest)}
+      isRejected={isQuestRejected(quest)}
+      onSelect={() => handleQuestSelect(quest)}
+    />
                   ))}
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {filteredQuests.map((quest) => (
+                  {baseFilteredQuests.map((quest) => (
                     <div key={quest.id} className="border rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer"
                          onClick={() => handleQuestSelect(quest)}>
                       <div className="flex items-start justify-between">
@@ -302,15 +376,18 @@ const filteredQuests = quests.filter(quest => {
               )}
             </TabsContent>
 
+
+
+
             <TabsContent value="available">
               <div className={cn(
                 viewMode === 'grid' 
                   ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
                   : 'space-y-4'
               )}>
-                {filteredQuests
-                  .filter(q => !user?.completedQuests?.includes(String(q.id)))
-                  .map((quest) => (
+                {baseFilteredQuests
+                 .filter((q) => !isQuestCompleted(q))
+    .map((quest) => (
                     <QuestCard
                       key={quest.id}
                       quest={quest}
@@ -327,13 +404,53 @@ const filteredQuests = quests.filter(quest => {
                   ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
                   : 'space-y-4'
               )}>
-                {filteredQuests
-                  .filter(q => user?.completedQuests?.includes(String(q.id)))
-                  .map((quest) => (
+                {baseFilteredQuests
+    .filter((q) => isQuestCompleted(q))
+    .map((quest) => (
                     <QuestCard
                       key={quest.id}
                       quest={quest}
                       isCompleted={true}
+                      onSelect={() => handleQuestSelect(quest)}
+                    />
+                  ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="pending">
+              <div className={cn(
+                viewMode === 'grid' 
+                  ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+                  : 'space-y-4'
+              )}>
+                {baseFilteredQuests
+                  .filter((q) => isQuestPending(q))
+                  .map((quest) => (
+                    <QuestCard
+                      key={quest.id}
+                      quest={quest}
+                      isCompleted={false}
+                      isPending={true}
+                      onSelect={() => handleQuestSelect(quest)}
+                    />
+                  ))}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="rejected">
+              <div className={cn(
+                viewMode === 'grid' 
+                  ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+                  : 'space-y-4'
+              )}>
+                {baseFilteredQuests
+                  .filter((q) => isQuestRejected(q))
+                  .map((quest) => (
+                    <QuestCard
+                      key={quest.id}
+                      quest={quest}
+                      isCompleted={false}
+                      isRejected={true}
                       onSelect={() => handleQuestSelect(quest)}
                     />
                   ))}
