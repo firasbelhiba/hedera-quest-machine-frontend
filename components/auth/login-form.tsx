@@ -15,6 +15,7 @@ import useStore from '@/lib/store';
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
 import { HydrationSafe } from '@/components/hydration-safe';
 import ErrorBoundary from '@/components/error-boundary';
+import { useToast } from '@/hooks/use-toast';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -32,6 +33,7 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const { toast } = useToast();
 
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema)
@@ -43,15 +45,69 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
     setIsLoading(true);
     setError(null);
 
+    // Client-side validation feedback
+    if (!data.email || !data.password) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    // Show loading toast
+    const loadingToast = toast({
+      title: "Signing you in...",
+      description: "Please wait while we verify your credentials.",
+      variant: "default"
+    });
+
     try {
       await login(data.email, data.password);
+      
+      // Dismiss loading toast
+      loadingToast.dismiss();
+      
       // Get the user data from store after successful login
       const { user } = useStore.getState();
       if (user) {
+        // Show success toast
+        toast({
+          title: "Welcome back!",
+          description: `Successfully signed in as ${user.name || user.email}`,
+          variant: "default"
+        });
+        
         onSuccess(user, user.role === 'admin');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
+      // Dismiss loading toast
+      loadingToast.dismiss();
+      
+      const errorMessage = err instanceof Error ? err.message : 'Login failed. Please try again.';
+      setError(errorMessage);
+      
+      // Show appropriate error toast based on error type
+      let toastTitle = "Sign In Failed";
+      let toastDescription = errorMessage;
+      
+      if (errorMessage.toLowerCase().includes('password')) {
+        toastTitle = "Incorrect Password";
+        toastDescription = "The password you entered is incorrect. Please try again.";
+      } else if (errorMessage.toLowerCase().includes('email') || errorMessage.toLowerCase().includes('user not found')) {
+        toastTitle = "Account Not Found";
+        toastDescription = "No account found with this email address. Please check your email or create an account.";
+      } else if (errorMessage.toLowerCase().includes('network') || errorMessage.toLowerCase().includes('connection')) {
+        toastTitle = "Connection Error";
+        toastDescription = "Unable to connect to our servers. Please check your internet connection and try again.";
+      }
+      
+      toast({
+        title: toastTitle,
+        description: toastDescription,
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
@@ -74,7 +130,7 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
           </CardHeader>
           
           <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <div className="relative">

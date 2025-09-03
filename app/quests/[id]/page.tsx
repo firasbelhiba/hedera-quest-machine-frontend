@@ -9,6 +9,7 @@ import { Quest, User } from '@/lib/types';
 import { QuestService } from '@/lib/services';
 import { api } from '@/lib/api/client';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -70,6 +71,7 @@ const getCategoryIcon = (category: string) => {
 export default function QuestDetailPage() {
   const params = useParams();
   const questId = params?.id as string;
+  const { toast } = useToast();
 
   const [quest, setQuest] = useState<Quest | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -145,16 +147,60 @@ export default function QuestDetailPage() {
     setVerifyMessage(null);
     setShowVerifyDialog(false);
 
+    // Show loading toast
+    const loadingToast = toast({
+      title: "Verifying Quest...",
+      description: "Please wait while we verify your quest completion.",
+      variant: "default"
+    });
+
     try {
       await api.post(`/quest-completions/quests/${quest.id}/verify`);
+      
+      // Dismiss loading toast
+      loadingToast.dismiss();
+      
+      // Show success toast
+      toast({
+        title: "Quest Verified Successfully! 🎉",
+        description: `Congratulations! You've completed "${quest.title}" and earned ${quest.reward || 0} points!`,
+        variant: "default"
+      });
+      
       setVerifyMessage('Quest verification successful!');
+      
       // Refresh the page to update stats and hide action buttons
       setTimeout(() => {
         window.location.reload();
-      }, 1500); // Wait 1.5 seconds to show success message
+      }, 2000); // Wait 2 seconds to show success message
     } catch (error: any) {
+      // Dismiss loading toast
+      loadingToast.dismiss();
+      
       console.error('Verification failed:', error);
-      setVerifyMessage(error?.response?.data?.message || 'Verification failed. Please try again.');
+      const errorMessage = error?.response?.data?.message || 'Verification failed. Please try again.';
+      setVerifyMessage(errorMessage);
+      
+      // Show appropriate error toast based on error type
+      let toastTitle = "Quest Verification Failed";
+      let toastDescription = errorMessage;
+      
+      if (errorMessage.toLowerCase().includes('already')) {
+        toastTitle = "Quest Already Completed";
+        toastDescription = "You have already completed this quest.";
+      } else if (errorMessage.toLowerCase().includes('requirements')) {
+        toastTitle = "Requirements Not Met";
+        toastDescription = "Please ensure you've completed all quest requirements before verifying.";
+      } else if (errorMessage.toLowerCase().includes('network') || errorMessage.toLowerCase().includes('connection')) {
+        toastTitle = "Connection Error";
+        toastDescription = "Unable to verify quest due to connection issues. Please try again.";
+      }
+      
+      toast({
+        title: toastTitle,
+        description: toastDescription,
+        variant: "destructive"
+      });
     } finally {
       setVerifying(false);
     }
