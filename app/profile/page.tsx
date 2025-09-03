@@ -184,16 +184,9 @@ export default function ProfilePage() {
 
   const fetchUserStats = async () => {
     try {
-      const accessToken = localStorage.getItem("auth_token");
-      if (!accessToken) {
-        console.log("No access token found");
-        return;
-      }
-
       const response = await fetch("/api/user/stats", {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
       });
@@ -270,48 +263,6 @@ export default function ProfilePage() {
       setTimeout(() => setSaveError(null), 5000);
     } finally {
       setIsConnectingTwitter(false);
-    }
-  };
-  const handleConnectHedera = async () => {
-    // setIsConnectingHedera(true);
-    try {
-      const accessToken = localStorage.getItem("auth_token");
-      if (!accessToken) {
-        setSaveError("No access token found. Please login again.");
-        setTimeout(() => setSaveError(null), 5000);
-        return;
-      }
-
-      const baseUrl = "https://hedera-quests.com";
-      const response = await fetch(`${baseUrl}/profile/twitter/url`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to get Twitter authorization URL");
-      }
-
-      const data = await response.json();
-
-      if (data.success && data.url) {
-        // Redirect to Twitter authorization URL
-        window.location.href = data.url;
-      } else {
-        throw new Error("Invalid response from server");
-      }
-    } catch (error) {
-      console.error("Error connecting to Twitter:", error);
-      setSaveError(
-        error instanceof Error ? error.message : "Failed to connect to Twitter"
-      );
-      setTimeout(() => setSaveError(null), 5000);
-    } finally {
-      console.log("Finished connecting to Twitter");
-      // setIsConnectingTwitter(false);
     }
   };
   const handleConnectHedera = async () => {
@@ -403,8 +354,8 @@ export default function ProfilePage() {
     }
   };
 
-  const verifyHederaDidEmail = async () => {
-    // setIsConnectingHedera(true);
+  const handleConnectFacebook = async () => {
+    setIsConnectingFacebook(true);
     try {
       const accessToken = localStorage.getItem("auth_token");
       if (!accessToken) {
@@ -429,7 +380,7 @@ export default function ProfilePage() {
       const data = await response.json();
 
       if (data.success && data.url) {
-        // Redirect to Twitter authorization URL
+        // Redirect to Facebook authorization URL
         window.location.href = data.url;
       } else {
         throw new Error("Invalid response from server");
