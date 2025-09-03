@@ -15,7 +15,7 @@ import useStore from '@/lib/store';
 import { Suspense } from 'react';
 import { ClientProvider } from '@/components/providers/client-provider';
 import ErrorBoundary from '@/components/error-boundary';
-import { Toaster } from '@/components/ui/sonner';
+import { Toaster } from '@/components/ui/toaster';
 import { BalanceWidget } from '@/components/ui/balance-widget';
 
 const inter = Inter({ subsets: ['latin'] });

@@ -390,8 +390,22 @@ export default function SubmissionReview({ className }: SubmissionReviewProps = 
     try {
       setLoading(true);
       
+      // Show loading toast
+      const loadingToast = toast({
+        title: "Processing Review...",
+        description: "Please wait while we process the submission review.",
+        variant: "default"
+      });
+      
       // Call the API to review the submission
       await QuestService.reviewSubmission(submissionId, status, feedback, score);
+      
+      // Dismiss loading toast
+      loadingToast.dismiss();
+      
+      // Find the submission to get user and quest details for better toast messages
+      const submission = submissions.find(s => s.id === submissionId) || 
+                        questSubmissions.find(s => s.id === submissionId);
       
       // Update local state for general submissions
       setSubmissions(prev => prev.map(submission => {
@@ -423,17 +437,63 @@ export default function SubmissionReview({ className }: SubmissionReviewProps = 
         return submission;
       }));
       
+      // Show appropriate success toast based on status
+      let toastTitle = "Review Completed";
+      let toastDescription = "";
+      
+      if (status === 'approved') {
+        toastTitle = "✅ Submission Approved";
+        toastDescription = submission 
+          ? `${submission.userName}'s submission for "${submission.questTitle}" has been approved and they've earned ${score} points!`
+          : "Submission has been approved successfully.";
+      } else if (status === 'rejected') {
+        toastTitle = "❌ Submission Rejected";
+        toastDescription = submission 
+          ? `${submission.userName}'s submission for "${submission.questTitle}" has been rejected.`
+          : "Submission has been rejected.";
+      } else if (status === 'needs-revision') {
+        toastTitle = "📝 Revision Requested";
+        toastDescription = submission 
+          ? `${submission.userName} has been asked to revise their submission for "${submission.questTitle}".`
+          : "Revision has been requested for this submission.";
+      }
+      
       toast({
-        title: "Review Submitted",
-        description: `Submission has been ${status}.`,
+        title: toastTitle,
+        description: toastDescription,
         variant: "default",
       });
       
     } catch (error) {
+      // Dismiss loading toast if it exists
+      const loadingToast = toast({
+        title: "Processing Review...",
+        description: "Please wait while we process the submission review.",
+        variant: "default"
+      });
+      loadingToast.dismiss();
+      
       console.error('Error reviewing submission:', error);
+      
+      // Show appropriate error toast
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      let toastTitle = "Review Failed";
+      let toastDescription = "Failed to submit review. Please try again.";
+      
+      if (errorMessage.toLowerCase().includes('network') || errorMessage.toLowerCase().includes('connection')) {
+        toastTitle = "Connection Error";
+        toastDescription = "Unable to submit review due to connection issues. Please check your internet and try again.";
+      } else if (errorMessage.toLowerCase().includes('permission') || errorMessage.toLowerCase().includes('unauthorized')) {
+        toastTitle = "Permission Denied";
+        toastDescription = "You don't have permission to review this submission.";
+      } else if (errorMessage.toLowerCase().includes('not found')) {
+        toastTitle = "Submission Not Found";
+        toastDescription = "The submission could not be found. It may have been deleted.";
+      }
+      
       toast({
-        title: "Review Failed",
-        description: "Failed to submit review. Please try again.",
+        title: toastTitle,
+        description: toastDescription,
         variant: "destructive",
       });
     } finally {

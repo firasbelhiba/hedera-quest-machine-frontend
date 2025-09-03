@@ -158,6 +158,13 @@ export function EditQuestForm({
     setIsLoading(true);
     setError(null);
 
+    // Show loading toast
+    const loadingToast = toast({
+      title: "Updating Quest...",
+      description: "Please wait while we save your changes.",
+      variant: "default"
+    });
+
     try {
       console.log("Updating quest data:", data);
 
@@ -242,30 +249,84 @@ export function EditQuestForm({
       }
 
       if (Object.keys(updateData).length === 0) {
+        // Dismiss loading toast
+        loadingToast.dismiss();
+        
         toast({
-          title: "No Changes",
-          description: "No changes were made to the quest.",
+          title: "No Changes Detected",
+          description: "No modifications were made to the quest.",
+          variant: "default"
         });
         onSuccess?.();
         return;
       }
 
       await QuestService.updateQuest(String(quest.id), updateData);
+      
+      // Dismiss loading toast
+      loadingToast.dismiss();
+      
       console.log("Quest updated successfully");
+      
+      // Show success toast with details about what was updated
+      const updatedFields = Object.keys(updateData);
+      let successDescription = `"${data.title || quest.title}" has been successfully updated.`;
+      
+      if (updatedFields.includes('status')) {
+        if (updateData.status === 'active') {
+          successDescription += " The quest is now live and available to users.";
+        } else if (updateData.status === 'draft') {
+          successDescription += " The quest has been saved as a draft.";
+        }
+      }
+      
+      if (updatedFields.includes('reward')) {
+        successDescription += ` Reward updated to ${updateData.reward} points.`;
+      }
+      
       toast({
-        title: "Quest Updated",
-        description: `The quest "${
-          data.title || quest.title
-        }" has been successfully updated.`,
+        title: "Quest Updated Successfully! ✅",
+        description: successDescription,
+        variant: "default"
       });
+      
       onSuccess?.();
     } catch (err) {
+      // Dismiss loading toast
+      loadingToast.dismiss();
+      
       console.error("Error updating quest:", err);
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to update quest. Please try again."
-      );
+      const errorMessage = err instanceof Error
+        ? err.message
+        : "Failed to update quest. Please try again.";
+      setError(errorMessage);
+      
+      // Show appropriate error toast
+      let toastTitle = "Quest Update Failed";
+      let toastDescription = errorMessage;
+      
+      if (errorMessage.toLowerCase().includes('title') && errorMessage.toLowerCase().includes('already')) {
+        toastTitle = "Duplicate Quest Title";
+        toastDescription = "A quest with this title already exists. Please choose a different title.";
+      } else if (errorMessage.toLowerCase().includes('validation')) {
+        toastTitle = "Validation Error";
+        toastDescription = "Please check all fields and ensure they meet the requirements.";
+      } else if (errorMessage.toLowerCase().includes('permission') || errorMessage.toLowerCase().includes('unauthorized')) {
+        toastTitle = "Permission Denied";
+        toastDescription = "You don't have permission to update this quest.";
+      } else if (errorMessage.toLowerCase().includes('not found')) {
+        toastTitle = "Quest Not Found";
+        toastDescription = "The quest could not be found. It may have been deleted.";
+      } else if (errorMessage.toLowerCase().includes('network') || errorMessage.toLowerCase().includes('connection')) {
+        toastTitle = "Connection Error";
+        toastDescription = "Unable to update quest due to connection issues. Please check your internet and try again.";
+      }
+      
+      toast({
+        title: toastTitle,
+        description: toastDescription,
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }

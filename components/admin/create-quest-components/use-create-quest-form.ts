@@ -89,6 +89,11 @@ export const useCreateQuestForm = (onSuccess?: () => void) => {
     try {
       if (selectedBadges.length > 10) {
         setError("Cannot assign more than 10 badges to a single quest");
+        toast({
+          title: "Too Many Badges",
+          description: "You can only assign up to 10 badges per quest. Please remove some badges and try again.",
+          variant: "destructive",
+        });
         setIsLoading(false);
         return;
       }
@@ -107,6 +112,13 @@ export const useCreateQuestForm = (onSuccess?: () => void) => {
           return;
         }
       }
+
+      // Show loading toast
+      const loadingToast = toast({
+        title: "Creating Quest...",
+        description: "Please wait while we create your quest.",
+        variant: "default"
+      });
 
       const formatDateTime = (date: Date | undefined, time: string) => {
         if (!date) return "";
@@ -138,10 +150,30 @@ export const useCreateQuestForm = (onSuccess?: () => void) => {
       };
 
       await QuestService.createQuest(questData);
+      
+      // Dismiss loading toast
+      loadingToast.dismiss();
+      
+      // Show success toast with appropriate message based on status
+      let successTitle = "Quest Created Successfully! 🎉";
+      let successDescription = "";
+      
+      if (status === "active") {
+        successTitle = "Quest Created and Published! 🚀";
+        successDescription = `"${questData.title}" is now live and available for users to complete. It offers ${data.reward || 0} points${selectedBadges.length > 0 ? ` and ${selectedBadges.length} badge${selectedBadges.length > 1 ? 's' : ''}` : ''}.`;
+      } else if (status === "draft") {
+        successTitle = "Quest Saved as Draft 📝";
+        successDescription = `"${questData.title}" has been saved as a draft. You can edit and publish it later from the quest management page.`;
+      } else {
+        successDescription = `"${questData.title}" has been created with ${status} status.`;
+      }
+      
       toast({
-        title: "Quest Created Successfully",
-        description: `The quest "${questData.title}" has been created with ${status} status.`,
+        title: successTitle,
+        description: successDescription,
+        variant: "default"
       });
+      
       onSuccess?.();
     } catch (err) {
       console.error("Error creating quest:", err);
@@ -150,9 +182,28 @@ export const useCreateQuestForm = (onSuccess?: () => void) => {
           ? err.message
           : "Failed to create quest. Please try again.";
       setError(errorMessage);
+      
+      // Show appropriate error toast
+      let toastTitle = "Quest Creation Failed";
+      let toastDescription = errorMessage;
+      
+      if (errorMessage.toLowerCase().includes('title') && errorMessage.toLowerCase().includes('already')) {
+        toastTitle = "Duplicate Quest Title";
+        toastDescription = "A quest with this title already exists. Please choose a different title.";
+      } else if (errorMessage.toLowerCase().includes('validation')) {
+        toastTitle = "Validation Error";
+        toastDescription = "Please check all required fields and ensure they meet the requirements.";
+      } else if (errorMessage.toLowerCase().includes('permission') || errorMessage.toLowerCase().includes('unauthorized')) {
+        toastTitle = "Permission Denied";
+        toastDescription = "You don't have permission to create quests.";
+      } else if (errorMessage.toLowerCase().includes('network') || errorMessage.toLowerCase().includes('connection')) {
+        toastTitle = "Connection Error";
+        toastDescription = "Unable to create quest due to connection issues. Please check your internet and try again.";
+      }
+      
       toast({
-        title: "Error Creating Quest",
-        description: errorMessage,
+        title: toastTitle,
+        description: toastDescription,
         variant: "destructive",
       });
     } finally {
