@@ -31,6 +31,9 @@ export default function RootLayout({
   const { user, isAuthenticated, isLoading, loadCurrentUser, setUser } = useStore();
   const router = useRouter();
 
+    const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+  const hideFooter = pathname === '/validate-user';
+
   const handleAuthSuccess = async (authenticatedUser: User, isAdmin: boolean) => {
     // User data is already set in store by login method
     // Just handle the redirect
@@ -114,7 +117,7 @@ export default function RootLayout({
                 )}
                 
                 {/* Balance Widget - Shows for all authenticated users except loading states */}
-                {isAuthenticated && user && !isLoading && (
+                {isAuthenticated && user && !isLoading && !hideFooter && (
                   <BalanceWidget />
                 )}
               </Suspense>

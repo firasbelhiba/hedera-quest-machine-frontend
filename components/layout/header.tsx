@@ -308,13 +308,13 @@ export function Header({ onMenuClick }: HeaderProps) {
         
 
 
-        <div className="relative w-64">
+        {/* <div className="relative w-64">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-purple-500" />
           <Input
             placeholder="[SEARCH_QUESTS...]"
             className="pl-10 border-2 border-dashed border-purple-500/50 bg-gradient-to-r from-purple-500/5 to-cyan-500/5 font-mono placeholder:text-purple-500/70 focus:border-cyan-500/70 focus:bg-gradient-to-r focus:from-cyan-500/10 focus:to-purple-500/10"
           />
-        </div>
+        </div> */}
       </div>
 
       <div className="flex items-center space-x-4">

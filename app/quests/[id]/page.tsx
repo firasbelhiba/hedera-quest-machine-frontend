@@ -52,6 +52,7 @@ import {
   Heart,
   MessageCircle,
   Share,
+  XCircle,
 } from 'lucide-react';
 
 const getCategoryIcon = (category: string) => {
@@ -80,6 +81,19 @@ export default function QuestDetailPage() {
   const [verifyMessage, setVerifyMessage] = useState<string | null>(null);
   const [showVerifyDialog, setShowVerifyDialog] = useState(false);
 
+  const now = new Date();
+  const availableQuests = quest &&
+                          quest.endDate &&
+                          new Date(quest.endDate) > now && quest.user_status === "unstarted"
+
+  const rejectedQuests = quest && quest.user_status === "rejected"
+
+  const pendingQuests = quest && quest.user_status === "pending"
+
+  const completedQuests = quest && quest.user_status === "validated";
+
+   const isExpired = quest && quest.endDate && new Date(quest.endDate) < now;
+
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true);
@@ -91,6 +105,8 @@ export default function QuestDetailPage() {
           QuestService.getCurrentUser(),
         ]);
 
+        console.log('Quest and user data loaded:', questData);
+
         const questDetails =
           questData && (questData as any).success ? (questData as any).data : questData;
 
@@ -101,14 +117,14 @@ export default function QuestDetailPage() {
         console.log('Quest data loaded:', questDetails);
         console.log('Quest reward:', questDetails.reward);
         console.log('Quest points:', (questDetails as any).points);
-        
+
         // Add fallback reward/points if missing
         if (!questDetails.reward && !questDetails.points && !(questDetails as any).points) {
           // Set reward based on difficulty
           // Reward values should be provided by the API, not hardcoded
           // questDetails.reward will use the value from the API
         }
-        
+
         setQuest(questDetails);
         setUser(userData);
       } catch (err) {
@@ -214,6 +230,8 @@ export default function QuestDetailPage() {
   }
 
   const isCompleted = user?.completedQuests?.includes(String(quest.id)) || false;
+ 
+ 
 
   const difficultyStars: Record<string, number> = {
     beginner: 1,
@@ -222,6 +240,8 @@ export default function QuestDetailPage() {
     expert: 4,
     master: 5,
   };
+
+  // const now = new Date();
 
   return (
     <main className="max-w-6xl mx-auto space-y-6" role="main" aria-label="Quest Details">
@@ -283,12 +303,36 @@ export default function QuestDetailPage() {
                               {quest.difficulty || 'unknown'}
                             </span>
                           </div>
-                          {isCompleted && (
+                          {completedQuests && (
                             <Badge className="px-4 py-2 text-sm font-semibold rounded-full border-0 shadow-sm bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 flex items-center gap-2">
                               <Trophy className="w-4 h-4" />
                               Completed
                             </Badge>
                           )}
+                          {isExpired && (
+                            <Badge className="px-4 py-2 text-sm font-semibold rounded-full border-0 shadow-sm bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 flex items-center gap-2">
+                              <Calendar className="w-4 h-4" />
+                              Expired
+                            </Badge>
+                          )}
+                          {rejectedQuests && (
+                            <Badge className="px-4 py-2 text-sm font-semibold rounded-full border-0 shadow-sm bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 flex items-center gap-2">
+                              <XCircle className="w-4 h-4" />
+                              Rejected
+                            </Badge>
+                          )}
+
+                          {pendingQuests && (
+                            <Badge className="px-4 py-2 text-sm font-semibold rounded-full border-0 shadow-sm bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 flex items-center gap-2">
+                              <Clock className="w-4 h-4" />
+                              Pending
+                            </Badge>
+                          )}
+                          {availableQuests && (
+                            <Badge className="px-4 py-2 text-sm font-semibold rounded-full border-0 shadow-sm bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 flex items-center gap-2">
+                              <CheckCircle className="w-4 h-4" />
+                              Available
+                            </Badge>)}
                         </div>
                       </div>
                     </div>
@@ -301,85 +345,24 @@ export default function QuestDetailPage() {
                       {(() => {
                         const reward = quest.reward;
                         const points = quest.points || (quest as any).points;
-                        
+
                         // Try reward first (could be string or number)
                         if (reward !== undefined && reward !== null && reward !== '') {
                           return typeof reward === 'string' ? (isNaN(Number(reward)) ? reward : Number(reward)) : reward;
                         }
-                        
+
                         // Try points
                         if (points !== undefined && points !== null && points !== 0) {
                           return points;
                         }
-                        
+
                         // Default fallback
                         return 'TBD';
                       })()} pts
                     </div>
                   </div>
 
-                  {/* Quest Stats Grid - Progress Stats Section Commented Out */}
-                  {/*
-                  <div
-                    className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
-                    role="group"
-                    aria-label="Quest Statistics"
-                  >
-                    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                          <Clock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                        </div>
-                        <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                          {quest.estimatedTime || 0}
-                        </span>
-                      </div>
-                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Minutes</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-500">Estimated time</p>
-                    </div>
 
-                    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                          <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                        </div>
-                        <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                          {quest.completions || 0}
-                        </span>
-                      </div>
-                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Completions</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-500">Total completed</p>
-                    </div>
-
-                    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                          <Trophy className="w-5 h-5 text-green-600 dark:text-green-400" />
-                        </div>
-                        <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                          {quest.reward || (quest as any).points}
-                        </span>
-                      </div>
-                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Points</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-500">Reward value</p>
-                    </div>
-
-                    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-                          <Calendar className="w-5 h-5 text-orange-600 dark:text-orange-400" />
-                        </div>
-                        <span className="text-sm font-bold text-gray-900 dark:text-white">
-                          {quest.endDate
-                            ? formatDistanceToNow(new Date(quest.endDate), { addSuffix: true })
-                            : 'No limit'}
-                        </span>
-                      </div>
-                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Deadline</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-500">Time remaining</p>
-                    </div>
-                  </div>
-                  */}
                 </div>
               </CardHeader>
 
@@ -396,6 +379,7 @@ export default function QuestDetailPage() {
                 </div>
 
                 {/* Quest Details Grid */}
+                { !(quest.quest_type === "hedera_profile_completion") && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow">
                     <div className="flex items-center gap-4">
@@ -470,7 +454,8 @@ export default function QuestDetailPage() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </div>)
+  }
 
 
 
@@ -479,85 +464,132 @@ export default function QuestDetailPage() {
                   className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4 sm:p-6 mt-8"
                   aria-label="Quest Actions"
                 >
-                  <div className="flex flex-col gap-4">
-                    {quest.quest_link ? (
-                      <Button
-                        size="lg"
-                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 sm:py-4 px-6 sm:px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border-0 text-sm sm:text-base"
-                        asChild
-                        aria-label="Start quest on external platform"
-                      >
-                        <a href={quest.quest_link} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-3">
-                          <ExternalLink className="w-5 h-5" />
-                          Start Quest
-                        </a>
-                      </Button>
-                    ) : (
-                      <Button
-                        size="lg"
-                        className="w-full bg-gray-400 text-white font-semibold py-3 sm:py-4 px-6 sm:px-8 rounded-xl cursor-not-allowed text-sm sm:text-base"
-                        disabled
-                        aria-label="Quest link not available"
-                      >
-                        <ExternalLink className="w-5 h-5" />
-                        Quest Link Not Available
-                      </Button>
-                    )}
+             <div className="flex flex-col gap-4">
+  {quest.quest_link && !isExpired ? (
+    !(quest.quest_type === "hedera_profile_completion") && (
+      <Button
+        size="lg"
+        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 sm:py-4 px-6 sm:px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border-0 text-sm sm:text-base"
+        asChild
+        aria-label="Start quest on external platform"
+      >
+        <a
+          href={quest.quest_link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-3"
+        >
+          <ExternalLink className="w-5 h-5" />
+          Start Quest
+        </a>
+      </Button>
+    )
+  ) : (
+    <Button
+      size="lg"
+      className="w-full bg-purple-400 text-white font-semibold py-3 sm:py-4 px-6 sm:px-8 rounded-xl cursor-not-allowed text-sm sm:text-base"
+      disabled
+      aria-label={isExpired ? "Quest expired" : "Quest link not available"}
+    >
+      <ExternalLink className="w-5 h-5" />
+      {isExpired ? "Quest Expired" : "Quest Link Not Available"}
+    </Button>
+  )}
 
-                    <AlertDialog open={showVerifyDialog} onOpenChange={setShowVerifyDialog}>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          size="lg"
-                          variant="outline"
-                          className="w-full border-2 border-green-500 text-green-600 hover:bg-green-50 dark:hover:bg-green-950/20 font-semibold py-3 sm:py-4 px-6 sm:px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 text-sm sm:text-base"
-                          disabled={verifying || isCompleted}
-                          aria-label={
-                            verifying
-                              ? 'Verifying quest completion'
-                              : isCompleted
-                                ? 'Quest already completed'
-                                : 'Verify quest completion'
-                          }
-                        >
-                          {verifying ? (
-                            <span className="flex items-center gap-2 sm:gap-3">
-                              <span className="animate-spin rounded-full h-5 w-5 border-b-2 border-green-600" />
-                              Verifying...
-                            </span>
-                          ) : isCompleted ? (
-                            <span className="flex items-center gap-2 sm:gap-3">
-                              <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-                              Completed
-                            </span>
-                          ) : (
-                            <span className="flex items-center gap-3">
-                              <CheckSquare className="w-5 h-5" />
-                              Verify Completion
-                            </span>
-                          )}
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent className="sm:max-w-md" aria-labelledby="verify-dialog-title" aria-describedby="verify-dialog-description">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle id="verify-dialog-title" className="flex items-center gap-2">
-                            <CheckSquare className="w-5 h-5 text-green-600" />
-                            Verify Quest Completion
-                          </AlertDialogTitle>
-                          <AlertDialogDescription id="verify-dialog-description" className="text-base leading-relaxed">
-                            Please confirm that you have completed all quest requirements. This action will submit your completion for verification.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel className="px-6" aria-label="Cancel verification">
-                            Cancel
-                          </AlertDialogCancel>
-                          <AlertDialogAction onClick={handleVerifyQuest} className="px-6 bg-green-600 hover:bg-green-700" aria-label="Confirm quest verification">
-                            Verify Now
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
+  <AlertDialog open={showVerifyDialog} onOpenChange={setShowVerifyDialog}>
+    <AlertDialogTrigger asChild>
+      <Button
+        size="lg"
+        variant="outline"
+        className={cn(
+          "w-full text-green-600 hover:bg-green-50 dark:hover:bg-green-950/20 font-semibold py-3 sm:py-4 px-6 sm:px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 text-sm sm:text-base",
+          completedQuests
+            ? "border-green-500"
+            : rejectedQuests
+            ? "border-red-500"
+            : pendingQuests
+            ? "border-yellow-500"
+            : isExpired
+            ? "border-purple-500"
+            : "border-green-500"
+        )}
+        disabled={
+          !!isExpired || !!pendingQuests || !!rejectedQuests || !!completedQuests
+        }
+        aria-label={
+          verifying
+            ? "Verifying quest completion"
+            : completedQuests
+            ? "Quest already completed"
+            : "Verify quest completion"
+        }
+      >
+        {pendingQuests ? (
+          <span className="flex items-center gap-2 sm:gap-3 text-yellow-600">
+            <span className="animate-spin rounded-full h-5 w-5 border-b-2 border-yellow-600 text-yellow-600" />
+            Verifying...
+          </span>
+        ) : completedQuests ? (
+          <span className="flex items-center gap-2 sm:gap-3 text-green-600">
+            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+            Completed
+          </span>
+        ) : rejectedQuests ? (
+          <span className="flex items-center gap-3 text-red-600">
+            <XCircle className="w-5 h-5 text-red-600" />
+            Rejected
+          </span>
+        ) : isExpired ? (
+          <span className="flex items-center gap-3 text-purple-600">
+            <XCircle className="w-5 h-5 text-purple-600" />
+            Expired
+          </span>
+        ) : (
+          <span className="flex items-center gap-3">
+            <CheckSquare className="w-5 h-5" />
+            Verify Completion
+          </span>
+        )}
+      </Button>
+    </AlertDialogTrigger>
+
+    <AlertDialogContent
+      className="sm:max-w-md"
+      aria-labelledby="verify-dialog-title"
+      aria-describedby="verify-dialog-description"
+    >
+      <AlertDialogHeader>
+        <AlertDialogTitle
+          id="verify-dialog-title"
+          className="flex items-center gap-2"
+        >
+          <CheckSquare className="w-5 h-5 text-green-600" />
+          Verify Quest Completion
+        </AlertDialogTitle>
+        <AlertDialogDescription
+          id="verify-dialog-description"
+          className="text-base leading-relaxed"
+        >
+          Please confirm that you have completed all quest requirements. This
+          action will submit your completion for verification.
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <AlertDialogFooter>
+        <AlertDialogCancel className="px-6" aria-label="Cancel verification">
+          Cancel
+        </AlertDialogCancel>
+        <AlertDialogAction
+          onClick={handleVerifyQuest}
+          className="px-6 bg-green-600 hover:bg-green-700"
+          aria-label="Confirm quest verification"
+        >
+          Verify Now
+        </AlertDialogAction>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
+</div>
+
 
                   {verifyMessage && (
                     <Alert
