@@ -124,7 +124,7 @@ export function HeroCarousel() {
           currentSlideData.gradient
         )} />
         
-        <div className="relative z-10 p-6 md:p-8 lg:p-10">
+        <div className="relative z-10 p-6 md:p-8 lg:p-20">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center min-h-[350px]">
             {/* Content */}
             <div className="space-y-6">
@@ -133,7 +133,7 @@ export function HeroCarousel() {
                   {currentSlideData.subtitle}
                 </Badge>
                 
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold font-mono bg-gradient-to-r from-primary via-purple-500 to-cyan-500 bg-clip-text text-transparent leading-tight">
+                <h1 className="text-3xl md:text-4xl lg:text-4xl font-bold font-mono bg-gradient-to-r from-primary via-purple-500 to-cyan-500 bg-clip-text text-transparent leading-tight">
                   {currentSlideData.title}
                 </h1>
                 

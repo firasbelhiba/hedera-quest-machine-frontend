@@ -112,7 +112,14 @@ export default function Dashboard() {
         
         setStats(statsData);
         // Filter featured quests to only show active ones
-        const activeQuests = enhancedQuests.filter(quest => quest.status === 'active' || quest.status === 'published');
+const now = new Date();
+
+const activeQuests = enhancedQuests.filter(quest =>
+  (quest.status === 'active' || quest.status === 'published') &&
+  quest.user_status === 'unstarted' &&
+  quest.endDate && new Date(quest.endDate) > now
+);
+
         setFeaturedQuests(activeQuests.slice(0, 6));
         setQuests(enhancedQuests);
         setUser(userData);

@@ -18,7 +18,7 @@ interface QuestFiltersProps {
 }
 
 const categories: { value: QuestCategory; label: string }[] = [
-  { value: 'getting-started', label: 'Getting Started' },
+  { value: 'getting-started', label: 'Getting Startedddd' },
   { value: 'defi', label: 'DeFi' },
   { value: 'nfts', label: 'NFTs' },
   { value: 'development', label: 'Development' },
@@ -28,7 +28,16 @@ const categories: { value: QuestCategory; label: string }[] = [
   { value: 'file-service', label: 'File Service' },
 ];
 
-
+const difficulties: { value: Difficulty; label: string }[] = [
+  { value: 'easy', label: 'Easy' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'hard', label: 'Hard' },
+  { value: 'beginner', label: 'Beginner' },
+  { value: 'intermediate', label: 'Intermediate' },
+  { value: 'advanced', label: 'Advanced' },
+  { value: 'expert', label: 'Expert' },
+  { value: 'master', label: 'Master' },
+];
 
 export function QuestFilters({ filters, onFiltersChange, className }: QuestFiltersProps) {
   const [searchValue, setSearchValue] = useState(filters.search);
@@ -40,12 +49,17 @@ export function QuestFilters({ filters, onFiltersChange, className }: QuestFilte
 
   const handleCategoryToggle = (category: QuestCategory) => {
     const newCategories = filters.categories.includes(category)
-      ? filters.categories.filter(c => c !== category)
+      ? filters.categories.filter((c) => c !== category)
       : [...filters.categories, category];
     onFiltersChange({ ...filters, categories: newCategories });
   };
 
-
+  const handleDifficultyToggle = (difficulty: Difficulty) => {
+    const newDifficulties = filters.difficulties.includes(difficulty)
+      ? filters.difficulties.filter((d) => d !== difficulty)
+      : [...filters.difficulties, difficulty];
+    onFiltersChange({ ...filters, difficulties: newDifficulties });
+  };
 
   const clearFilters = () => {
     setSearchValue('');
@@ -53,12 +67,14 @@ export function QuestFilters({ filters, onFiltersChange, className }: QuestFilte
       categories: [],
       difficulties: [],
       search: '',
-      showCompleted: false
+      showCompleted: false,
     });
   };
 
-  const hasActiveFilters = filters.categories.length > 0 || 
-    filters.search || 
+  const hasActiveFilters =
+    filters.categories.length > 0 ||
+    filters.difficulties.length > 0 || // ✅ ajouté
+    filters.search ||
     filters.showCompleted;
 
   return (
@@ -77,7 +93,7 @@ export function QuestFilters({ filters, onFiltersChange, className }: QuestFilte
           )}
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-6">
         {/* Search */}
         <div>
@@ -101,38 +117,38 @@ export function QuestFilters({ filters, onFiltersChange, className }: QuestFilte
           </form>
         </div>
 
-        {/* Categories */}
+        {/* Difficulties */}
         <div>
-          <Label className="text-sm font-medium mb-3 block">Categories</Label>
+          <Label className="text-sm font-medium mb-3 block">Difficulties</Label>
           <div className="grid grid-cols-2 gap-2">
-            {categories.map((category) => (
-              <div key={category.value} className="flex items-center space-x-2">
+            {difficulties.map((difficulty) => (
+              <div key={difficulty.value} className="flex items-center space-x-2">
                 <Checkbox
-                  id={`category-${category.value}`}
-                  checked={filters.categories.includes(category.value)}
-                  onCheckedChange={() => handleCategoryToggle(category.value)}
+                  id={`difficulty-${difficulty.value}`}
+                  checked={filters.difficulties.includes(difficulty.value)}
+                  onCheckedChange={() => handleDifficultyToggle(difficulty.value)}
                 />
                 <Label
-                  htmlFor={`category-${category.value}`}
+                  htmlFor={`difficulty-${difficulty.value}`}
                   className="text-sm font-normal cursor-pointer"
                 >
-                  {category.label}
+                  {difficulty.label}
                 </Label>
               </div>
             ))}
           </div>
-          {filters.categories.length > 0 && (
+          {filters.difficulties.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">
-              {filters.categories.map((category) => {
-                const categoryInfo = categories.find(c => c.value === category);
+              {filters.difficulties.map((difficulty) => {
+                const difficultyInfo = difficulties.find((d) => d.value === difficulty);
                 return (
-                  <Badge 
-                    key={category} 
-                    variant="secondary" 
+                  <Badge
+                    key={difficulty}
+                    variant="secondary"
                     className="text-xs cursor-pointer hover:bg-destructive hover:text-destructive-foreground"
-                    onClick={() => handleCategoryToggle(category)}
+                    onClick={() => handleDifficultyToggle(difficulty)}
                   >
-                    {categoryInfo?.label} ×
+                    {difficultyInfo?.label} ×
                   </Badge>
                 );
               })}
@@ -140,21 +156,22 @@ export function QuestFilters({ filters, onFiltersChange, className }: QuestFilte
           )}
         </div>
 
-
-
         {/* Show Completed */}
-        <div className="flex items-center space-x-2">
+        {/* <div className="flex items-center space-x-2">
           <Checkbox
             id="show-completed"
             checked={filters.showCompleted}
-            onCheckedChange={(checked) => 
+            onCheckedChange={(checked) =>
               onFiltersChange({ ...filters, showCompleted: checked as boolean })
             }
           />
-          <Label htmlFor="show-completed" className="text-sm font-normal cursor-pointer">
+          <Label
+            htmlFor="show-completed"
+            className="text-sm font-normal cursor-pointer"
+          >
             Show completed quests
           </Label>
-        </div>
+        </div> */}
       </CardContent>
     </Card>
   );

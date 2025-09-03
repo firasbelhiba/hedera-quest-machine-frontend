@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { SiDiscord } from 'react-icons/si';
 import { formatDistanceToNow } from 'date-fns';
+import { tr } from 'zod/v4/locales';
 
 
 
@@ -48,8 +49,39 @@ export default function ProfilePage() {
   const [isVerifyingEmail, setIsVerifyingEmail] = useState(false);
   const [emailVerificationSuccess, setEmailVerificationSuccess] = useState(false);
   const [isConnectingTwitter, setIsConnectingTwitter] = useState(false);
+  // const [isConnectingHedera, setIsConnectingHedera] = useState(false);
   const [isConnectingFacebook, setIsConnectingFacebook] = useState(false);
   const [isConnectingDiscord, setIsConnectingDiscord] = useState(false);
+
+    // Timer for Hedera DID verification button
+    const [hederaMailCooldown, setHederaMailCooldown] = useState<number>(0);
+    useEffect(() => {
+      let interval: NodeJS.Timeout | null = null;
+      if (profileData?.user?.hederaMail?.last_send) {
+        const updateCooldown = () => {
+          const lastSend = new Date(profileData.user.hederaMail.last_send).getTime();
+          const now = Date.now();
+          const diff = now - lastSend;
+          const cooldown = 60 * 60 * 1000 - diff;
+          setHederaMailCooldown(cooldown > 0 ? cooldown : 0);
+        };
+        updateCooldown();
+        interval = setInterval(updateCooldown, 1000);
+      } else {
+        setHederaMailCooldown(0);
+      }
+      return () => {
+        if (interval) clearInterval(interval);
+      };
+    }, [profileData?.user?.hederaMail?.last_send]);
+
+
+  // console.log("profileData",profileData.user.hederaProfile.hedera_did === "null");
+
+ 
+
+
+
 
   const { toast } = useToast();
 
@@ -117,7 +149,14 @@ export default function ProfilePage() {
         
         const data = await response.json();
         setProfileData(data);
-        
+        console.log("profileDataaaaa",data);
+
+        // Check if hedera_did is null
+        // if (data.user.hederaProfile.hedera_did === "null") {
+        //   console.log("Hedera DID is null");
+        //   verifyHederaDidEmail();
+        // }
+
         // Create user object from profile data
         const userData: User = {
           id: String(data.user.id),
@@ -159,6 +198,7 @@ export default function ProfilePage() {
       const data = await response.json();
       if (data.success) {
         setUserStats(data.stats);
+        
       }
     } catch (error) {
       console.error('Failed to load user stats:', error);
@@ -175,6 +215,8 @@ export default function ProfilePage() {
   useEffect(() => {
     loadUser();
     fetchUserStats();
+
+
   }, []);
 
 
@@ -222,6 +264,88 @@ export default function ProfilePage() {
       setIsConnectingTwitter(false);
     }
   };
+const handleConnectHedera = async () => {
+    // setIsConnectingHedera(true);
+    try {
+      const accessToken = localStorage.getItem('auth_token');
+      if (!accessToken) {
+        setSaveError('No access token found. Please login again.');
+        setTimeout(() => setSaveError(null), 5000);
+        return;
+      }
+
+      const baseUrl = 'https://hedera-quests.com';
+      const response = await fetch(`${baseUrl}/profile/hederadid/verify-user`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to get Twitter authorization URL');
+      }
+      
+      const data = await response.json();
+      
+      if (data.success && data.url) {
+        // Redirect to Twitter authorization URL
+        window.location.href = data.url;
+      } else {
+        throw new Error('Invalid response from server');
+      }
+    } catch (error) {
+      console.error('Error connecting to Twitter:', error);
+      setSaveError(error instanceof Error ? error.message : 'Failed to connect to Twitter');
+      setTimeout(() => setSaveError(null), 5000);
+    } finally {
+      console.log('Finished connecting to Twitter');
+      // setIsConnectingTwitter(false);
+    }
+  };
+
+  const verifyHederaDidEmail = async () => {
+    // setIsConnectingHedera(true);
+    try {
+      const accessToken = localStorage.getItem('auth_token');
+      if (!accessToken) {
+        setSaveError('No access token found. Please login again.');
+        setTimeout(() => setSaveError(null), 5000);
+        return;
+      }
+
+      const baseUrl = 'https://hedera-quests.com';
+      const response = await fetch(`${baseUrl}/profile/hederadid/verify-email`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to get Twitter authorization URL');
+      }
+      
+      const data = await response.json();
+      
+      if (data.success && data.url) {
+        // Redirect to Twitter authorization URL
+        window.location.href = data.url;
+      } else {
+        throw new Error('Invalid response from server');
+      }
+    } catch (error) {
+      console.error('Error connecting to Twitter:', error);
+      setSaveError(error instanceof Error ? error.message : 'Failed to connect to Twitter');
+      setTimeout(() => setSaveError(null), 5000);
+    } finally {
+      console.log('Finished connecting to Twitter');
+      // setIsConnectingTwitter(false);
+    }
+  };
+
 
   const handleConnectFacebook = async () => {
     setIsConnectingFacebook(true);
@@ -415,6 +539,11 @@ export default function ProfilePage() {
   };
 
   if (isLoading) {
+  //        if (profileData.user.hederaProfile.hedera_did === "null") {
+  //   // Handle case where hedera_did is null
+  //   console.log("Hedera DID is null");
+  //   verifyHederaDidEmail();
+  // }
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -429,6 +558,8 @@ export default function ProfilePage() {
       </div>
     );
   }
+
+
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -643,6 +774,139 @@ export default function ProfilePage() {
             </CardHeader>
             <CardContent className="space-y-6">
 
+              {/* hedera Integration */}
+
+<div className="border-2 border-dashed border-blue-500/30 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 hover:border-solid transition-all duration-200 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h3 className="font-mono font-semibold text-pink-600 dark:text-purple-400 uppercase tracking-wider">{'>'} HEDERA_INTEGRATION</h3>
+                    {profileData?.user?.hederaProfile ? (
+                      <p className="text-sm text-muted-foreground font-mono">
+                        [CONNECTED] @{profileData.user.firstName}{profileData.user.lastName}
+                      </p>
+                    ) : (
+                      <p className="text-sm text-muted-foreground font-mono">
+                        [DISCONNECTED] Link your Hedera account to verify social media quests
+                      </p>
+                    )}
+                  </div>
+                  {profileData?.user?.hederaProfile ? (
+                    <div className="flex gap-2">
+                      <Badge className="bg-green-500/20 text-green-700 dark:text-green-300 border border-dashed border-green-500/50 font-mono">
+                        <CheckCircle className="w-3 h-3 mr-1" />
+                        CONNECTED
+                      </Badge>
+                       {profileData?.user?.hederaProfile.hedera_did ? (<Badge className="bg-green-500/20 text-green-700 dark:text-green-300 border border-dashed border-green-500/50 font-mono text-xs">
+                     
+                                <CheckCircle className="w-3 h-3 mr-1" />
+                                VERIFIED
+                              </Badge>) : (
+                                <div className="flex items-center gap-2">
+                                <Badge className="bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 border border-dashed border-yellow-500/50 font-mono text-xs">
+                                  <AlertCircle className="w-3 h-3 mr-1" />
+                                  UNVERIFIED
+                                </Badge>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-6 px-2 text-xs font-mono border-dashed border-primary/50 hover:border-solid"
+                                    onClick={verifyHederaDidEmail}
+                                    disabled={hederaMailCooldown > 0}
+                                  >
+                                    {hederaMailCooldown > 0
+                                      ? `VERIFY (${Math.floor(hederaMailCooldown / 60000)}:${String(Math.floor((hederaMailCooldown % 60000) / 1000)).padStart(2, '0')})`
+                                      : (Date.now() - new Date(profileData?.user?.hederaMail.last_send).getTime() > 20 * 60 * 1000 ? 'RESET' : 'VERIFY')
+                                    }
+                                  </Button>
+                                </div>
+                                
+                              )}
+                    
+                               
+                            {/* ) : (
+                              <div className="flex items-center gap-2">
+                                <Badge className="bg-yellow-500/20 text-yellow-700 dark:text-yellow-300 border border-dashed border-yellow-500/50 font-mono text-xs">
+                                  <AlertCircle className="w-3 h-3 mr-1" />
+                                  UNVERIFIED
+                                </Badge>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="h-6 px-2 text-xs font-mono border-dashed border-primary/50 hover:border-solid"
+                                  onClick={handleVerifyEmail}
+                                  disabled={isVerifyingEmail}
+                                >
+                                  {isVerifyingEmail ? 'SENDING...' : 'VERIFY'}
+                                </Button>
+                              </div> */}
+                    </div>
+                  ) : (
+                    <Badge className="bg-gray-500/20 text-gray-700 dark:text-gray-300 border border-dashed border-gray-500/50 font-mono">
+                      <AlertCircle className="w-3 h-3 mr-1" />
+                      NOT_CONNECTED
+                    </Badge>
+                  )}
+                </div>
+
+                {profileData?.user?.hederaProfile ? (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3 p-3 bg-blue-500/10 rounded-lg border border-dashed border-blue-500/30">
+                      <Avatar className="w-10 h-10 border border-dashed border-blue-500/50">
+                        <AvatarImage src={profileData.user.hederaProfile.twitter_profile_picture} />
+                        <AvatarFallback className="font-mono">@</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <p className="font-medium font-mono">@{profileData.user.firstName}{profileData.user.lastName}</p>
+                        <p className="text-sm text-muted-foreground font-mono">ID: {profileData.user.hederaProfile.hedera_id}</p>
+                      </div>
+                    </div>
+                    {/* <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-dashed border-blue-500/50 hover:border-solid font-mono"
+                        onClick={() => window.open(`https://twitter.com/${profileData.user.twitterProfile.twitter_username}`, '_blank')}
+                      >
+                        <ExternalLink className="w-4 h-4 mr-1" />
+                        View Profile
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="text-red-600 hover:text-red-700 border-dashed border-red-500/50 hover:border-solid font-mono"
+                        onClick={handleDisconnectTwitter}
+                      >
+                        <Link className="w-4 h-4 mr-1" />
+                        Disconnect
+                      </Button>
+                    </div> */}
+                  </div>
+                ) : (
+                  <div>
+                    <div className="flex gap-2">
+                      <Button
+                         variant="default"
+                         size="sm"
+                         className="bg-gray-400 hover:bg-gray-600 text-white border-dashed border-blue-600/50 hover:border-solid font-mono"
+                         onClick={handleConnectHedera}
+                         disabled={profileData?.user?.hederaProfile}
+                       >
+                         {/* logo hedera */}
+
+                          <img src="/icon.png" alt="Hedera Logo" className="w-4 h-4 mr-1" />
+                         {isConnectingTwitter ? 'CONNECTING...' : 'CONNECT_HEDERA'}
+                       </Button>
+                      <Button variant="outline" size="sm" className="border-dashed border-gray-500/50 font-mono" disabled>
+                        <ExternalLink className="w-4 h-4 mr-1" />
+                        View Profile
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2 font-mono">
+                      [INFO] Connecting your Twitter account allows you to participate in social media quests and earn additional rewards.
+                    </p>
+                  </div>
+                )}
+              </div>
 
               {/* Social Media Integration */}
               <div className="border-2 border-dashed border-blue-500/30 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 hover:border-solid transition-all duration-200 rounded-lg p-4">
