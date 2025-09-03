@@ -184,13 +184,18 @@ export default function ProfilePage() {
 
   const fetchUserStats = async () => {
     try {
-      const response = await fetch('/api/user/stats', {
+      const accessToken = localStorage.getItem('auth_token');
+    
+
+       const baseUrl = 'https://hedera-quests.com';
+      const response = await fetch(`${baseUrl}/user/stats`, {
         method: 'GET',
         headers: {
+          'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch user stats');
       }
