@@ -184,10 +184,16 @@ export default function ProfilePage() {
 
   const fetchUserStats = async () => {
     try {
+      const accessToken = localStorage.getItem("auth_token");
+      if (!accessToken) {
+        throw new Error("No access token found");
+      }
+
       const response = await fetch("/api/user/stats", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
@@ -887,7 +893,7 @@ export default function ProfilePage() {
                                 ).padStart(2, "0")})`
                               : Date.now() -
                                   new Date(
-                                    profileData?.user?.hederaMail.last_send
+                                    profileData?.user?.hederaMail?.last_send
                                   ).getTime() >
                                 20 * 60 * 1000
                               ? "RESET"
