@@ -10,9 +10,15 @@ export default function RewardsPage() {
   const { user } = useStore();
   
   // Points conversion rate should be configurable
-  const pointsBalance = user?.points || 0;
-  const conversionRate = 0; // Will be provided by API/config
-  const dollarBalance = (pointsBalance * conversionRate).toFixed(2);
+  const pointsBalance = user?.points || 25;
+  const conversionRate = 0.001; // Will be provided by API/config
+  const dollarBalance = (pointsBalance * conversionRate).toFixed(3);
+
+
+  //   // Enhanced balance calculations
+  // const pointsBalance = user?.points || 0;
+  // const dollarBalance = (pointsBalance * conversionRate).toFixed(3);
+  // const isPositiveBalance = pointsBalance > 0;
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8">
