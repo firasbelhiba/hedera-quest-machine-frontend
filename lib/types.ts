@@ -45,6 +45,7 @@ export interface Quest {
   requirements?: string[];
   submissionType?: SubmissionType;
   submissionInstructions?: string;
+  quest_type?: string;
   isActive?: boolean;
   status?: string;
   createdAt?: string;

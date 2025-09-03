@@ -302,7 +302,7 @@ const filteredQuests = quests.filter((quest) => {
                 value="available"
                 className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[inset_2px_2px_0px_0px_rgba(0,0,0,0.1)] transition-all duration-200"
               >
-                Available ({baseFilteredQuests.filter((q) => !isQuestCompleted(q) && !isQuestRejected(q) && !isExpired(q)).length})
+                Available ({baseFilteredQuests.filter((q) => !isQuestCompleted(q) && !isQuestRejected(q) && !isExpired(q) && !isQuestPending(q)).length})
               </TabsTrigger>
               <TabsTrigger 
                 value="completed"
@@ -402,7 +402,7 @@ const filteredQuests = quests.filter((quest) => {
                   : 'space-y-4'
               )}>
                 {baseFilteredQuests
-                 .filter((q) => !isQuestCompleted(q) && !isQuestRejected(q) && !isExpired(q))
+                 .filter((q) => !isQuestCompleted(q) && !isQuestRejected(q) && !isExpired(q) && !isQuestPending(q))
     .map((quest) => (
                     <QuestCard
                       key={quest.id}
