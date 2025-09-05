@@ -163,9 +163,9 @@ const useStore = create<AppState>((set, get) => ({
     set({ isLoading: true });
     try {
       const authResult = await AuthService.login({ email, password });
-      // AuthService.login already returns complete user data
-      set({ user: authResult.user, isAuthenticated: true, isLoading: false });
-      
+      // Fetch the latest user data to ensure points/balance are up to date
+      const user = await QuestService.getCurrentUser();
+      set({ user: user || authResult.user, isAuthenticated: true, isLoading: false });
       // Connect WebSocket after successful login
       const token = tokenStorage.getAccessToken();
       if (token) {
