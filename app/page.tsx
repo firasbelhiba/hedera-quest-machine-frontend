@@ -273,7 +273,7 @@ const activeQuests = enhancedQuests.filter(quest =>
             </div>
             <div className="text-right bg-gradient-to-br from-primary/5 to-cyan-500/5 p-4 rounded-lg border border-dashed border-primary/20">
               <div className="text-3xl font-bold font-mono bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
-                {user?.total_points?.toLocaleString() || 0}
+                {user?.points?.toLocaleString() || 0}
               </div>
               <div className="text-muted-foreground text-sm font-mono">TOTAL_POINTS</div>
             </div>

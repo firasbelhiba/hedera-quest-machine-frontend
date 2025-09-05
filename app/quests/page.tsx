@@ -275,7 +275,7 @@ const filteredQuests = quests.filter((quest) => {
         </div>
       </div>
 
-      <div className="flex gap-6">
+  <div className="flex flex-col md:flex-row gap-6">
         {/* Sidebar Filters */}
         {showFilters && (
           <div className="w-80 flex-shrink-0">
@@ -290,36 +290,38 @@ const filteredQuests = quests.filter((quest) => {
         {/* Quest Content */}
         <div className="flex-1">
           <Tabs defaultValue="all" className="space-y-6">
-            <TabsList className="bg-gradient-to-r from-background via-muted/50 to-background border-2 border-dashed border-muted p-1">
+            <TabsList
+              className="flex bg-gradient-to-r from-background via-muted/50 to-background border-2 border-dashed border-muted pl-0 pr-4 py-1 overflow-x-auto overflow-y-hidden flex-nowrap whitespace-nowrap max-w-full w-auto no-scrollbar"
+              aria-label="Quest Tabs"
+            >
              
-              <TabsTrigger 
+              <TabsTrigger
                 value="all"
-                className="font-mono data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=active]:shadow-[inset_2px_2px_0px_0px_rgba(0,0,0,0.1)] transition-all duration-200"
+                className="min-w-max font-mono data-[state=active]:bg-accent data-[state=active]:text-accent-foreground data-[state=active]:shadow-[inset_2px_2px_0px_0px_rgba(0,0,0,0.1)] transition-all duration-200"
               >
                 All Quests ({baseFilteredQuests.length})
               </TabsTrigger>
-              <TabsTrigger 
+              <TabsTrigger
                 value="available"
-                className="font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[inset_2px_2px_0px_0px_rgba(0,0,0,0.1)] transition-all duration-200"
+                className="min-w-max font-mono data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-[inset_2px_2px_0px_0px_rgba(0,0,0,0.1)] transition-all duration-200"
               >
                 Available ({baseFilteredQuests.filter((q) => !isQuestCompleted(q) && !isQuestRejected(q) && !isExpired(q) && !isQuestPending(q)).length})
               </TabsTrigger>
-              <TabsTrigger 
+              <TabsTrigger
                 value="completed"
-                className="font-mono data-[state=active]:bg-green-500 data-[state=active]:text-green-900 data-[state=active]:shadow-[inset_2px_2px_0px_0px_rgba(0,255,0,0.1)] transition-all duration-200"
+                className="min-w-max font-mono data-[state=active]:bg-green-500 data-[state=active]:text-green-900 data-[state=active]:shadow-[inset_2px_2px_0px_0px_rgba(0,255,0,0.1)] transition-all duration-200"
               >
                 Completed ({baseFilteredQuests.filter((q) => isQuestCompleted(q)).length})
               </TabsTrigger>
-               <TabsTrigger 
+              <TabsTrigger
                 value="pending"
-                className="font-mono data-[state=active]:bg-yellow-400 data-[state=active]:text-yellow-900 data-[state=active]:shadow-[inset_2px_2px_0px_0px_rgba(255,255,0,0.1)] transition-all duration-200"
+                className="min-w-max font-mono data-[state=active]:bg-yellow-400 data-[state=active]:text-yellow-900 data-[state=active]:shadow-[inset_2px_2px_0px_0px_rgba(255,255,0,0.1)] transition-all duration-200"
               >
                 Pending ({baseFilteredQuests.filter((q) => isQuestPending(q)).length})
               </TabsTrigger>
-         
-              <TabsTrigger 
+              <TabsTrigger
                 value="rejected"
-                className="font-mono data-[state=active]:bg-destructive data-[state=active]:text-destructive-foreground data-[state=active]:shadow-[inset_2px_2px_0px_0px_rgba(255,0,0,0.1)] transition-all duration-200"
+                className="min-w-max font-mono data-[state=active]:bg-destructive data-[state=active]:text-destructive-foreground data-[state=active]:shadow-[inset_2px_2px_0px_0px_rgba(255,0,0,0.1)] transition-all duration-200"
               >
                 Rejected ({baseFilteredQuests.filter((q) => isQuestRejected(q)).length})
               </TabsTrigger>
