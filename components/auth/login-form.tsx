@@ -15,6 +15,7 @@ import useStore from '@/lib/store';
 import { Eye, EyeOff, Mail, Lock, AlertCircle } from 'lucide-react';
 import { HydrationSafe } from '@/components/hydration-safe';
 import ErrorBoundary from '@/components/error-boundary';
+import { useToast } from '@/hooks/use-toast';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -38,6 +39,7 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
   });
 
   const { login } = useStore();
+  const { toast } = useToast(); // ✅ toast hook
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
@@ -45,13 +47,24 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
 
     try {
       await login(data.email, data.password);
-      // Get the user data from store after successful login
       const { user } = useStore.getState();
+
       if (user) {
+        toast({
+          title: "✅ Login successful",
+          description: `Welcome back, ${user.email}`,
+        });
         onSuccess(user, user.role === 'admin');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
+      const msg = err instanceof Error ? err.message : 'Invalid credentials. Please try again.';
+      setError(msg);
+
+      toast({
+        variant: "destructive",
+        title: "❌ Invalid credentials",
+        description: msg,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -74,73 +87,71 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
           </CardHeader>
           
           <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                className="pl-10"
-                {...register('email')}
-              />
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    className="pl-10"
+                    {...register('email')}
+                  />
+                </div>
+                {errors.email && (
+                  <p className="text-sm text-destructive">{errors.email.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Enter your password"
+                    className="pl-10 pr-10"
+                    {...register('password')}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="text-sm text-destructive">{errors.password.message}</p>
+                )}
+              </div>
+
+              {error && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              <Button type="submit" className="w-full" disabled={isLoading}>
+                {isLoading ? 'Signing in...' : 'Sign In'}
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <p className="text-sm text-muted-foreground">
+                Don't have an account?{' '}
+                <button
+                  onClick={onSwitchToRegister}
+                  className="text-primary hover:underline font-medium"
+                >
+                  Create one here
+                </button>
+              </p>
             </div>
-            {errors.email && (
-              <p className="text-sm text-destructive">{errors.email.message}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Enter your password"
-                className="pl-10 pr-10"
-                {...register('password')}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </button>
-            </div>
-            {errors.password && (
-              <p className="text-sm text-destructive">{errors.password.message}</p>
-            )}
-          </div>
-
-          {error && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? 'Signing in...' : 'Sign In'}
-          </Button>
-        </form>
-
-        <div className="mt-6 text-center">
-          <p className="text-sm text-muted-foreground">
-            Don't have an account?{' '}
-            <button
-              onClick={onSwitchToRegister}
-              className="text-primary hover:underline font-medium"
-            >
-              Create one here
-            </button>
-          </p>
-        </div>
-
-
           </CardContent>
         </Card>
       </HydrationSafe>

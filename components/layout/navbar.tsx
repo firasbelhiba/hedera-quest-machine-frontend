@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import useStore from '@/lib/store';
+import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -69,6 +70,7 @@ export function Navbar({ className }: NavbarProps) {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const { user, logout } = useStore();
+  const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -102,6 +104,11 @@ export function Navbar({ className }: NavbarProps) {
 
   const handleLogout = () => {
     logout();
+    toast({
+      title: 'Déconnexion réussie',
+      description: 'Vous avez été déconnecté avec succès.',
+      variant: 'default',
+    });
     router.push('/');
   };
 
