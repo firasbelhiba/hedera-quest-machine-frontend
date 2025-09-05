@@ -100,7 +100,9 @@ export function BalanceWidget({
   return (
     <div
       className={cn(
-        'fixed top-16 right-4 z-50 select-none group',
+        // Centered on mobile, right on md+
+        'fixed top-16 left-1/2 -translate-x-1/2 right-auto z-50 select-none group',
+        'md:left-auto md:right-4 md:translate-x-0',
         'transition-all duration-300 ease-out',
         enableAnimations && 'animate-in fade-in slide-in-from-top-4',
         className
