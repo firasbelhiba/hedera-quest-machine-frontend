@@ -54,6 +54,34 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
     setIsLoading(true);
     setError(null);
 
+    // Client-side validation feedback
+    if (!data.name || !data.email || !data.password || !data.confirmPassword) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    if (data.password !== data.confirmPassword) {
+      toast({
+        title: "Password Mismatch",
+        description: "Passwords do not match. Please check and try again.",
+        variant: "destructive"
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    // Show loading toast
+    const loadingToast = toast({
+      title: "Creating your account...",
+      description: "Please wait while we set up your account.",
+      variant: "default"
+    });
+
     try {
       await AuthService.register({
         name: data.name,
@@ -62,17 +90,48 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
         confirmPassword: data.confirmPassword
       });
       
+      // Dismiss loading toast
+      loadingToast.dismiss();
+      
       // Show success toast
       toast({
-        title: "Registration Successful!",
-        description: "Your account has been created successfully. Please log in to continue.",
+        title: "Account Created Successfully!",
+        description: "Welcome to Hedera Quest! Please sign in to continue your journey.",
         variant: "default"
       });
       
       // Registration successful - redirect to login
       onSwitchToLogin();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');
+      // Dismiss loading toast
+      loadingToast.dismiss();
+      
+      const errorMessage = err instanceof Error ? err.message : 'Registration failed. Please try again.';
+      setError(errorMessage);
+      
+      // Show appropriate error toast based on error type
+      let toastTitle = "Registration Failed";
+      let toastDescription = errorMessage;
+      
+      if (errorMessage.toLowerCase().includes('email') && errorMessage.toLowerCase().includes('already')) {
+        toastTitle = "Email Already Registered";
+        toastDescription = "An account with this email address already exists. Please try signing in instead.";
+      } else if (errorMessage.toLowerCase().includes('password')) {
+        toastTitle = "Password Requirements Not Met";
+        toastDescription = "Please ensure your password meets all requirements and try again.";
+      } else if (errorMessage.toLowerCase().includes('name')) {
+        toastTitle = "Invalid Name";
+        toastDescription = "Please enter a valid name and try again.";
+      } else if (errorMessage.toLowerCase().includes('network') || errorMessage.toLowerCase().includes('connection')) {
+        toastTitle = "Connection Error";
+        toastDescription = "Unable to connect to our servers. Please check your internet connection and try again.";
+      }
+      
+      toast({
+        title: toastTitle,
+        description: toastDescription,
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
@@ -95,7 +154,7 @@ export function RegisterForm({ onSwitchToLogin }: RegisterFormProps) {
           </CardHeader>
       
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
           <div className="space-y-2">
             <Label htmlFor="name">Full Name</Label>
             <div className="relative">

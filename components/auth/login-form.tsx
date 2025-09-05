@@ -33,17 +33,36 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const { toast } = useToast();
 
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema)
   });
 
   const { login } = useStore();
-  const { toast } = useToast(); // ✅ toast hook
+  // const { toast } = useToast(); // ✅ toast hook
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     setError(null);
+
+    // Client-side validation feedback
+    if (!data.email || !data.password) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    // Show loading toast
+    const loadingToast = toast({
+      title: "Signing you in...",
+      description: "Please wait while we verify your credentials.",
+      variant: "default"
+    });
 
     try {
       await login(data.email, data.password);
