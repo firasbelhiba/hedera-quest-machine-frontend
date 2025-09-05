@@ -105,8 +105,8 @@ export function Navbar({ className }: NavbarProps) {
   const handleLogout = () => {
     logout();
     toast({
-      title: 'Déconnexion réussie',
-      description: 'Vous avez été déconnecté avec succès.',
+      title: 'Logout successful',
+      description: 'You have been logged out successfully.',
       variant: 'default',
     });
     router.push('/');
